@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/data/models/category.dart';
 
-/// 2 tab CHI TIÊU / THU NHẬP, dùng trên nền xanh (header).
 class TypeTabs extends StatelessWidget {
   const TypeTabs({super.key, required this.type, required this.onChanged});
 

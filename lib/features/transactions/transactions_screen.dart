@@ -23,6 +23,22 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   Period _period = Period.week;
   DateTime _anchor = DateTime.now();
 
+  /// Xóa giao dịch, cho phép hoàn tác trong vài giây.
+  void _delete(Transaction t) {
+    _store.removeTransaction(t.id);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: const Text('Đã xóa giao dịch'),
+          action: SnackBarAction(
+            label: 'Hoàn tác',
+            onPressed: () => _store.addTransaction(t),
+          ),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -118,9 +134,20 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           ),
                         ),
                         for (final t in entry.value)
-                          _TransactionTile(
-                            transaction: t,
-                            category: _store.categoryById(t.categoryId),
+                          Dismissible(
+                            key: ValueKey(t.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: Colors.red.shade400,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(Icons.delete, color: Colors.white),
+                            ),
+                            onDismissed: (_) => _delete(t),
+                            child: _TransactionTile(
+                              transaction: t,
+                              category: _store.categoryById(t.categoryId),
+                            ),
                           ),
                       ],
                     ],

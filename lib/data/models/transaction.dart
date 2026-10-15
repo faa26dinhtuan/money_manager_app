@@ -1,6 +1,5 @@
 import 'package:money_manager_app/data/models/category.dart';
 
-/// Một giao dịch thu hoặc chi.
 class Transaction {
   const Transaction({
     required this.id,

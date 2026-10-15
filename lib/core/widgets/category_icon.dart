@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Icon tròn màu của danh mục.
 class CategoryIcon extends StatelessWidget {
   const CategoryIcon({
     super.key,

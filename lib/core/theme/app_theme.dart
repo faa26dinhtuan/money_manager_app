@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Màu, font, style chung (tông xanh lá + vàng giống app mẫu).
 class AppTheme {
   AppTheme._();
 

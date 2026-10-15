@@ -8,7 +8,6 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
-/// Màn hình thêm giao dịch mới.
 class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key, this.initialType = TxType.expense});
 
@@ -88,7 +87,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               type: _type,
               onChanged: (t) => setState(() {
                 _type = t;
-                _categoryId = null; // danh mục khác nhau giữa thu/chi
+                _categoryId = null;
               }),
             ),
           ),
@@ -105,7 +104,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   controller: _amountCtrl,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
                   decoration: const InputDecoration(hintText: '0'),
                 ),
               ),
@@ -138,7 +140,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       children: [
                         CategoryIcon(
                           icon: c.icon,
-                          color: _categoryId == c.id ? c.color : Colors.blueGrey.shade200,
+                          color: _categoryId == c.id
+                              ? c.color
+                              : Colors.blueGrey.shade200,
                           size: 52,
                           selected: _categoryId == c.id,
                         ),
@@ -149,7 +153,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _categoryId == c.id ? c.color : Colors.black54,
+                            color: _categoryId == c.id
+                                ? c.color
+                                : Colors.black54,
                           ),
                         ),
                       ],

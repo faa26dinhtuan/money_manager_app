@@ -46,6 +46,11 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeTransaction(String id) {
+    _transactions.removeWhere((t) => t.id == id);
+    notifyListeners();
+  }
+
   void addCategory(Category c) {
     _categories.add(c);
     notifyListeners();

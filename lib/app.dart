@@ -7,7 +7,6 @@ import 'package:money_manager_app/features/overview/overview_screen.dart';
 import 'package:money_manager_app/features/settings/settings_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
 
-/// MaterialApp gốc của ứng dụng.
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -22,7 +21,6 @@ class App extends StatelessWidget {
   }
 }
 
-/// Khung chính: nội dung + thanh điều hướng dưới.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -33,7 +31,6 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  // Thứ tự phải khớp với thứ tự tab trong CustomBottomNav.
   static const List<Widget> _screens = [
     OverviewScreen(),
     TransactionsScreen(),
@@ -44,7 +41,6 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // IndexedStack giữ nguyên trạng thái từng tab khi chuyển qua lại.
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,

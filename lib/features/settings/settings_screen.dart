@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 
-/// Màn hình Cài đặt (giao diện mẫu, chức năng sẽ làm ở các bước sau).
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   void _soon(BuildContext context) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Tính năng sẽ có ở bước sau')));
+      ..showSnackBar(
+        const SnackBar(content: Text('Tính năng sẽ có ở bước sau')),
+      );
   }
 
   @override
@@ -29,7 +30,9 @@ class SettingsScreen extends StatelessWidget {
           Card(
             color: Colors.white,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Column(
               children: [
                 for (var i = 0; i < items.length; i++) ...[
@@ -40,7 +43,8 @@ class SettingsScreen extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _soon(context),
                   ),
-                  if (i < items.length - 1) const Divider(height: 1, indent: 56),
+                  if (i < items.length - 1)
+                    const Divider(height: 1, indent: 56),
                 ],
               ],
             ),

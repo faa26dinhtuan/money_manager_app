@@ -10,7 +10,6 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 
-/// Màn hình Tổng quan: số dư, biểu đồ tròn theo danh mục, danh sách top danh mục.
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
 
@@ -88,8 +87,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    _type == TxType.expense ? 'Đã chi' : 'Đã thu',
-                                    style: const TextStyle(color: Colors.black45),
+                                    _type == TxType.expense
+                                        ? 'Đã chi'
+                                        : 'Đã thu',
+                                    style: const TextStyle(
+                                      color: Colors.black45,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(

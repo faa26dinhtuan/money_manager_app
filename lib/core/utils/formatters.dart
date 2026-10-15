@@ -1,4 +1,3 @@
-/// Định dạng số tiền kiểu Việt Nam: 1.234.567 ₫
 String formatMoney(double value) {
   final negative = value < 0;
   final digits = value.abs().round().toString();
@@ -12,10 +11,8 @@ String formatMoney(double value) {
 
 String _two(int n) => n.toString().padLeft(2, '0');
 
-/// dd/MM/yyyy
 String formatDate(DateTime d) => '${_two(d.day)}/${_two(d.month)}/${d.year}';
 
-/// dd/MM
 String formatDayMonth(DateTime d) => '${_two(d.day)}/${_two(d.month)}';
 
 bool isSameDay(DateTime a, DateTime b) =>

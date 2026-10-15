@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class DonutSlice {
@@ -7,7 +8,6 @@ class DonutSlice {
   final Color color;
 }
 
-/// Biểu đồ tròn (donut) tự vẽ, không cần thư viện ngoài.
 class DonutChart extends StatelessWidget {
   const DonutChart({
     super.key,

@@ -5,7 +5,6 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/categories/create_category_screen.dart';
 
-/// Màn hình Danh mục: xem và thêm danh mục thu/chi.
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 
-/// Thanh điều hướng dưới (4 tab).
 class CustomBottomNav extends StatelessWidget {
   const CustomBottomNav({
     super.key,
