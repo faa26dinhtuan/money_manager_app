@@ -1,0 +1,201 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/type_tabs.dart';
+import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/transaction.dart';
+import 'package:money_manager_app/data/services/app_store.dart';
+
+/// Màn hình thêm giao dịch mới.
+class AddTransactionScreen extends StatefulWidget {
+  const AddTransactionScreen({super.key, this.initialType = TxType.expense});
+
+  final TxType initialType;
+
+  @override
+  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+}
+
+class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  final _store = AppStore.instance;
+  final _amountCtrl = TextEditingController();
+  final _noteCtrl = TextEditingController();
+
+  late TxType _type = widget.initialType;
+  String? _categoryId;
+  DateTime _date = DateTime.now();
+
+  @override
+  void dispose() {
+    _amountCtrl.dispose();
+    _noteCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) setState(() => _date = picked);
+  }
+
+  void _submit() {
+    final amount = double.tryParse(_amountCtrl.text) ?? 0;
+    if (amount <= 0) {
+      _toast('Vui lòng nhập số tiền');
+      return;
+    }
+    if (_categoryId == null) {
+      _toast('Vui lòng chọn danh mục');
+      return;
+    }
+    _store.addTransaction(
+      Transaction(
+        id: _store.newId(),
+        type: _type,
+        categoryId: _categoryId!,
+        amount: amount,
+        date: _date,
+        note: _noteCtrl.text.trim(),
+      ),
+    );
+    Navigator.of(context).pop();
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = _store.categoriesOf(_type);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Thêm giao dịch'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TypeTabs(
+              type: _type,
+              onChanged: (t) => setState(() {
+                _type = t;
+                _categoryId = null; // danh mục khác nhau giữa thu/chi
+              }),
+            ),
+          ),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _amountCtrl,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  decoration: const InputDecoration(hintText: '0'),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 8, bottom: 12),
+                child: Text(
+                  'VND',
+                  style: TextStyle(
+                    color: AppTheme.primary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Text('Danh mục', style: TextStyle(color: Colors.black54)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 14,
+            runSpacing: 14,
+            children: [
+              for (final c in categories)
+                GestureDetector(
+                  onTap: () => setState(() => _categoryId = c.id),
+                  child: SizedBox(
+                    width: 72,
+                    child: Column(
+                      children: [
+                        CategoryIcon(
+                          icon: c.icon,
+                          color: _categoryId == c.id ? c.color : Colors.blueGrey.shade200,
+                          size: 52,
+                          selected: _categoryId == c.id,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          c.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _categoryId == c.id ? c.color : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const Text('Ngày', style: TextStyle(color: Colors.black54)),
+          InkWell(
+            onTap: _pickDate,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                formatDate(_date),
+                style: const TextStyle(
+                  color: AppTheme.primary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _noteCtrl,
+            decoration: const InputDecoration(labelText: 'Ghi chú'),
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            height: 52,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.accent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(26),
+                ),
+              ),
+              onPressed: _submit,
+              child: const Text('Thêm', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
