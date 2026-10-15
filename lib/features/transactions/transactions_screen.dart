@@ -8,6 +8,7 @@ import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 
 /// Màn hình Giao dịch: danh sách thu/chi nhóm theo ngày.
 class TransactionsScreen extends StatefulWidget {
@@ -152,9 +153,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               child: const Icon(Icons.delete, color: Colors.white),
                             ),
                             onDismissed: (_) => _delete(t),
-                            child: _TransactionTile(
-                              transaction: t,
-                              category: _store.categoryById(t.categoryId),
+                            child: InkWell(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => AddTransactionScreen(transaction: t),
+                                ),
+                              ),
+                              child: _TransactionTile(
+                                transaction: t,
+                                category: _store.categoryById(t.categoryId),
+                              ),
                             ),
                           ),
                       ],

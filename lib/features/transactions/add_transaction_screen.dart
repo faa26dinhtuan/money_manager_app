@@ -8,10 +8,16 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
+/// Màn hình thêm giao dịch mới.
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key, this.initialType = TxType.expense});
+  const AddTransactionScreen({
+    super.key,
+    this.initialType = TxType.expense,
+    this.transaction,
+  });
 
   final TxType initialType;
+  final Transaction? transaction;
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -22,9 +28,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _amountCtrl = TextEditingController();
   final _noteCtrl = TextEditingController();
 
-  late TxType _type = widget.initialType;
+  late TxType _type = widget.transaction?.type ?? widget.initialType;
   String? _categoryId;
   DateTime _date = DateTime.now();
+
+  bool get _isEditing => widget.transaction != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final t = widget.transaction;
+    if (t != null) {
+      _amountCtrl.text = t.amount.round().toString();
+      _noteCtrl.text = t.note;
+      _categoryId = t.categoryId;
+      _date = t.date;
+    }
+  }
 
   @override
   void dispose() {
@@ -53,16 +73,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       _toast('Vui lòng chọn danh mục');
       return;
     }
-    _store.addTransaction(
-      Transaction(
-        id: _store.newId(),
-        type: _type,
-        categoryId: _categoryId!,
-        amount: amount,
-        date: _date,
-        note: _noteCtrl.text.trim(),
-      ),
+    final transaction = Transaction(
+      id: widget.transaction?.id ?? _store.newId(),
+      type: _type,
+      categoryId: _categoryId!,
+      amount: amount,
+      date: _date,
+      note: _noteCtrl.text.trim(),
     );
+    if (_isEditing) {
+      _store.updateTransaction(transaction);
+    } else {
+      _store.addTransaction(transaction);
+    }
     Navigator.of(context).pop();
   }
 
@@ -78,7 +101,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thêm giao dịch'),
+        title: Text(_isEditing ? 'Sửa giao dịch' : 'Thêm giao dịch'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Padding(
@@ -87,7 +110,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               type: _type,
               onChanged: (t) => setState(() {
                 _type = t;
-                _categoryId = null;
+                _categoryId = null; // danh mục khác nhau giữa thu/chi
               }),
             ),
           ),
@@ -104,10 +127,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   controller: _amountCtrl,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
                 ),
               ),
@@ -140,9 +160,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       children: [
                         CategoryIcon(
                           icon: c.icon,
-                          color: _categoryId == c.id
-                              ? c.color
-                              : Colors.blueGrey.shade200,
+                          color: _categoryId == c.id ? c.color : Colors.blueGrey.shade200,
                           size: 52,
                           selected: _categoryId == c.id,
                         ),
@@ -153,9 +171,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _categoryId == c.id
-                                ? c.color
-                                : Colors.black54,
+                            color: _categoryId == c.id ? c.color : Colors.black54,
                           ),
                         ),
                       ],
@@ -197,7 +213,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               onPressed: _submit,
-              child: const Text('Thêm', style: TextStyle(fontSize: 16)),
+              child: Text(_isEditing ? 'Lưu' : 'Thêm', style: const TextStyle(fontSize: 16)),
             ),
           ),
         ],

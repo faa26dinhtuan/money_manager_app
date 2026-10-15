@@ -46,6 +46,13 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateTransaction(Transaction updated) {
+    final index = _transactions.indexWhere((t) => t.id == updated.id);
+    if (index == -1) return;
+    _transactions[index] = updated;
+    notifyListeners();
+  }
+
   void removeTransaction(String id) {
     _transactions.removeWhere((t) => t.id == id);
     notifyListeners();
