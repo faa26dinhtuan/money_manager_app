@@ -23,7 +23,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   Period _period = Period.week;
   DateTime _anchor = DateTime.now();
 
-  /// Xóa giao dịch, cho phép hoàn tác trong vài giây.
   void _delete(Transaction t) {
     _store.removeTransaction(t.id);
     ScaffoldMessenger.of(context)
@@ -31,6 +30,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ..showSnackBar(
         SnackBar(
           content: const Text('Đã xóa giao dịch'),
+          duration: const Duration(seconds: 3),
+          persist: false,
+          dismissDirection: DismissDirection.horizontal,
           action: SnackBarAction(
             label: 'Hoàn tác',
             onPressed: () => _store.addTransaction(t),
@@ -136,8 +138,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         for (final t in entry.value)
                           Dismissible(
                             key: ValueKey(t.id),
-                            direction: DismissDirection.endToStart,
+                            direction: DismissDirection.horizontal,
                             background: Container(
+                              color: Colors.red.shade400,
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.only(left: 20),
+                              child: const Icon(Icons.delete, color: Colors.white),
+                            ),
+                            secondaryBackground: Container(
                               color: Colors.red.shade400,
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
