@@ -61,22 +61,6 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  int transactionCountOf(String categoryId) =>
-      _transactions.where((t) => t.categoryId == categoryId).length;
-
-  void updateCategory(Category updated) {
-    final index = _categories.indexWhere((c) => c.id == updated.id);
-    if (index == -1) return;
-    _categories[index] = updated;
-    notifyListeners();
-  }
-
-  void removeCategory(String id) {
-    _categories.removeWhere((c) => c.id == id);
-    _transactions.removeWhere((t) => t.categoryId == id);
-    notifyListeners();
-  }
-
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
   void _seed() {

@@ -24,31 +24,38 @@ class PeriodBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             for (final p in Period.values)
-              GestureDetector(
-                onTap: () => onPeriodChanged(p),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: p == period
-                            ? AppTheme.primary
-                            : Colors.transparent,
-                        width: 2,
+              Flexible(
+                child: GestureDetector(
+                  onTap: () => onPeriodChanged(p),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: p == period
+                              ? AppTheme.primary
+                              : Colors.transparent,
+                          width: 2,
+                        ),
                       ),
                     ),
-                  ),
-                  child: Text(
-                    p.label,
-                    style: TextStyle(
-                      color: p == period ? AppTheme.primary : Colors.black54,
-                      fontWeight: p == period
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        p.label,
+                        style: TextStyle(
+                          color: p == period
+                              ? AppTheme.primary
+                              : Colors.black54,
+                          fontWeight: p == period
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
                     ),
                   ),
                 ),

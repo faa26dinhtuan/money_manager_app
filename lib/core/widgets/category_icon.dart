@@ -5,7 +5,7 @@ class CategoryIcon extends StatelessWidget {
     super.key,
     required this.icon,
     required this.color,
-    this.size = 120,
+    this.size = 40,
     this.selected = false,
   });
 

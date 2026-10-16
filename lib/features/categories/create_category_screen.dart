@@ -5,14 +5,9 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class CreateCategoryScreen extends StatefulWidget {
-  const CreateCategoryScreen({
-    super.key,
-    this.initialType = TxType.expense,
-    this.category,
-  });
+  const CreateCategoryScreen({super.key, this.initialType = TxType.expense});
 
   final TxType initialType;
-  final Category? category;
 
   @override
   State<CreateCategoryScreen> createState() => _CreateCategoryScreenState();
@@ -20,70 +15,44 @@ class CreateCategoryScreen extends StatefulWidget {
 
 class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   static const _icons = <IconData>[
-    Icons.shopping_basket, Icons.shopping_cart, Icons.restaurant, Icons.home,
-    Icons.account_balance, Icons.favorite, Icons.help_outline, Icons.directions_bus,
-    Icons.family_restroom, Icons.card_giftcard, Icons.flight, Icons.pets,
-    Icons.bolt, Icons.directions_car, Icons.brush, Icons.fitness_center,
-    Icons.school, Icons.movie, Icons.coffee, Icons.phone_android,
+    Icons.shopping_basket,
+    Icons.shopping_cart,
+    Icons.restaurant,
+    Icons.home,
+    Icons.account_balance,
+    Icons.favorite,
+    Icons.help_outline,
+    Icons.directions_bus,
+    Icons.family_restroom,
+    Icons.card_giftcard,
+    Icons.flight,
+    Icons.pets,
+    Icons.bolt,
+    Icons.directions_car,
+    Icons.brush,
+    Icons.fitness_center,
+    Icons.school,
+    Icons.movie,
+    Icons.coffee,
+    Icons.phone_android,
   ];
 
   static const _colors = <Color>[
-    Color(0xFFE53935), Color(0xFF6BB94A), Color(0xFF4C9BE8), Color(0xFFF5B82E),
-    Color(0xFFE8506E), Color(0xFF8E9A93), Color(0xFF3CC6B0), Color(0xFF9B5DE5),
+    Color(0xFFE53935),
+    Color(0xFF6BB94A),
+    Color(0xFF4C9BE8),
+    Color(0xFFF5B82E),
+    Color(0xFFE8506E),
+    Color(0xFF8E9A93),
+    Color(0xFF3CC6B0),
+    Color(0xFF9B5DE5),
   ];
 
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
-  late TxType _type = widget.category?.type ?? widget.initialType;
-  late IconData _icon = widget.category?.icon ?? _icons.first;
-  late Color _color = widget.category?.color ?? _colors[1];
-
-  late final List<IconData> _iconChoices = [
-    if (!_icons.contains(_icon)) _icon,
-    ..._icons,
-  ];
-  late final List<Color> _colorChoices = [
-    if (!_colors.contains(_color)) _color,
-    ..._colors,
-  ];
-
-  bool get _isEditing => widget.category != null;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameCtrl.text = widget.category?.name ?? '';
-  }
-
-  Future<void> _confirmDelete() async {
-    final category = widget.category!;
-    final count = _store.transactionCountOf(category.id);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Xóa danh mục?'),
-        content: Text(
-          count == 0
-              ? 'Danh mục "${category.name}" sẽ bị xóa.'
-              : 'Danh mục "${category.name}" và $count giao dịch thuộc danh mục này sẽ bị xóa.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true && mounted) {
-      _store.removeCategory(category.id);
-      Navigator.of(context).pop();
-    }
-  }
+  late TxType _type = widget.initialType;
+  IconData _icon = _icons.first;
+  Color _color = _colors[1];
 
   @override
   void dispose() {
@@ -96,37 +65,27 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
     if (name.isEmpty) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Vui lòng nhập tên danh mục')));
+        ..showSnackBar(
+          const SnackBar(content: Text('Vui lòng nhập tên danh mục')),
+        );
       return;
     }
-    final category = Category(
-      id: widget.category?.id ?? _store.newId(),
-      name: name,
-      icon: _icon,
-      color: _color,
-      type: _type,
+    _store.addCategory(
+      Category(
+        id: _store.newId(),
+        name: name,
+        icon: _icon,
+        color: _color,
+        type: _type,
+      ),
     );
-    if (_isEditing) {
-      _store.updateCategory(category);
-    } else {
-      _store.addCategory(category);
-    }
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Sửa danh mục' : 'Tạo danh mục mới'),
-        actions: [
-          if (_isEditing)
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: _confirmDelete,
-            ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Tạo danh mục mới')),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -149,8 +108,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
               ButtonSegment(value: TxType.income, label: Text('Thu nhập')),
             ],
             selected: {_type},
-            onSelectionChanged:
-                _isEditing ? null : (s) => setState(() => _type = s.first),
+            onSelectionChanged: (s) => setState(() => _type = s.first),
           ),
           const SizedBox(height: 24),
           const Text('Biểu tượng', style: TextStyle(color: Colors.black54)),
@@ -159,7 +117,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
             spacing: 14,
             runSpacing: 14,
             children: [
-              for (final ic in _iconChoices)
+              for (final ic in _icons)
                 GestureDetector(
                   onTap: () => setState(() => _icon = ic),
                   child: CategoryIcon(
@@ -177,7 +135,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
           Wrap(
             spacing: 14,
             children: [
-              for (final c in _colorChoices)
+              for (final c in _colors)
                 GestureDetector(
                   onTap: () => setState(() => _color = c),
                   child: Container(
@@ -198,10 +156,12 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.accent,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(26),
+                ),
               ),
               onPressed: _submit,
-              child: Text(_isEditing ? 'Lưu' : 'Thêm', style: const TextStyle(fontSize: 16)),
+              child: const Text('Thêm', style: TextStyle(fontSize: 16)),
             ),
           ),
         ],
