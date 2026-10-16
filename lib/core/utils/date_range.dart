@@ -4,7 +4,8 @@ enum Period {
   day('Ngày'),
   week('Tuần'),
   month('Tháng'),
-  year('Năm');
+  year('Năm'),
+  custom('Kỳ');
 
   const Period(this.label);
   final String label;
@@ -17,7 +18,7 @@ class DateRange {
 
   bool contains(DateTime d) => !d.isBefore(start) && d.isBefore(end);
 
-  static DateRange of(Period p, DateTime a) {
+  static DateRange of(Period p, DateTime a, [DateRange? custom]) {
     switch (p) {
       case Period.day:
         return DateRange(
@@ -37,6 +38,8 @@ class DateRange {
         );
       case Period.year:
         return DateRange(DateTime(a.year), DateTime(a.year + 1));
+      case Period.custom:
+        return custom ?? of(Period.day, a);
     }
   }
 
@@ -50,10 +53,12 @@ class DateRange {
         return DateTime(a.year, a.month + delta);
       case Period.year:
         return DateTime(a.year + delta);
+      case Period.custom:
+        return a;
     }
   }
 
-  static String label(Period p, DateTime a) {
+  static String label(Period p, DateTime a, [DateRange? custom]) {
     switch (p) {
       case Period.day:
         return isSameDay(a, DateTime.now())
@@ -67,6 +72,10 @@ class DateRange {
         return 'Tháng ${a.month}, ${a.year}';
       case Period.year:
         return 'Năm ${a.year}';
+      case Period.custom:
+        if (custom == null) return 'Chọn khoảng thời gian';
+        final customLast = custom.end.subtract(const Duration(days: 1));
+        return '${formatDate(custom.start)} – ${formatDate(customLast)}';
     }
   }
 }

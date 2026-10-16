@@ -9,12 +9,25 @@ class PeriodBar extends StatelessWidget {
     required this.anchor,
     required this.onPeriodChanged,
     required this.onShift,
+    this.periods = _defaultPeriods,
+    this.customRange,
+    this.onLabelTap,
   });
+
+  static const _defaultPeriods = [
+    Period.day,
+    Period.week,
+    Period.month,
+    Period.year,
+  ];
 
   final Period period;
   final DateTime anchor;
   final ValueChanged<Period> onPeriodChanged;
   final ValueChanged<int> onShift;
+  final List<Period> periods;
+  final DateRange? customRange;
+  final VoidCallback? onLabelTap;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +36,7 @@ class PeriodBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            for (final p in Period.values)
+            for (final p in periods)
               Flexible(
                 child: GestureDetector(
                   onTap: () => onPeriodChanged(p),
@@ -65,22 +78,32 @@ class PeriodBar extends StatelessWidget {
         const SizedBox(height: 4),
         Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () => onShift(-1),
-            ),
+            if (period == Period.custom)
+              const SizedBox(width: 48)
+            else
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: () => onShift(-1),
+              ),
             Expanded(
-              child: Center(
-                child: Text(
-                  DateRange.label(period, anchor),
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+              child: GestureDetector(
+                onTap: period == Period.custom ? onLabelTap : null,
+                behavior: HitTestBehavior.opaque,
+                child: Center(
+                  child: Text(
+                    DateRange.label(period, anchor, customRange),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right),
-              onPressed: () => onShift(1),
-            ),
+            if (period == Period.custom)
+              const SizedBox(width: 48)
+            else
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () => onShift(1),
+              ),
           ],
         ),
       ],

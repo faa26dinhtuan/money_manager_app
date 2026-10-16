@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/utils/text_utils.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
@@ -22,6 +23,48 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   TxType _type = TxType.expense;
   Period _period = Period.week;
   DateTime _anchor = DateTime.now();
+  DateRange? _customRange;
+  final _searchCtrl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickRange() async {
+    final current = _customRange;
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      initialDateRange: current == null
+          ? null
+          : DateTimeRange(
+              start: current.start,
+              end: current.end.subtract(const Duration(days: 1)),
+            ),
+    );
+    if (picked == null) return;
+    setState(() {
+      _customRange = DateRange(
+        DateTime(picked.start.year, picked.start.month, picked.start.day),
+        DateTime(picked.end.year, picked.end.month, picked.end.day + 1),
+      );
+      _period = Period.custom;
+    });
+  }
+
+  List<Transaction> _filter(List<Transaction> list) {
+    final query = normalizeText(_query.trim());
+    if (query.isEmpty) return list;
+    return list.where((t) {
+      final name = _store.categoryById(t.categoryId)?.name ?? '';
+      return normalizeText(t.note).contains(query) ||
+          normalizeText(name).contains(query);
+    }).toList();
+  }
 
   void _delete(Transaction t) {
     _store.removeTransaction(t.id);
@@ -49,10 +92,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
-        final range = DateRange.of(_period, _anchor);
-        final items = _store.query(_type, range);
-        final income = _sum(_store.query(TxType.income, range));
-        final expense = _sum(_store.query(TxType.expense, range));
+        final range = DateRange.of(_period, _anchor, _customRange);
+        final incomeItems = _filter(_store.query(TxType.income, range));
+        final expenseItems = _filter(_store.query(TxType.expense, range));
+        final items = _type == TxType.income ? incomeItems : expenseItems;
+        final income = _sum(incomeItems);
+        final expense = _sum(expenseItems);
 
         final groups = <DateTime, List<Transaction>>{};
         for (final t in items) {
@@ -77,6 +122,31 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              TextField(
+                controller: _searchCtrl,
+                onChanged: (value) => setState(() => _query = value),
+                decoration: InputDecoration(
+                  hintText: 'Tìm theo danh mục hoặc ghi chú',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _query.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setState(() => _query = '');
+                          },
+                        ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               Card(
                 color: Colors.white,
                 elevation: 0,
@@ -90,10 +160,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       PeriodBar(
                         period: _period,
                         anchor: _anchor,
-                        onPeriodChanged: (p) => setState(() {
-                          _period = p;
-                          _anchor = DateTime.now();
-                        }),
+                        periods: Period.values,
+                        customRange: _customRange,
+                        onLabelTap: _pickRange,
+                        onPeriodChanged: (p) {
+                          if (p == Period.custom) {
+                            _pickRange();
+                            return;
+                          }
+                          setState(() {
+                            _period = p;
+                            _anchor = DateTime.now();
+                          });
+                        },
                         onShift: (d) => setState(() {
                           _anchor = DateRange.shift(_period, _anchor, d);
                         }),
@@ -101,11 +180,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       const Divider(),
                       _SummaryRow(income: income, expense: expense),
                       if (groups.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 32),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32),
                           child: Text(
-                            'Chưa có giao dịch',
-                            style: TextStyle(color: Colors.black54),
+                            _query.trim().isEmpty
+                                ? 'Chưa có giao dịch'
+                                : 'Không tìm thấy giao dịch',
+                            style: const TextStyle(color: Colors.black54),
                           ),
                         ),
                       for (final entry in groups.entries) ...[
