@@ -43,7 +43,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             crossAxisSpacing: 8,
             childAspectRatio: 0.85,
             children: [
-              for (final c in categories) _CategoryTile(category: c),
+              for (final c in categories)
+                _CategoryTile(
+                  category: c,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CreateCategoryScreen(category: c),
+                    ),
+                  ),
+                ),
               _AddTile(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -60,22 +68,27 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 }
 
 class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({required this.category});
+  const _CategoryTile({required this.category, required this.onTap});
   final Category category;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CategoryIcon(icon: category.icon, color: category.color, size: 56),
-        const SizedBox(height: 6),
-        Text(
-          category.name,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 12),
-        ),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          CategoryIcon(icon: category.icon, color: category.color, size: 56),
+          const SizedBox(height: 6),
+          Text(
+            category.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -30,7 +30,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
       builder: (context, _) {
         final items = _store.query(_type, DateRange.of(_period, _anchor));
 
-        // Gộp tổng tiền theo danh mục.
         final totals = <String, double>{};
         for (final t in items) {
           totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;

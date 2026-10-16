@@ -10,7 +10,6 @@ import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 
-/// Màn hình Giao dịch: danh sách thu/chi nhóm theo ngày.
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
 
@@ -50,7 +49,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         final items = _store.query(_type, DateRange.of(_period, _anchor));
         final total = items.fold<double>(0, (s, t) => s + t.amount);
 
-        // Nhóm theo ngày (items đã sắp xếp mới → cũ).
         final groups = <DateTime, List<Transaction>>{};
         for (final t in items) {
           final key = DateTime(t.date.year, t.date.month, t.date.day);

@@ -8,7 +8,6 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
-/// Màn hình thêm giao dịch mới.
 class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({
     super.key,
@@ -110,7 +109,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               type: _type,
               onChanged: (t) => setState(() {
                 _type = t;
-                _categoryId = null; // danh mục khác nhau giữa thu/chi
+                _categoryId = null;
               }),
             ),
           ),
