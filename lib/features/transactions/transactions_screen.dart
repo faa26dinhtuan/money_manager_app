@@ -41,13 +41,18 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       );
   }
 
+  double _sum(List<Transaction> list) =>
+      list.fold<double>(0, (sum, t) => sum + t.amount);
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
-        final items = _store.query(_type, DateRange.of(_period, _anchor));
-        final total = items.fold<double>(0, (s, t) => s + t.amount);
+        final range = DateRange.of(_period, _anchor);
+        final items = _store.query(_type, range);
+        final income = _sum(_store.query(TxType.income, range));
+        final expense = _sum(_store.query(TxType.expense, range));
 
         final groups = <DateTime, List<Transaction>>{};
         for (final t in items) {
@@ -94,25 +99,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         }),
                       ),
                       const Divider(),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Tổng cộng',
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                            Text(
-                              formatMoney(total),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _SummaryRow(income: income, expense: expense),
                       if (groups.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 32),
@@ -144,26 +131,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               color: Colors.red.shade400,
                               alignment: Alignment.centerLeft,
                               padding: const EdgeInsets.only(left: 20),
-                              child: const Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
+                              child: const Icon(Icons.delete, color: Colors.white),
                             ),
                             secondaryBackground: Container(
                               color: Colors.red.shade400,
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
-                              child: const Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
+                              child: const Icon(Icons.delete, color: Colors.white),
                             ),
                             onDismissed: (_) => _delete(t),
                             child: InkWell(
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      AddTransactionScreen(transaction: t),
+                                  builder: (_) => AddTransactionScreen(transaction: t),
                                 ),
                               ),
                               child: _TransactionTile(
@@ -222,6 +202,70 @@ class _TransactionTile extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: isIncome ? AppTheme.primary : Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  const _SummaryRow({required this.income, required this.expense});
+
+  final double income;
+  final double expense;
+
+  @override
+  Widget build(BuildContext context) {
+    final balance = income - expense;
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: Row(
+        children: [
+          _SummaryItem(label: 'Thu', value: income, color: AppTheme.primary),
+          _SummaryItem(
+            label: 'Chi',
+            value: expense,
+            color: Colors.red.shade400,
+          ),
+          _SummaryItem(
+            label: 'Chênh lệch',
+            value: balance,
+            color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryItem extends StatelessWidget {
+  const _SummaryItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final double value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Colors.black54, fontSize: 12),
+          ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              formatMoney(value),
+              style: TextStyle(fontWeight: FontWeight.bold, color: color),
             ),
           ),
         ],
