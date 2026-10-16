@@ -29,6 +29,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   late TxType _type = widget.transaction?.type ?? widget.initialType;
   String? _categoryId;
+  String? _walletId;
   DateTime _date = DateTime.now();
 
   bool get _isEditing => widget.transaction != null;
@@ -37,6 +38,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void initState() {
     super.initState();
     final t = widget.transaction;
+    _walletId = t?.walletId ?? _store.wallets.first.id;
     if (t != null) {
       _amountCtrl.text = t.amount.round().toString();
       _noteCtrl.text = t.note;
@@ -76,6 +78,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       id: widget.transaction?.id ?? _store.newId(),
       type: _type,
       categoryId: _categoryId!,
+      walletId: _walletId!,
       amount: amount,
       date: _date,
       note: _noteCtrl.text.trim(),
@@ -166,6 +169,31 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text('Ví', style: TextStyle(color: Colors.black54)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final w in _store.wallets)
+                ChoiceChip(
+                  avatar: Icon(
+                    w.icon,
+                    size: 18,
+                    color: _walletId == w.id ? Colors.white : w.color,
+                  ),
+                  label: Text(w.name),
+                  selected: _walletId == w.id,
+                  selectedColor: w.color,
+                  showCheckmark: false,
+                  labelStyle: TextStyle(
+                    color: _walletId == w.id ? Colors.white : Colors.black87,
+                  ),
+                  onSelected: (_) => setState(() => _walletId = w.id),
+                ),
             ],
           ),
           const SizedBox(height: 20),

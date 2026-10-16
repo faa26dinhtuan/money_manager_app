@@ -23,6 +23,10 @@ const Map<String, IconData> categoryIcons = {
   'movie': Icons.movie,
   'coffee': Icons.coffee,
   'phone_android': Icons.phone_android,
+  'credit_card': Icons.credit_card,
+  'savings': Icons.savings,
+  'payments': Icons.payments,
+  'attach_money': Icons.attach_money,
 };
 
 String iconToKey(IconData icon) {

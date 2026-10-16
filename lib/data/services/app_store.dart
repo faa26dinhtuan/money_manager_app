@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
+import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStore extends ChangeNotifier {
@@ -12,16 +13,26 @@ class AppStore extends ChangeNotifier {
 
   static const _categoriesKey = 'categories';
   static const _transactionsKey = 'transactions';
+  static const _walletsKey = 'wallets';
+
+  static const _cashWallet = Wallet(
+    id: 'cash',
+    name: 'Tiền mặt',
+    icon: Icons.payments,
+    color: Color(0xFF2A8C66),
+  );
 
   late final SharedPreferences _prefs;
 
   final List<Category> _categories = [];
   final List<Transaction> _transactions = [];
+  final List<Wallet> _wallets = [];
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
     final rawCategories = _prefs.getString(_categoriesKey);
     final rawTransactions = _prefs.getString(_transactionsKey);
+    final rawWallets = _prefs.getString(_walletsKey);
     if (rawCategories != null && rawTransactions != null) {
       try {
         final categories = (jsonDecode(rawCategories) as List)
@@ -30,16 +41,27 @@ class AppStore extends ChangeNotifier {
         final transactions = (jsonDecode(rawTransactions) as List)
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
             .toList();
+        final wallets = rawWallets == null
+            ? <Wallet>[_cashWallet]
+            : (jsonDecode(rawWallets) as List)
+                .map((e) => Wallet.fromJson(e as Map<String, dynamic>))
+                .toList();
+        if (wallets.isEmpty) throw const FormatException('no wallets');
         _categories
           ..clear()
           ..addAll(categories);
         _transactions
           ..clear()
           ..addAll(transactions);
+        _wallets
+          ..clear()
+          ..addAll(wallets);
+        if (rawWallets == null) await _save();
         return;
       } catch (_) {
         _categories.clear();
         _transactions.clear();
+        _wallets.clear();
       }
     }
     _seed();
@@ -54,6 +76,10 @@ class AppStore extends ChangeNotifier {
     await _prefs.setString(
       _transactionsKey,
       jsonEncode(_transactions.map((t) => t.toJson()).toList()),
+    );
+    await _prefs.setString(
+      _walletsKey,
+      jsonEncode(_wallets.map((w) => w.toJson()).toList()),
     );
   }
 
@@ -75,12 +101,50 @@ class AppStore extends ChangeNotifier {
     return list;
   }
 
-  double get balance {
-    var sum = 0.0;
+  List<Wallet> get wallets => List.unmodifiable(_wallets);
+
+  Wallet? walletById(String id) {
+    for (final w in _wallets) {
+      if (w.id == id) return w;
+    }
+    return null;
+  }
+
+  int transactionCountOfWallet(String walletId) =>
+      _transactions.where((t) => t.walletId == walletId).length;
+
+  double walletBalance(String walletId) {
+    var sum = walletById(walletId)?.initialBalance ?? 0;
     for (final t in _transactions) {
+      if (t.walletId != walletId) continue;
       sum += t.type == TxType.income ? t.amount : -t.amount;
     }
     return sum;
+  }
+
+  double get balance =>
+      _wallets.fold<double>(0, (sum, w) => sum + walletBalance(w.id));
+
+  void addWallet(Wallet w) {
+    _wallets.add(w);
+    notifyListeners();
+    _save();
+  }
+
+  void updateWallet(Wallet updated) {
+    final index = _wallets.indexWhere((w) => w.id == updated.id);
+    if (index == -1) return;
+    _wallets[index] = updated;
+    notifyListeners();
+    _save();
+  }
+
+  void removeWallet(String id) {
+    if (_wallets.length <= 1) return;
+    _wallets.removeWhere((w) => w.id == id);
+    _transactions.removeWhere((t) => t.walletId == id);
+    notifyListeners();
+    _save();
   }
 
   void addTransaction(Transaction t) {
@@ -147,6 +211,16 @@ class AppStore extends ChangeNotifier {
       Category(id: 'other_i', name: 'Khác', icon: Icons.help_outline, color: Color(0xFF8E9A93), type: i),
     ]);
 
+    _wallets.addAll(const [
+      _cashWallet,
+      Wallet(
+        id: 'bank',
+        name: 'Ngân hàng',
+        icon: Icons.account_balance,
+        color: Color(0xFF4C9BE8),
+      ),
+    ]);
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     Transaction tx(String id, TxType type, String cat, double amount, int daysAgo, [String note = '']) =>
@@ -154,6 +228,7 @@ class AppStore extends ChangeNotifier {
           id: id,
           type: type,
           categoryId: cat,
+          walletId: type == TxType.income ? 'bank' : 'cash',
           amount: amount,
           date: today.subtract(Duration(days: daysAgo)).add(const Duration(hours: 12)),
           note: note,

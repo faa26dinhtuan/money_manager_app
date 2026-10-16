@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -25,6 +26,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Danh mục'),
+            actions: const [SettingsButton()],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: Padding(

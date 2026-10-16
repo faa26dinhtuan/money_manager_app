@@ -6,5 +6,5 @@ class AppConstants {
   static const String tabOverview = 'Tổng quan';
   static const String tabTransactions = 'Giao dịch';
   static const String tabCategories = 'Danh mục';
-  static const String tabSettings = 'Cài đặt';
+  static const String tabWallet = 'Ví tiền';
 }

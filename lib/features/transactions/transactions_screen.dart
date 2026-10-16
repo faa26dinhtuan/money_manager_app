@@ -6,6 +6,7 @@ import 'package:money_manager_app/core/utils/text_utils.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/date_range_dialog.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
+import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
@@ -107,6 +108,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Giao dịch'),
+            actions: const [SettingsButton()],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: Padding(

@@ -4,10 +4,10 @@ import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
 import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
-import 'package:money_manager_app/features/settings/settings_screen.dart';
 import 'package:money_manager_app/features/splash/splash_screen.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
+import 'package:money_manager_app/features/wallet/wallet_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -37,7 +37,7 @@ class _MainShellState extends State<MainShell> {
     OverviewScreen(),
     TransactionsScreen(),
     CategoriesScreen(),
-    SettingsScreen(),
+    WalletScreen(),
   ];
 
   @override
