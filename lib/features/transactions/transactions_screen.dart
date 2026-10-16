@@ -8,7 +8,6 @@ import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
-import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -30,9 +29,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ..showSnackBar(
         SnackBar(
           content: const Text('Đã xóa giao dịch'),
-          duration: const Duration(seconds: 3),
-          persist: false,
-          dismissDirection: DismissDirection.horizontal,
           action: SnackBarAction(
             label: 'Hoàn tác',
             onPressed: () => _store.addTransaction(t),
@@ -137,30 +133,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         for (final t in entry.value)
                           Dismissible(
                             key: ValueKey(t.id),
-                            direction: DismissDirection.horizontal,
+                            direction: DismissDirection.endToStart,
                             background: Container(
-                              color: Colors.red.shade400,
-                              alignment: Alignment.centerLeft,
-                              padding: const EdgeInsets.only(left: 20),
-                              child: const Icon(Icons.delete, color: Colors.white),
-                            ),
-                            secondaryBackground: Container(
                               color: Colors.red.shade400,
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
                               child: const Icon(Icons.delete, color: Colors.white),
                             ),
                             onDismissed: (_) => _delete(t),
-                            child: InkWell(
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => AddTransactionScreen(transaction: t),
-                                ),
-                              ),
-                              child: _TransactionTile(
-                                transaction: t,
-                                category: _store.categoryById(t.categoryId),
-                              ),
+                            child: _TransactionTile(
+                              transaction: t,
+                              category: _store.categoryById(t.categoryId),
                             ),
                           ),
                       ],

@@ -109,7 +109,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               type: _type,
               onChanged: (t) => setState(() {
                 _type = t;
-                _categoryId = null;
+                _categoryId = null; 
               }),
             ),
           ),
