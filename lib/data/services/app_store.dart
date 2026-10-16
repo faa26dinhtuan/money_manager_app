@@ -23,11 +23,10 @@ class AppStore extends ChangeNotifier {
   }
 
   List<Transaction> query(TxType type, DateRange range) {
-    final list =
-        _transactions
-            .where((t) => t.type == type && range.contains(t.date))
-            .toList()
-          ..sort((a, b) => b.date.compareTo(a.date));
+    final list = _transactions
+        .where((t) => t.type == type && range.contains(t.date))
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
     return list;
   }
 
@@ -61,117 +60,53 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  int transactionCountOf(String categoryId) =>
+      _transactions.where((t) => t.categoryId == categoryId).length;
+
+  void updateCategory(Category updated) {
+    final index = _categories.indexWhere((c) => c.id == updated.id);
+    if (index == -1) return;
+    _categories[index] = updated;
+    notifyListeners();
+  }
+
+  void removeCategory(String id) {
+    _categories.removeWhere((c) => c.id == id);
+    _transactions.removeWhere((t) => t.categoryId == id);
+    notifyListeners();
+  }
+
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
   void _seed() {
     const e = TxType.expense;
     const i = TxType.income;
     _categories.addAll(const [
-      Category(
-        id: 'food',
-        name: 'Ăn uống',
-        icon: Icons.restaurant,
-        color: Color(0xFFF5B82E),
-        type: e,
-      ),
-      Category(
-        id: 'grocery',
-        name: 'Đi chợ',
-        icon: Icons.shopping_basket,
-        color: Color(0xFF4C9BE8),
-        type: e,
-      ),
-      Category(
-        id: 'shop',
-        name: 'Mua sắm',
-        icon: Icons.shopping_cart,
-        color: Color(0xFF9B5DE5),
-        type: e,
-      ),
-      Category(
-        id: 'home',
-        name: 'Nhà cửa',
-        icon: Icons.home,
-        color: Color(0xFFE8506E),
-        type: e,
-      ),
-      Category(
-        id: 'transport',
-        name: 'Di chuyển',
-        icon: Icons.directions_bus,
-        color: Color(0xFF3CC6B0),
-        type: e,
-      ),
-      Category(
-        id: 'health',
-        name: 'Sức khỏe',
-        icon: Icons.favorite,
-        color: Color(0xFFEF6C57),
-        type: e,
-      ),
-      Category(
-        id: 'bill',
-        name: 'Hóa đơn',
-        icon: Icons.bolt,
-        color: Color(0xFF6BB94A),
-        type: e,
-      ),
-      Category(
-        id: 'other_e',
-        name: 'Khác',
-        icon: Icons.help_outline,
-        color: Color(0xFF8E9A93),
-        type: e,
-      ),
-      Category(
-        id: 'salary',
-        name: 'Lương',
-        icon: Icons.account_balance_wallet,
-        color: Color(0xFF2A8C66),
-        type: i,
-      ),
-      Category(
-        id: 'bonus',
-        name: 'Thưởng',
-        icon: Icons.card_giftcard,
-        color: Color(0xFFF5B82E),
-        type: i,
-      ),
-      Category(
-        id: 'invest',
-        name: 'Đầu tư',
-        icon: Icons.trending_up,
-        color: Color(0xFF4C9BE8),
-        type: i,
-      ),
-      Category(
-        id: 'other_i',
-        name: 'Khác',
-        icon: Icons.help_outline,
-        color: Color(0xFF8E9A93),
-        type: i,
-      ),
+      Category(id: 'food', name: 'Ăn uống', icon: Icons.restaurant, color: Color(0xFFF5B82E), type: e),
+      Category(id: 'grocery', name: 'Đi chợ', icon: Icons.shopping_basket, color: Color(0xFF4C9BE8), type: e),
+      Category(id: 'shop', name: 'Mua sắm', icon: Icons.shopping_cart, color: Color(0xFF9B5DE5), type: e),
+      Category(id: 'home', name: 'Nhà cửa', icon: Icons.home, color: Color(0xFFE8506E), type: e),
+      Category(id: 'transport', name: 'Di chuyển', icon: Icons.directions_bus, color: Color(0xFF3CC6B0), type: e),
+      Category(id: 'health', name: 'Sức khỏe', icon: Icons.favorite, color: Color(0xFFEF6C57), type: e),
+      Category(id: 'bill', name: 'Hóa đơn', icon: Icons.bolt, color: Color(0xFF6BB94A), type: e),
+      Category(id: 'other_e', name: 'Khác', icon: Icons.help_outline, color: Color(0xFF8E9A93), type: e),
+      Category(id: 'salary', name: 'Lương', icon: Icons.account_balance_wallet, color: Color(0xFF2A8C66), type: i),
+      Category(id: 'bonus', name: 'Thưởng', icon: Icons.card_giftcard, color: Color(0xFFF5B82E), type: i),
+      Category(id: 'invest', name: 'Đầu tư', icon: Icons.trending_up, color: Color(0xFF4C9BE8), type: i),
+      Category(id: 'other_i', name: 'Khác', icon: Icons.help_outline, color: Color(0xFF8E9A93), type: i),
     ]);
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    Transaction tx(
-      String id,
-      TxType type,
-      String cat,
-      double amount,
-      int daysAgo, [
-      String note = '',
-    ]) => Transaction(
-      id: id,
-      type: type,
-      categoryId: cat,
-      amount: amount,
-      date: today
-          .subtract(Duration(days: daysAgo))
-          .add(const Duration(hours: 12)),
-      note: note,
-    );
+    Transaction tx(String id, TxType type, String cat, double amount, int daysAgo, [String note = '']) =>
+        Transaction(
+          id: id,
+          type: type,
+          categoryId: cat,
+          amount: amount,
+          date: today.subtract(Duration(days: daysAgo)).add(const Duration(hours: 12)),
+          note: note,
+        );
 
     _transactions.addAll([
       tx('1', e, 'food', 85000, 0, 'Cơm trưa'),
