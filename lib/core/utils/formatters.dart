@@ -17,3 +17,9 @@ String formatDayMonth(DateTime d) => '${_two(d.day)}/${_two(d.month)}';
 
 bool isSameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;
+
+String formatPercent(double value) {
+  final text = value.toStringAsFixed(1);
+  if (value > 0 && text == '0.0') return '<0,1%';
+  return '${text.replaceAll('.', ',')}%';
+}

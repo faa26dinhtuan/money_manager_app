@@ -244,7 +244,7 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
             Text(
-              '${percent.round()}%',
+              formatPercent(percent),
               style: const TextStyle(color: Colors.black45),
             ),
             const SizedBox(width: 16),
