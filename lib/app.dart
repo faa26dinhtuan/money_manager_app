@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
 import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
 import 'package:money_manager_app/features/settings/settings_screen.dart';
+import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
 
 class App extends StatelessWidget {
@@ -45,6 +46,9 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
+        onAdd: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+        ),
       ),
     );
   }

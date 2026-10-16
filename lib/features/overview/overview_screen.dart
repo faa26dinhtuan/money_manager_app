@@ -8,7 +8,6 @@ import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
-import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/category_transactions_screen.dart';
 
 class OverviewScreen extends StatefulWidget {
@@ -140,14 +139,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 ),
               ),
             ],
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => AddTransactionScreen(initialType: _type),
-              ),
-            ),
-            child: const Icon(Icons.add, size: 30),
           ),
         );
       },
