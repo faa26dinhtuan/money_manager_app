@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
 import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
 import 'package:money_manager_app/features/settings/settings_screen.dart';
+import 'package:money_manager_app/features/splash/splash_screen.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
 
@@ -17,7 +18,7 @@ class App extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const MainShell(),
+      home: const SplashScreen(next: MainShell()),
     );
   }
 }
