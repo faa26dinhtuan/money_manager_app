@@ -1,16 +1,61 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStore extends ChangeNotifier {
-  AppStore._() {
-    _seed();
-  }
+  AppStore._();
   static final AppStore instance = AppStore._();
+
+  static const _categoriesKey = 'categories';
+  static const _transactionsKey = 'transactions';
+
+  late final SharedPreferences _prefs;
 
   final List<Category> _categories = [];
   final List<Transaction> _transactions = [];
+
+  Future<void> load() async {
+    _prefs = await SharedPreferences.getInstance();
+    final rawCategories = _prefs.getString(_categoriesKey);
+    final rawTransactions = _prefs.getString(_transactionsKey);
+    if (rawCategories != null && rawTransactions != null) {
+      try {
+        final categories = (jsonDecode(rawCategories) as List)
+            .map((e) => Category.fromJson(e as Map<String, dynamic>))
+            .toList();
+        final transactions = (jsonDecode(rawTransactions) as List)
+            .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+            .toList();
+        _categories
+          ..clear()
+          ..addAll(categories);
+        _transactions
+          ..clear()
+          ..addAll(transactions);
+        return;
+      } catch (_) {
+        _categories.clear();
+        _transactions.clear();
+      }
+    }
+    _seed();
+    await _save();
+  }
+
+  Future<void> _save() async {
+    await _prefs.setString(
+      _categoriesKey,
+      jsonEncode(_categories.map((c) => c.toJson()).toList()),
+    );
+    await _prefs.setString(
+      _transactionsKey,
+      jsonEncode(_transactions.map((t) => t.toJson()).toList()),
+    );
+  }
 
   List<Category> categoriesOf(TxType type) =>
       _categories.where((c) => c.type == type).toList();
@@ -41,6 +86,7 @@ class AppStore extends ChangeNotifier {
   void addTransaction(Transaction t) {
     _transactions.add(t);
     notifyListeners();
+    _save();
   }
 
   void updateTransaction(Transaction updated) {
@@ -48,16 +94,19 @@ class AppStore extends ChangeNotifier {
     if (index == -1) return;
     _transactions[index] = updated;
     notifyListeners();
+    _save();
   }
 
   void removeTransaction(String id) {
     _transactions.removeWhere((t) => t.id == id);
     notifyListeners();
+    _save();
   }
 
   void addCategory(Category c) {
     _categories.add(c);
     notifyListeners();
+    _save();
   }
 
   int transactionCountOf(String categoryId) =>
@@ -68,12 +117,14 @@ class AppStore extends ChangeNotifier {
     if (index == -1) return;
     _categories[index] = updated;
     notifyListeners();
+    _save();
   }
 
   void removeCategory(String id) {
     _categories.removeWhere((c) => c.id == id);
     _transactions.removeWhere((t) => t.categoryId == id);
     notifyListeners();
+    _save();
   }
 
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
