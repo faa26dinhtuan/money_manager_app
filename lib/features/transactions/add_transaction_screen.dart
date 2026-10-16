@@ -88,6 +88,31 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     Navigator.of(context).pop();
   }
 
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xóa giao dịch?'),
+        content: const Text('Giao dịch này sẽ bị xóa và không thể khôi phục.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      _store.removeTransaction(widget.transaction!.id);
+      Navigator.of(context).pop();
+    }
+  }
+
   void _toast(String msg) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -126,10 +151,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   controller: _amountCtrl,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
                 ),
               ),
@@ -162,9 +184,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       children: [
                         CategoryIcon(
                           icon: c.icon,
-                          color: _categoryId == c.id
-                              ? c.color
-                              : Colors.blueGrey.shade200,
+                          color: _categoryId == c.id ? c.color : Colors.blueGrey.shade200,
                           size: 52,
                           selected: _categoryId == c.id,
                         ),
@@ -175,9 +195,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _categoryId == c.id
-                                ? c.color
-                                : Colors.black54,
+                            color: _categoryId == c.id ? c.color : Colors.black54,
                           ),
                         ),
                       ],
@@ -219,12 +237,29 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               onPressed: _submit,
-              child: Text(
-                _isEditing ? 'Lưu' : 'Thêm',
-                style: const TextStyle(fontSize: 16),
-              ),
+              child: Text(_isEditing ? 'Lưu' : 'Thêm', style: const TextStyle(fontSize: 16)),
             ),
           ),
+          if (_isEditing) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 52,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.red.shade500,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                ),
+                onPressed: _confirmDelete,
+                child: const Text(
+                  'Xóa giao dịch',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

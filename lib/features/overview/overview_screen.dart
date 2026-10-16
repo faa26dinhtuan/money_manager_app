@@ -9,6 +9,7 @@ import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
+import 'package:money_manager_app/features/transactions/category_transactions_screen.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -124,6 +125,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
                         category: _store.categoryById(e.key),
                         amount: e.value,
                         percent: total == 0 ? 0 : e.value / total * 100,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => CategoryTransactionsScreen(
+                              categoryId: e.key,
+                              type: _type,
+                              range: DateRange.of(_period, _anchor),
+                              rangeLabel: DateRange.label(_period, _anchor),
+                            ),
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -198,45 +209,51 @@ class _CategoryRow extends StatelessWidget {
     required this.category,
     required this.amount,
     required this.percent,
+    required this.onTap,
   });
 
   final Category? category;
   final double amount;
   final double percent;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          CategoryIcon(
-            icon: category?.icon ?? Icons.help_outline,
-            color: category?.color ?? Colors.grey,
-            size: 36,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              category?.name ?? 'Khác',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            CategoryIcon(
+              icon: category?.icon ?? Icons.help_outline,
+              color: category?.color ?? Colors.grey,
+              size: 36,
             ),
-          ),
-          Text(
-            '${percent.round()}%',
-            style: const TextStyle(color: Colors.black45),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            formatMoney(amount),
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                category?.name ?? 'Khác',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+            Text(
+              '${percent.round()}%',
+              style: const TextStyle(color: Colors.black45),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              formatMoney(amount),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
     );
   }
