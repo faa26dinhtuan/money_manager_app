@@ -4,6 +4,7 @@ import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/text_utils.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/date_range_dialog.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
@@ -35,11 +36,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   Future<void> _pickRange() async {
     final current = _customRange;
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      initialDateRange: current == null
+    final picked = await showAppDateRangePicker(
+      context,
+      initial: current == null
           ? null
           : DateTimeRange(
               start: current.start,
