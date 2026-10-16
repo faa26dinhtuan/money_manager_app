@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
+import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
@@ -14,6 +15,7 @@ class AppStore extends ChangeNotifier {
   static const _categoriesKey = 'categories';
   static const _transactionsKey = 'transactions';
   static const _walletsKey = 'wallets';
+  static const _budgetsKey = 'budgets';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -27,12 +29,14 @@ class AppStore extends ChangeNotifier {
   final List<Category> _categories = [];
   final List<Transaction> _transactions = [];
   final List<Wallet> _wallets = [];
+  final List<Budget> _budgets = [];
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
     final rawCategories = _prefs.getString(_categoriesKey);
     final rawTransactions = _prefs.getString(_transactionsKey);
     final rawWallets = _prefs.getString(_walletsKey);
+    final rawBudgets = _prefs.getString(_budgetsKey);
     if (rawCategories != null && rawTransactions != null) {
       try {
         final categories = (jsonDecode(rawCategories) as List)
@@ -46,6 +50,11 @@ class AppStore extends ChangeNotifier {
             : (jsonDecode(rawWallets) as List)
                 .map((e) => Wallet.fromJson(e as Map<String, dynamic>))
                 .toList();
+        final budgets = rawBudgets == null
+            ? <Budget>[]
+            : (jsonDecode(rawBudgets) as List)
+                .map((e) => Budget.fromJson(e as Map<String, dynamic>))
+                .toList();
         if (wallets.isEmpty) throw const FormatException('no wallets');
         _categories
           ..clear()
@@ -56,12 +65,16 @@ class AppStore extends ChangeNotifier {
         _wallets
           ..clear()
           ..addAll(wallets);
-        if (rawWallets == null) await _save();
+        _budgets
+          ..clear()
+          ..addAll(budgets);
+        if (rawWallets == null || rawBudgets == null) await _save();
         return;
       } catch (_) {
         _categories.clear();
         _transactions.clear();
         _wallets.clear();
+        _budgets.clear();
       }
     }
     _seed();
@@ -80,6 +93,10 @@ class AppStore extends ChangeNotifier {
     await _prefs.setString(
       _walletsKey,
       jsonEncode(_wallets.map((w) => w.toJson()).toList()),
+    );
+    await _prefs.setString(
+      _budgetsKey,
+      jsonEncode(_budgets.map((b) => b.toJson()).toList()),
     );
   }
 
@@ -187,6 +204,53 @@ class AppStore extends ChangeNotifier {
   void removeCategory(String id) {
     _categories.removeWhere((c) => c.id == id);
     _transactions.removeWhere((t) => t.categoryId == id);
+    _budgets.removeWhere((b) => b.categoryId == id);
+    notifyListeners();
+    _save();
+  }
+
+  List<Budget> get budgets => List.unmodifiable(_budgets);
+
+  Budget? budgetOfCategory(String categoryId) {
+    for (final b in _budgets) {
+      if (b.categoryId == categoryId) return b;
+    }
+    return null;
+  }
+
+  double spentOfCategory(String categoryId, DateRange range) {
+    var sum = 0.0;
+    for (final t in _transactions) {
+      if (t.type != TxType.expense || t.categoryId != categoryId) continue;
+      if (range.contains(t.date)) sum += t.amount;
+    }
+    return sum;
+  }
+
+  double expenseTotal(DateRange range) {
+    var sum = 0.0;
+    for (final t in _transactions) {
+      if (t.type == TxType.expense && range.contains(t.date)) sum += t.amount;
+    }
+    return sum;
+  }
+
+  void addBudget(Budget b) {
+    _budgets.add(b);
+    notifyListeners();
+    _save();
+  }
+
+  void updateBudget(Budget updated) {
+    final index = _budgets.indexWhere((b) => b.id == updated.id);
+    if (index == -1) return;
+    _budgets[index] = updated;
+    notifyListeners();
+    _save();
+  }
+
+  void removeBudget(String id) {
+    _budgets.removeWhere((b) => b.id == id);
     notifyListeners();
     _save();
   }
@@ -219,6 +283,12 @@ class AppStore extends ChangeNotifier {
         icon: Icons.account_balance,
         color: Color(0xFF4C9BE8),
       ),
+    ]);
+
+    _budgets.addAll(const [
+      Budget(id: 'b_food', categoryId: 'food', limit: 2000000),
+      Budget(id: 'b_shop', categoryId: 'shop', limit: 1000000),
+      Budget(id: 'b_transport', categoryId: 'transport', limit: 500000),
     ]);
 
     final now = DateTime.now();

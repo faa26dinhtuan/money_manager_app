@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/budget_status.dart';
+import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
@@ -83,12 +85,38 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       date: _date,
       note: _noteCtrl.text.trim(),
     );
+    final messenger = ScaffoldMessenger.of(context);
     if (_isEditing) {
       _store.updateTransaction(transaction);
     } else {
       _store.addTransaction(transaction);
     }
+    final warning = _budgetWarning(transaction);
     Navigator.of(context).pop();
+    if (warning != null) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(warning)));
+    }
+  }
+
+  String? _budgetWarning(Transaction t) {
+    if (t.type != TxType.expense) return null;
+    final budget = _store.budgetOfCategory(t.categoryId);
+    if (budget == null) return null;
+    final spent = _store.spentOfCategory(
+      t.categoryId,
+      DateRange.of(Period.month, t.date),
+    );
+    final name = _store.categoryById(t.categoryId)?.name ?? 'Khác';
+    final level = BudgetLevel.of(spent, budget.limit);
+    if (level == BudgetLevel.over) {
+      return 'Đã vượt ngân sách "$name" ${formatMoney(spent - budget.limit)}';
+    }
+    if (level == BudgetLevel.warning) {
+      return 'Ngân sách "$name" đã dùng ${formatPercent(spent / budget.limit * 100)}';
+    }
+    return null;
   }
 
   Future<void> _confirmDelete() async {

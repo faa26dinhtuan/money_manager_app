@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/features/budget/budget_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_list_screen.dart';
 
 class WalletScreen extends StatelessWidget {
@@ -85,8 +86,9 @@ class WalletScreen extends StatelessWidget {
                 color: const Color(0xFFF5B82E),
                 title: 'Ngân sách theo danh mục',
                 subtitle: 'Đặt hạn mức chi tiêu mỗi tháng',
-                comingSoon: true,
-                onTap: () => _comingSoon(context),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const BudgetScreen()),
+                ),
               ),
               _SectionTile(
                 icon: Icons.flag,
