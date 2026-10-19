@@ -22,6 +22,7 @@ class AppStore extends ChangeNotifier {
   static const _goalsKey = 'goals';
   static const _debtsKey = 'debts';
   static const _recurringsKey = 'recurrings';
+  static const _onboardedKey = 'onboarded';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -39,9 +40,13 @@ class AppStore extends ChangeNotifier {
   final List<Goal> _goals = [];
   final List<Debt> _debts = [];
   final List<RecurringTransaction> _recurrings = [];
+  bool _onboarded = false;
+
+  bool get onboarded => _onboarded;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
+    _onboarded = _prefs.getBool(_onboardedKey) ?? false;
     final rawRecurrings = _prefs.getString(_recurringsKey);
     if (rawRecurrings != null) {
       try {
@@ -553,6 +558,14 @@ class AppStore extends ChangeNotifier {
       _save();
     }
     return created;
+  }
+
+  void completeOnboarding([Wallet? wallet]) {
+    if (wallet != null) _wallets.add(wallet);
+    _onboarded = true;
+    _prefs.setBool(_onboardedKey, true);
+    notifyListeners();
+    _save();
   }
 
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
