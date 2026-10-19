@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -9,14 +8,11 @@ import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/budget/budget_screen.dart';
 import 'package:money_manager_app/features/debts/debts_screen.dart';
 import 'package:money_manager_app/features/goals/goals_screen.dart';
+import 'package:money_manager_app/features/recurring/recurring_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_list_screen.dart';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
-
-  void _comingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showApp('Tính năng sẽ có ở bước sau');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,9 +102,10 @@ class WalletScreen extends StatelessWidget {
                 icon: Icons.autorenew,
                 color: const Color(0xFF3CC6B0),
                 title: 'Giao dịch định kỳ',
-                subtitle: 'Tự động lặp lại hằng tháng',
-                comingSoon: true,
-                onTap: () => _comingSoon(context),
+                subtitle: 'Tự động lặp lại theo chu kỳ',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const RecurringScreen()),
+                ),
               ),
             ],
           ),

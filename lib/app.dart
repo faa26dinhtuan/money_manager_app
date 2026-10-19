@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
+import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
 import 'package:money_manager_app/features/splash/splash_screen.dart';
@@ -30,8 +32,35 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _runRecurring());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _runRecurring();
+  }
+
+  void _runRecurring() {
+    final count = AppStore.instance.processRecurring();
+    if (count > 0 && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showApp('Đã tự động thêm $count giao dịch định kỳ');
+    }
+  }
 
   static const List<Widget> _screens = [
     OverviewScreen(),

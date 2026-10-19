@@ -6,6 +6,7 @@ import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/models/goal.dart';
+import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,7 @@ class AppStore extends ChangeNotifier {
   static const _budgetsKey = 'budgets';
   static const _goalsKey = 'goals';
   static const _debtsKey = 'debts';
+  static const _recurringsKey = 'recurrings';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -36,9 +38,23 @@ class AppStore extends ChangeNotifier {
   final List<Budget> _budgets = [];
   final List<Goal> _goals = [];
   final List<Debt> _debts = [];
+  final List<RecurringTransaction> _recurrings = [];
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
+    final rawRecurrings = _prefs.getString(_recurringsKey);
+    if (rawRecurrings != null) {
+      try {
+        final recurrings = (jsonDecode(rawRecurrings) as List)
+            .map((e) => RecurringTransaction.fromJson(e as Map<String, dynamic>))
+            .toList();
+        _recurrings
+          ..clear()
+          ..addAll(recurrings);
+      } catch (_) {
+        _recurrings.clear();
+      }
+    }
     final rawCategories = _prefs.getString(_categoriesKey);
     final rawTransactions = _prefs.getString(_transactionsKey);
     final rawWallets = _prefs.getString(_walletsKey);
@@ -137,6 +153,10 @@ class AppStore extends ChangeNotifier {
       _debtsKey,
       jsonEncode(_debts.map((d) => d.toJson()).toList()),
     );
+    await _prefs.setString(
+      _recurringsKey,
+      jsonEncode(_recurrings.map((r) => r.toJson()).toList()),
+    );
   }
 
   List<Category> categoriesOf(TxType type) =>
@@ -228,6 +248,7 @@ class AppStore extends ChangeNotifier {
     if (_wallets.length <= 1) return;
     _wallets.removeWhere((w) => w.id == id);
     _transactions.removeWhere((t) => t.walletId == id);
+    _recurrings.removeWhere((r) => r.walletId == id);
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
       if (g.entries.any((e) => e.walletId == id)) {
@@ -295,6 +316,7 @@ class AppStore extends ChangeNotifier {
     _categories.removeWhere((c) => c.id == id);
     _transactions.removeWhere((t) => t.categoryId == id);
     _budgets.removeWhere((b) => b.categoryId == id);
+    _recurrings.removeWhere((r) => r.categoryId == id);
     notifyListeners();
     _save();
   }
@@ -441,6 +463,96 @@ class AppStore extends ChangeNotifier {
     );
     notifyListeners();
     _save();
+  }
+
+  List<RecurringTransaction> get recurrings => List.unmodifiable(_recurrings);
+
+  RecurringTransaction? recurringById(String id) {
+    for (final r in _recurrings) {
+      if (r.id == id) return r;
+    }
+    return null;
+  }
+
+  int addRecurring(RecurringTransaction r) {
+    _recurrings.add(r);
+    notifyListeners();
+    _save();
+    return processRecurring();
+  }
+
+  int updateRecurring(RecurringTransaction updated) {
+    final index = _recurrings.indexWhere((r) => r.id == updated.id);
+    if (index == -1) return 0;
+    _recurrings[index] = updated;
+    notifyListeners();
+    _save();
+    return processRecurring();
+  }
+
+  void removeRecurring(String id) {
+    _recurrings.removeWhere((r) => r.id == id);
+    notifyListeners();
+    _save();
+  }
+
+  int toggleRecurring(String id) {
+    final index = _recurrings.indexWhere((r) => r.id == id);
+    if (index == -1) return 0;
+    final r = _recurrings[index];
+    if (r.active) {
+      _recurrings[index] = r.copyWith(active: false);
+    } else {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      var next = r.nextDate;
+      var guard = 0;
+      while (next.isBefore(today) && guard < 4000) {
+        next = r.advance(next);
+        guard++;
+      }
+      _recurrings[index] = r.copyWith(active: true, nextDate: next);
+    }
+    notifyListeners();
+    _save();
+    return processRecurring();
+  }
+
+  int processRecurring([DateTime? now]) {
+    final current = now ?? DateTime.now();
+    final today = DateTime(current.year, current.month, current.day);
+    var created = 0;
+    var changed = false;
+    for (var i = 0; i < _recurrings.length; i++) {
+      var r = _recurrings[i];
+      var steps = 0;
+      while (r.isDue(today) && steps < 400) {
+        final d = r.nextDate;
+        _transactions.add(
+          Transaction(
+            id: 'rec_${r.id}_${d.millisecondsSinceEpoch}',
+            type: r.type,
+            categoryId: r.categoryId,
+            walletId: r.walletId,
+            amount: r.amount,
+            date: DateTime(d.year, d.month, d.day, 12),
+            note: r.note,
+          ),
+        );
+        r = r.copyWith(nextDate: r.advance(d));
+        steps++;
+      }
+      if (steps > 0) {
+        _recurrings[i] = r;
+        created += steps;
+        changed = true;
+      }
+    }
+    if (changed) {
+      notifyListeners();
+      _save();
+    }
+    return created;
   }
 
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
