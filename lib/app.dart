@@ -79,12 +79,15 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
+      floatingActionButtonLocation: const AddNavButtonLocation(),
+      floatingActionButton: AddNavButton(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+        ),
+      ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        onAdd: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
-        ),
       ),
     );
   }
