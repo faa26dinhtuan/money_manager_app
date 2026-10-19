@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   void _soon(BuildContext context) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Tính năng sẽ có ở bước sau')),
-      );
+    ScaffoldMessenger.of(context).showApp('Tính năng sẽ có ở bước sau');
   }
 
   @override

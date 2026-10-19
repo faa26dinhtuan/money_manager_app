@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/text_utils.dart';
@@ -68,20 +69,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   void _delete(Transaction t) {
     _store.removeTransaction(t.id);
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: const Text('Đã xóa giao dịch'),
-          duration: const Duration(seconds: 3),
-          persist: false,
-          dismissDirection: DismissDirection.horizontal,
-          action: SnackBarAction(
-            label: 'Hoàn tác',
-            onPressed: () => _store.addTransaction(t),
-          ),
-        ),
-      );
+    ScaffoldMessenger.of(context).showApp(
+      'Đã xóa giao dịch',
+      action: SnackBarAction(
+        label: 'Hoàn tác',
+        onPressed: () => _store.addTransaction(t),
+      ),
+    );
   }
 
   double _sum(List<Transaction> list) =>

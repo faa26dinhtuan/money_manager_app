@@ -30,6 +30,9 @@ class AppTheme {
         foregroundColor: Colors.white,
         shape: CircleBorder(),
       ),
+      snackBarTheme: const SnackBarThemeData(
+        dismissDirection: DismissDirection.horizontal,
+      ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
         indicatorColor: primary.withValues(alpha: 0.15),

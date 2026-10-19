@@ -6,7 +6,7 @@ enum BudgetLevel {
   warning,
   over;
 
-  static const double warningRatio = 0.8;
+  static const double warningRatio = 0.5;
 
   static BudgetLevel of(double spent, double limit) {
     if (limit <= 0) return BudgetLevel.safe;

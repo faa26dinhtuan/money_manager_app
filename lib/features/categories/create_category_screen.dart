@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -94,9 +95,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   void _submit() {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Vui lòng nhập tên danh mục')));
+      ScaffoldMessenger.of(context).showApp('Vui lòng nhập tên danh mục');
       return;
     }
     final category = Category(

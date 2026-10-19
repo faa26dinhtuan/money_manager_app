@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -93,11 +94,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
     final warning = _budgetWarning(transaction);
     Navigator.of(context).pop();
-    if (warning != null) {
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(warning)));
-    }
+    if (warning != null) messenger.showApp(warning);
   }
 
   String? _budgetWarning(Transaction t) {
@@ -114,7 +111,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return 'Đã vượt ngân sách "$name" ${formatMoney(spent - budget.limit)}';
     }
     if (level == BudgetLevel.warning) {
-      return 'Ngân sách "$name" đã dùng ${formatPercent(spent / budget.limit * 100)}';
+      final percent = formatPercent(spent / budget.limit * 100);
+      final remaining = formatMoney(budget.limit - spent);
+      return 'Ngân sách "$name" đã dùng $percent, còn lại $remaining';
     }
     return null;
   }
@@ -145,9 +144,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _toast(String msg) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showApp(msg);
   }
 
   @override

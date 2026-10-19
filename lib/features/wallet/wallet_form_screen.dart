@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -73,16 +74,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
   }
 
   void _toast(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 3),
-          persist: false,
-          dismissDirection: DismissDirection.horizontal,
-        ),
-      );
+    ScaffoldMessenger.of(context).showApp(message);
   }
 
   void _submit() {

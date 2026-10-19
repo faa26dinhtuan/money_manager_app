@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -12,16 +13,7 @@ class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
 
   void _comingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('Tính năng sẽ có ở bước sau'),
-          duration: Duration(seconds: 3),
-          persist: false,
-          dismissDirection: DismissDirection.horizontal,
-        ),
-      );
+    ScaffoldMessenger.of(context).showApp('Tính năng sẽ có ở bước sau');
   }
 
   @override
