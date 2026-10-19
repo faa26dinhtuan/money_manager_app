@@ -3,6 +3,8 @@ class AppConstants {
 
   static const String appName = 'Money Manager';
 
+  static const bool alwaysShowOnboarding = true;
+
   static const String tabOverview = 'Tổng quan';
   static const String tabTransactions = 'Giao dịch';
   static const String tabCategories = 'Danh mục';
