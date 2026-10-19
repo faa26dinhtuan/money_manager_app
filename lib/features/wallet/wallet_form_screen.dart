@@ -105,15 +105,16 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
       return;
     }
     final count = _store.transactionCountOfWallet(wallet.id);
-    final goalCount = _store.goalEntryCountOfWallet(wallet.id);
+    final linkedCount = _store.goalEntryCountOfWallet(wallet.id) +
+        _store.debtEntryCountOfWallet(wallet.id);
     final message = StringBuffer(
       count == 0
           ? 'Ví "${wallet.name}" sẽ bị xóa.'
           : 'Ví "${wallet.name}" và $count giao dịch trong ví này sẽ bị xóa.',
     );
-    if (goalCount > 0) {
+    if (linkedCount > 0) {
       message.write(
-        ' $goalCount khoản nạp/rút mục tiêu liên quan sẽ được giữ lại nhưng không còn gắn với ví.',
+        ' $linkedCount khoản ở mục tiêu và sổ nợ liên quan sẽ được giữ lại nhưng không còn gắn với ví.',
       );
     }
     final confirmed = await showDialog<bool>(

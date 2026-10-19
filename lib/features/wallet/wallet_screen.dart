@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/budget/budget_screen.dart';
+import 'package:money_manager_app/features/debts/debts_screen.dart';
 import 'package:money_manager_app/features/goals/goals_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_list_screen.dart';
 
@@ -97,8 +98,9 @@ class WalletScreen extends StatelessWidget {
                 color: const Color(0xFFE8506E),
                 title: 'Sổ nợ',
                 subtitle: 'Theo dõi các khoản cho vay và đi vay',
-                comingSoon: true,
-                onTap: () => _comingSoon(context),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DebtsScreen()),
+                ),
               ),
               _SectionTile(
                 icon: Icons.autorenew,

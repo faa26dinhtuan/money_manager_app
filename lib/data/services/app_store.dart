@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
@@ -18,6 +19,7 @@ class AppStore extends ChangeNotifier {
   static const _walletsKey = 'wallets';
   static const _budgetsKey = 'budgets';
   static const _goalsKey = 'goals';
+  static const _debtsKey = 'debts';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -33,6 +35,7 @@ class AppStore extends ChangeNotifier {
   final List<Wallet> _wallets = [];
   final List<Budget> _budgets = [];
   final List<Goal> _goals = [];
+  final List<Debt> _debts = [];
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -41,6 +44,7 @@ class AppStore extends ChangeNotifier {
     final rawWallets = _prefs.getString(_walletsKey);
     final rawBudgets = _prefs.getString(_budgetsKey);
     final rawGoals = _prefs.getString(_goalsKey);
+    final rawDebts = _prefs.getString(_debtsKey);
     if (rawCategories != null && rawTransactions != null) {
       try {
         final categories = (jsonDecode(rawCategories) as List)
@@ -52,18 +56,23 @@ class AppStore extends ChangeNotifier {
         final wallets = rawWallets == null
             ? <Wallet>[_cashWallet]
             : (jsonDecode(rawWallets) as List)
-                .map((e) => Wallet.fromJson(e as Map<String, dynamic>))
-                .toList();
+                  .map((e) => Wallet.fromJson(e as Map<String, dynamic>))
+                  .toList();
         final budgets = rawBudgets == null
             ? <Budget>[]
             : (jsonDecode(rawBudgets) as List)
-                .map((e) => Budget.fromJson(e as Map<String, dynamic>))
-                .toList();
+                  .map((e) => Budget.fromJson(e as Map<String, dynamic>))
+                  .toList();
         final goals = rawGoals == null
             ? <Goal>[]
             : (jsonDecode(rawGoals) as List)
-                .map((e) => Goal.fromJson(e as Map<String, dynamic>))
-                .toList();
+                  .map((e) => Goal.fromJson(e as Map<String, dynamic>))
+                  .toList();
+        final debts = rawDebts == null
+            ? <Debt>[]
+            : (jsonDecode(rawDebts) as List)
+                  .map((e) => Debt.fromJson(e as Map<String, dynamic>))
+                  .toList();
         if (wallets.isEmpty) throw const FormatException('no wallets');
         _categories
           ..clear()
@@ -80,7 +89,13 @@ class AppStore extends ChangeNotifier {
         _goals
           ..clear()
           ..addAll(goals);
-        if (rawWallets == null || rawBudgets == null || rawGoals == null) {
+        _debts
+          ..clear()
+          ..addAll(debts);
+        if (rawWallets == null ||
+            rawBudgets == null ||
+            rawGoals == null ||
+            rawDebts == null) {
           await _save();
         }
         return;
@@ -90,6 +105,7 @@ class AppStore extends ChangeNotifier {
         _wallets.clear();
         _budgets.clear();
         _goals.clear();
+        _debts.clear();
       }
     }
     _seed();
@@ -117,6 +133,10 @@ class AppStore extends ChangeNotifier {
       _goalsKey,
       jsonEncode(_goals.map((g) => g.toJson()).toList()),
     );
+    await _prefs.setString(
+      _debtsKey,
+      jsonEncode(_debts.map((d) => d.toJson()).toList()),
+    );
   }
 
   List<Category> categoriesOf(TxType type) =>
@@ -130,10 +150,11 @@ class AppStore extends ChangeNotifier {
   }
 
   List<Transaction> query(TxType type, DateRange range) {
-    final list = _transactions
-        .where((t) => t.type == type && range.contains(t.date))
-        .toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    final list =
+        _transactions
+            .where((t) => t.type == type && range.contains(t.date))
+            .toList()
+          ..sort((a, b) => b.date.compareTo(a.date));
     return list;
   }
 
@@ -157,6 +178,15 @@ class AppStore extends ChangeNotifier {
     return count;
   }
 
+  int debtEntryCountOfWallet(String walletId) {
+    var count = 0;
+    for (final d in _debts) {
+      if (d.walletId == walletId) count++;
+      count += d.payments.where((p) => p.walletId == walletId).length;
+    }
+    return count;
+  }
+
   double walletBalance(String walletId) {
     var sum = walletById(walletId)?.initialBalance ?? 0;
     for (final t in _transactions) {
@@ -166,6 +196,12 @@ class AppStore extends ChangeNotifier {
     for (final g in _goals) {
       for (final e in g.entries) {
         if (e.walletId == walletId) sum -= e.amount;
+      }
+    }
+    for (final d in _debts) {
+      if (d.walletId == walletId) sum += d.principalFlow;
+      for (final p in d.payments) {
+        if (p.walletId == walletId) sum += d.paymentFlow(p);
       }
     }
     return sum;
@@ -198,6 +234,18 @@ class AppStore extends ChangeNotifier {
         _goals[i] = g.copyWith(
           entries: [
             for (final e in g.entries) e.walletId == id ? e.withoutWallet() : e,
+          ],
+        );
+      }
+    }
+    for (var i = 0; i < _debts.length; i++) {
+      final d = _debts[i];
+      if (d.walletId == id || d.payments.any((p) => p.walletId == id)) {
+        _debts[i] = d.copyWith(
+          clearWallet: d.walletId == id,
+          payments: [
+            for (final p in d.payments)
+              p.walletId == id ? p.withoutWallet() : p,
           ],
         );
       }
@@ -346,24 +394,145 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  List<Debt> get debts => List.unmodifiable(_debts);
+
+  Debt? debtById(String id) {
+    for (final d in _debts) {
+      if (d.id == id) return d;
+    }
+    return null;
+  }
+
+  void addDebt(Debt d) {
+    _debts.add(d);
+    notifyListeners();
+    _save();
+  }
+
+  void updateDebt(Debt updated) {
+    final index = _debts.indexWhere((d) => d.id == updated.id);
+    if (index == -1) return;
+    _debts[index] = updated;
+    notifyListeners();
+    _save();
+  }
+
+  void removeDebt(String id) {
+    _debts.removeWhere((d) => d.id == id);
+    notifyListeners();
+    _save();
+  }
+
+  void addDebtPayment(String debtId, DebtPayment payment) {
+    final index = _debts.indexWhere((d) => d.id == debtId);
+    if (index == -1) return;
+    final debt = _debts[index];
+    _debts[index] = debt.copyWith(payments: [...debt.payments, payment]);
+    notifyListeners();
+    _save();
+  }
+
+  void removeDebtPayment(String debtId, String paymentId) {
+    final index = _debts.indexWhere((d) => d.id == debtId);
+    if (index == -1) return;
+    final debt = _debts[index];
+    _debts[index] = debt.copyWith(
+      payments: debt.payments.where((p) => p.id != paymentId).toList(),
+    );
+    notifyListeners();
+    _save();
+  }
+
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
   void _seed() {
     const e = TxType.expense;
     const i = TxType.income;
     _categories.addAll(const [
-      Category(id: 'food', name: 'Ăn uống', icon: Icons.restaurant, color: Color(0xFFF5B82E), type: e),
-      Category(id: 'grocery', name: 'Đi chợ', icon: Icons.shopping_basket, color: Color(0xFF4C9BE8), type: e),
-      Category(id: 'shop', name: 'Mua sắm', icon: Icons.shopping_cart, color: Color(0xFF9B5DE5), type: e),
-      Category(id: 'home', name: 'Nhà cửa', icon: Icons.home, color: Color(0xFFE8506E), type: e),
-      Category(id: 'transport', name: 'Di chuyển', icon: Icons.directions_bus, color: Color(0xFF3CC6B0), type: e),
-      Category(id: 'health', name: 'Sức khỏe', icon: Icons.favorite, color: Color(0xFFEF6C57), type: e),
-      Category(id: 'bill', name: 'Hóa đơn', icon: Icons.bolt, color: Color(0xFF6BB94A), type: e),
-      Category(id: 'other_e', name: 'Khác', icon: Icons.help_outline, color: Color(0xFF8E9A93), type: e),
-      Category(id: 'salary', name: 'Lương', icon: Icons.account_balance_wallet, color: Color(0xFF2A8C66), type: i),
-      Category(id: 'bonus', name: 'Thưởng', icon: Icons.card_giftcard, color: Color(0xFFF5B82E), type: i),
-      Category(id: 'invest', name: 'Đầu tư', icon: Icons.trending_up, color: Color(0xFF4C9BE8), type: i),
-      Category(id: 'other_i', name: 'Khác', icon: Icons.help_outline, color: Color(0xFF8E9A93), type: i),
+      Category(
+        id: 'food',
+        name: 'Ăn uống',
+        icon: Icons.restaurant,
+        color: Color(0xFFF5B82E),
+        type: e,
+      ),
+      Category(
+        id: 'grocery',
+        name: 'Đi chợ',
+        icon: Icons.shopping_basket,
+        color: Color(0xFF4C9BE8),
+        type: e,
+      ),
+      Category(
+        id: 'shop',
+        name: 'Mua sắm',
+        icon: Icons.shopping_cart,
+        color: Color(0xFF9B5DE5),
+        type: e,
+      ),
+      Category(
+        id: 'home',
+        name: 'Nhà cửa',
+        icon: Icons.home,
+        color: Color(0xFFE8506E),
+        type: e,
+      ),
+      Category(
+        id: 'transport',
+        name: 'Di chuyển',
+        icon: Icons.directions_bus,
+        color: Color(0xFF3CC6B0),
+        type: e,
+      ),
+      Category(
+        id: 'health',
+        name: 'Sức khỏe',
+        icon: Icons.favorite,
+        color: Color(0xFFEF6C57),
+        type: e,
+      ),
+      Category(
+        id: 'bill',
+        name: 'Hóa đơn',
+        icon: Icons.bolt,
+        color: Color(0xFF6BB94A),
+        type: e,
+      ),
+      Category(
+        id: 'other_e',
+        name: 'Khác',
+        icon: Icons.help_outline,
+        color: Color(0xFF8E9A93),
+        type: e,
+      ),
+      Category(
+        id: 'salary',
+        name: 'Lương',
+        icon: Icons.account_balance_wallet,
+        color: Color(0xFF2A8C66),
+        type: i,
+      ),
+      Category(
+        id: 'bonus',
+        name: 'Thưởng',
+        icon: Icons.card_giftcard,
+        color: Color(0xFFF5B82E),
+        type: i,
+      ),
+      Category(
+        id: 'invest',
+        name: 'Đầu tư',
+        icon: Icons.trending_up,
+        color: Color(0xFF4C9BE8),
+        type: i,
+      ),
+      Category(
+        id: 'other_i',
+        name: 'Khác',
+        icon: Icons.help_outline,
+        color: Color(0xFF8E9A93),
+        type: i,
+      ),
     ]);
 
     _wallets.addAll(const [
@@ -384,16 +553,24 @@ class AppStore extends ChangeNotifier {
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    Transaction tx(String id, TxType type, String cat, double amount, int daysAgo, [String note = '']) =>
-        Transaction(
-          id: id,
-          type: type,
-          categoryId: cat,
-          walletId: type == TxType.income ? 'bank' : 'cash',
-          amount: amount,
-          date: today.subtract(Duration(days: daysAgo)).add(const Duration(hours: 12)),
-          note: note,
-        );
+    Transaction tx(
+      String id,
+      TxType type,
+      String cat,
+      double amount,
+      int daysAgo, [
+      String note = '',
+    ]) => Transaction(
+      id: id,
+      type: type,
+      categoryId: cat,
+      walletId: type == TxType.income ? 'bank' : 'cash',
+      amount: amount,
+      date: today
+          .subtract(Duration(days: daysAgo))
+          .add(const Duration(hours: 12)),
+      note: note,
+    );
 
     _transactions.addAll([
       tx('1', e, 'food', 85000, 0, 'Cơm trưa'),
@@ -434,5 +611,34 @@ class AppStore extends ChangeNotifier {
         ],
       ),
     );
+
+    _debts.addAll([
+      Debt(
+        id: 'd_minh',
+        type: DebtType.lend,
+        person: 'Bạn Minh',
+        amount: 1500000,
+        date: today.subtract(const Duration(days: 12)),
+        dueDate: today.add(const Duration(days: 18)),
+        note: 'Cho mượn đóng tiền trọ',
+        payments: [
+          DebtPayment(
+            id: 'dp_1',
+            amount: 500000,
+            date: today.subtract(const Duration(days: 4)),
+            note: 'Trả đợt 1',
+          ),
+        ],
+      ),
+      Debt(
+        id: 'd_lan',
+        type: DebtType.borrow,
+        person: 'Chị Lan',
+        amount: 3000000,
+        date: today.subtract(const Duration(days: 40)),
+        dueDate: today.subtract(const Duration(days: 3)),
+        note: 'Mượn mua xe đạp',
+      ),
+    ]);
   }
 }
