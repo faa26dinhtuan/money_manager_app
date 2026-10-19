@@ -122,7 +122,6 @@ class _SectionTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.comingSoon = false,
   });
 
   final IconData icon;
@@ -130,7 +129,6 @@ class _SectionTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final bool comingSoon;
 
   @override
   Widget build(BuildContext context) {
@@ -145,19 +143,7 @@ class _SectionTile extends StatelessWidget {
         leading: CategoryIcon(icon: icon, color: color, size: 44),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text(subtitle),
-        trailing: comingSoon
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Text(
-                  'Sắp có',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
-                ),
-              )
-            : const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
     );
