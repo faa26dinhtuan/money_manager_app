@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -15,8 +16,10 @@ class GoalEntryDialog extends StatefulWidget {
 }
 
 class _GoalEntryDialogState extends State<GoalEntryDialog> {
+  final _store = AppStore.instance;
   final _amountCtrl = TextEditingController();
   final _noteCtrl = TextEditingController();
+  late String _walletId = _store.wallets.first.id;
   DateTime _date = DateTime.now();
   String? _error;
 
@@ -49,7 +52,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
     }
     final now = DateTime.now();
     final entry = GoalEntry(
-      id: AppStore.instance.newId(),
+      id: _store.newId(),
       amount: widget.deposit ? amount : -amount,
       date: DateTime(
         _date.year,
@@ -60,6 +63,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
         now.second,
       ),
       note: _noteCtrl.text.trim(),
+      walletId: _walletId,
     );
     Navigator.of(context).pop(entry);
   }
@@ -67,6 +71,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
   @override
   Widget build(BuildContext context) {
     final remaining = widget.goal.remaining;
+    final walletBalance = _store.walletBalance(_walletId);
     return AlertDialog(
       title: Text(widget.deposit ? 'Nạp tiền' : 'Rút tiền'),
       content: SingleChildScrollView(
@@ -98,6 +103,42 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
                 }),
               ),
             ],
+            const SizedBox(height: 16),
+            Text(
+              widget.deposit ? 'Trừ từ ví' : 'Cộng vào ví',
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final w in _store.wallets)
+                  ChoiceChip(
+                    avatar: Icon(
+                      w.icon,
+                      size: 18,
+                      color: _walletId == w.id ? Colors.white : w.color,
+                    ),
+                    label: Text(w.name),
+                    selected: _walletId == w.id,
+                    selectedColor: w.color,
+                    showCheckmark: false,
+                    labelStyle: TextStyle(
+                      color: _walletId == w.id ? Colors.white : Colors.black87,
+                    ),
+                    onSelected: (_) => setState(() => _walletId = w.id),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Số dư ví: ${formatMoney(walletBalance)}',
+              style: TextStyle(
+                fontSize: 12,
+                color: walletBalance < 0 ? Colors.red.shade400 : Colors.black45,
+              ),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: _noteCtrl,
@@ -114,7 +155,10 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
                     const SizedBox(width: 8),
                     Text(
                       formatDate(_date),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: AppTheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),

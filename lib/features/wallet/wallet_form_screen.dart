@@ -105,15 +105,22 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
       return;
     }
     final count = _store.transactionCountOfWallet(wallet.id);
+    final goalCount = _store.goalEntryCountOfWallet(wallet.id);
+    final message = StringBuffer(
+      count == 0
+          ? 'Ví "${wallet.name}" sẽ bị xóa.'
+          : 'Ví "${wallet.name}" và $count giao dịch trong ví này sẽ bị xóa.',
+    );
+    if (goalCount > 0) {
+      message.write(
+        ' $goalCount khoản nạp/rút mục tiêu liên quan sẽ được giữ lại nhưng không còn gắn với ví.',
+      );
+    }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Xóa ví?'),
-        content: Text(
-          count == 0
-              ? 'Ví "${wallet.name}" sẽ bị xóa.'
-              : 'Ví "${wallet.name}" và $count giao dịch trong ví này sẽ bị xóa.',
-        ),
+        content: Text(message.toString()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),

@@ -276,7 +276,12 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             child: const Icon(Icons.delete, color: Colors.white),
                           ),
                           onDismissed: (_) => _removeEntry(goal, e),
-                          child: _EntryTile(entry: e),
+                          child: _EntryTile(
+                            entry: e,
+                            walletName: e.walletId == null
+                                ? null
+                                : _store.walletById(e.walletId!)?.name,
+                          ),
                         ),
                     ],
                   ),
@@ -321,9 +326,10 @@ class _Stat extends StatelessWidget {
 }
 
 class _EntryTile extends StatelessWidget {
-  const _EntryTile({required this.entry});
+  const _EntryTile({required this.entry, this.walletName});
 
   final GoalEntry entry;
+  final String? walletName;
 
   @override
   Widget build(BuildContext context) {
@@ -349,7 +355,9 @@ class _EntryTile extends StatelessWidget {
                       : entry.note,
                 ),
                 Text(
-                  formatDate(entry.date),
+                  walletName == null
+                      ? formatDate(entry.date)
+                      : '${formatDate(entry.date)} · $walletName',
                   style: const TextStyle(color: Colors.black45, fontSize: 12),
                 ),
               ],

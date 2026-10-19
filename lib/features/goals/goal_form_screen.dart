@@ -148,15 +148,20 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   Future<void> _confirmDelete() async {
     final goal = _store.goalById(widget.goal!.id) ?? widget.goal!;
     final count = goal.entries.length;
+    final linked = goal.entries.where((e) => e.walletId != null).length;
+    final message = StringBuffer(
+      count == 0
+          ? 'Mục tiêu "${goal.name}" sẽ bị xóa.'
+          : 'Mục tiêu "${goal.name}" cùng $count lần nạp/rút sẽ bị xóa.',
+    );
+    if (linked > 0) {
+      message.write(' Các khoản nạp/rút qua ví sẽ được hoàn về ví tương ứng.');
+    }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Xóa mục tiêu?'),
-        content: Text(
-          count == 0
-              ? 'Mục tiêu "${goal.name}" sẽ bị xóa.'
-              : 'Mục tiêu "${goal.name}" cùng $count lần nạp/rút sẽ bị xóa.',
-        ),
+        content: Text(message.toString()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),

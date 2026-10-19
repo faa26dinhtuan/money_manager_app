@@ -7,14 +7,20 @@ class GoalEntry {
     required this.amount,
     required this.date,
     this.note = '',
+    this.walletId,
   });
 
   final String id;
   final double amount;
   final DateTime date;
   final String note;
+  final String? walletId;
 
   bool get isDeposit => amount > 0;
+
+  GoalEntry withoutWallet() {
+    return GoalEntry(id: id, amount: amount, date: date, note: note);
+  }
 
   factory GoalEntry.fromJson(Map<String, dynamic> json) {
     return GoalEntry(
@@ -22,6 +28,7 @@ class GoalEntry {
       amount: (json['amount'] as num).toDouble(),
       date: DateTime.parse(json['date'] as String),
       note: json['note'] as String? ?? '',
+      walletId: json['walletId'] as String?,
     );
   }
 
@@ -31,6 +38,7 @@ class GoalEntry {
       'amount': amount,
       'date': date.toIso8601String(),
       'note': note,
+      'walletId': walletId,
     };
   }
 }

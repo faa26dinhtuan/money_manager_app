@@ -149,11 +149,24 @@ class AppStore extends ChangeNotifier {
   int transactionCountOfWallet(String walletId) =>
       _transactions.where((t) => t.walletId == walletId).length;
 
+  int goalEntryCountOfWallet(String walletId) {
+    var count = 0;
+    for (final g in _goals) {
+      count += g.entries.where((e) => e.walletId == walletId).length;
+    }
+    return count;
+  }
+
   double walletBalance(String walletId) {
     var sum = walletById(walletId)?.initialBalance ?? 0;
     for (final t in _transactions) {
       if (t.walletId != walletId) continue;
       sum += t.type == TxType.income ? t.amount : -t.amount;
+    }
+    for (final g in _goals) {
+      for (final e in g.entries) {
+        if (e.walletId == walletId) sum -= e.amount;
+      }
     }
     return sum;
   }
@@ -179,6 +192,16 @@ class AppStore extends ChangeNotifier {
     if (_wallets.length <= 1) return;
     _wallets.removeWhere((w) => w.id == id);
     _transactions.removeWhere((t) => t.walletId == id);
+    for (var i = 0; i < _goals.length; i++) {
+      final g = _goals[i];
+      if (g.entries.any((e) => e.walletId == id)) {
+        _goals[i] = g.copyWith(
+          entries: [
+            for (final e in g.entries) e.walletId == id ? e.withoutWallet() : e,
+          ],
+        );
+      }
+    }
     notifyListeners();
     _save();
   }
