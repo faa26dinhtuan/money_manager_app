@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/budget/budget_screen.dart';
+import 'package:money_manager_app/features/goals/goals_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_list_screen.dart';
 
 class WalletScreen extends StatelessWidget {
@@ -87,8 +88,9 @@ class WalletScreen extends StatelessWidget {
                 color: const Color(0xFF9B5DE5),
                 title: 'Mục tiêu kiếm tiền',
                 subtitle: 'Tiết kiệm cho kế hoạch của bạn',
-                comingSoon: true,
-                onTap: () => _comingSoon(context),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const GoalsScreen()),
+                ),
               ),
               _SectionTile(
                 icon: Icons.request_quote,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ class AppStore extends ChangeNotifier {
   static const _transactionsKey = 'transactions';
   static const _walletsKey = 'wallets';
   static const _budgetsKey = 'budgets';
+  static const _goalsKey = 'goals';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -30,6 +32,7 @@ class AppStore extends ChangeNotifier {
   final List<Transaction> _transactions = [];
   final List<Wallet> _wallets = [];
   final List<Budget> _budgets = [];
+  final List<Goal> _goals = [];
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -37,6 +40,7 @@ class AppStore extends ChangeNotifier {
     final rawTransactions = _prefs.getString(_transactionsKey);
     final rawWallets = _prefs.getString(_walletsKey);
     final rawBudgets = _prefs.getString(_budgetsKey);
+    final rawGoals = _prefs.getString(_goalsKey);
     if (rawCategories != null && rawTransactions != null) {
       try {
         final categories = (jsonDecode(rawCategories) as List)
@@ -55,6 +59,11 @@ class AppStore extends ChangeNotifier {
             : (jsonDecode(rawBudgets) as List)
                 .map((e) => Budget.fromJson(e as Map<String, dynamic>))
                 .toList();
+        final goals = rawGoals == null
+            ? <Goal>[]
+            : (jsonDecode(rawGoals) as List)
+                .map((e) => Goal.fromJson(e as Map<String, dynamic>))
+                .toList();
         if (wallets.isEmpty) throw const FormatException('no wallets');
         _categories
           ..clear()
@@ -68,13 +77,19 @@ class AppStore extends ChangeNotifier {
         _budgets
           ..clear()
           ..addAll(budgets);
-        if (rawWallets == null || rawBudgets == null) await _save();
+        _goals
+          ..clear()
+          ..addAll(goals);
+        if (rawWallets == null || rawBudgets == null || rawGoals == null) {
+          await _save();
+        }
         return;
       } catch (_) {
         _categories.clear();
         _transactions.clear();
         _wallets.clear();
         _budgets.clear();
+        _goals.clear();
       }
     }
     _seed();
@@ -97,6 +112,10 @@ class AppStore extends ChangeNotifier {
     await _prefs.setString(
       _budgetsKey,
       jsonEncode(_budgets.map((b) => b.toJson()).toList()),
+    );
+    await _prefs.setString(
+      _goalsKey,
+      jsonEncode(_goals.map((g) => g.toJson()).toList()),
     );
   }
 
@@ -255,6 +274,55 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  List<Goal> get goals => List.unmodifiable(_goals);
+
+  Goal? goalById(String id) {
+    for (final g in _goals) {
+      if (g.id == id) return g;
+    }
+    return null;
+  }
+
+  void addGoal(Goal g) {
+    _goals.add(g);
+    notifyListeners();
+    _save();
+  }
+
+  void updateGoal(Goal updated) {
+    final index = _goals.indexWhere((g) => g.id == updated.id);
+    if (index == -1) return;
+    _goals[index] = updated;
+    notifyListeners();
+    _save();
+  }
+
+  void removeGoal(String id) {
+    _goals.removeWhere((g) => g.id == id);
+    notifyListeners();
+    _save();
+  }
+
+  void addGoalEntry(String goalId, GoalEntry entry) {
+    final index = _goals.indexWhere((g) => g.id == goalId);
+    if (index == -1) return;
+    final goal = _goals[index];
+    _goals[index] = goal.copyWith(entries: [...goal.entries, entry]);
+    notifyListeners();
+    _save();
+  }
+
+  void removeGoalEntry(String goalId, String entryId) {
+    final index = _goals.indexWhere((g) => g.id == goalId);
+    if (index == -1) return;
+    final goal = _goals[index];
+    _goals[index] = goal.copyWith(
+      entries: goal.entries.where((e) => e.id != entryId).toList(),
+    );
+    notifyListeners();
+    _save();
+  }
+
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
   void _seed() {
@@ -318,5 +386,30 @@ class AppStore extends ChangeNotifier {
       tx('11', i, 'bonus', 1000000, 10, 'Thưởng dự án'),
       tx('12', i, 'invest', 350000, 20, 'Lãi tiết kiệm'),
     ]);
+
+    _goals.add(
+      Goal(
+        id: 'g_trip',
+        name: 'Du lịch Đà Lạt',
+        icon: Icons.flight,
+        color: const Color(0xFF4C9BE8),
+        target: 10000000,
+        deadline: today.add(const Duration(days: 90)),
+        entries: [
+          GoalEntry(
+            id: 'ge_1',
+            amount: 2000000,
+            date: today.subtract(const Duration(days: 20)),
+            note: 'Số tiền ban đầu',
+          ),
+          GoalEntry(
+            id: 'ge_2',
+            amount: 1500000,
+            date: today.subtract(const Duration(days: 6)),
+            note: 'Dành dụm tháng này',
+          ),
+        ],
+      ),
+    );
   }
 }
