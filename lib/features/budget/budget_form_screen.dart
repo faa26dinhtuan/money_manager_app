@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
-import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -18,10 +17,8 @@ class BudgetFormScreen extends StatefulWidget {
 }
 
 class _BudgetFormScreenState extends State<BudgetFormScreen> {
-  static const _quickAmounts = <double>[500000, 1000000, 2000000, 5000000];
-
   final _store = AppStore.instance;
-  final _limitCtrl = TextEditingController();
+  final _limitCtrl = MoneyController();
   String? _categoryId;
 
   bool get _isEditing => widget.budget != null;
@@ -32,7 +29,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
     final b = widget.budget;
     if (b != null) {
       _categoryId = b.categoryId;
-      _limitCtrl.text = b.limit.round().toString();
+      _limitCtrl.amount = b.limit;
     }
   }
 
@@ -59,7 +56,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
   }
 
   void _submit() {
-    final limit = double.tryParse(_limitCtrl.text) ?? 0;
+    final limit = _limitCtrl.amount;
     if (_categoryId == null) {
       _toast('Vui lòng chọn danh mục');
       return;
@@ -123,10 +120,9 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: TextField(
+                child: MoneyField(
                   controller: _limitCtrl,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  title: 'Hạn mức mỗi tháng',
                   style:
                       const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
@@ -143,18 +139,6 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final a in _quickAmounts)
-                ActionChip(
-                  label: Text(formatMoney(a)),
-                  onPressed: () => _limitCtrl.text = a.round().toString(),
-                ),
             ],
           ),
           const SizedBox(height: 24),

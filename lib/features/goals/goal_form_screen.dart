@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -49,8 +49,8 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
 
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
-  final _targetCtrl = TextEditingController();
-  final _initialCtrl = TextEditingController();
+  final _targetCtrl = MoneyController();
+  final _initialCtrl = MoneyController();
 
   late IconData _icon = widget.goal?.icon ?? _icons.first;
   late Color _color = widget.goal?.color ?? _colors[1];
@@ -73,7 +73,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
     final g = widget.goal;
     if (g != null) {
       _nameCtrl.text = g.name;
-      _targetCtrl.text = g.target.round().toString();
+      _targetCtrl.amount = g.target;
     }
   }
 
@@ -97,7 +97,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
 
   void _submit() {
     final name = _nameCtrl.text.trim();
-    final target = double.tryParse(_targetCtrl.text) ?? 0;
+    final target = _targetCtrl.amount;
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showApp('Vui lòng nhập tên mục tiêu');
       return;
@@ -120,7 +120,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
       );
     } else {
       final id = _store.newId();
-      final initial = double.tryParse(_initialCtrl.text) ?? 0;
+      final initial = _initialCtrl.amount;
       _store.addGoal(
         Goal(
           id: id,
@@ -203,10 +203,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          TextField(
+          MoneyField(
             controller: _targetCtrl,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            title: 'Số tiền mục tiêu',
             decoration: const InputDecoration(
               labelText: 'Số tiền mục tiêu',
               hintText: '0',
@@ -215,10 +214,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
           ),
           if (!_isEditing) ...[
             const SizedBox(height: 16),
-            TextField(
+            MoneyField(
               controller: _initialCtrl,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              title: 'Số tiền đã có',
               decoration: const InputDecoration(
                 labelText: 'Số tiền đã có (không bắt buộc)',
                 hintText: '0',

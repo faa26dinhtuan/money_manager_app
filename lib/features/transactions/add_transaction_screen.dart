@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
@@ -27,7 +27,7 @@ class AddTransactionScreen extends StatefulWidget {
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _store = AppStore.instance;
-  final _amountCtrl = TextEditingController();
+  final _amountCtrl = MoneyController();
   final _noteCtrl = TextEditingController();
 
   late TxType _type = widget.transaction?.type ?? widget.initialType;
@@ -43,7 +43,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final t = widget.transaction;
     _walletId = t?.walletId ?? _store.wallets.first.id;
     if (t != null) {
-      _amountCtrl.text = t.amount.round().toString();
+      _amountCtrl.amount = t.amount;
       _noteCtrl.text = t.note;
       _categoryId = t.categoryId;
       _date = t.date;
@@ -68,7 +68,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _submit() {
-    final amount = double.tryParse(_amountCtrl.text) ?? 0;
+    final amount = _amountCtrl.amount;
     if (amount <= 0) {
       _toast('Vui lòng nhập số tiền');
       return;
@@ -175,10 +175,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: TextField(
+                child: MoneyField(
                   controller: _amountCtrl,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  title: 'Số tiền',
                   style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
                 ),

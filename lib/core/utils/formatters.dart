@@ -9,6 +9,15 @@ String formatMoney(double value) {
   return '${negative ? '-' : ''}$buffer ₫';
 }
 
+String groupDigits(String digits) {
+  final buffer = StringBuffer();
+  for (var i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 == 0) buffer.write('.');
+    buffer.write(digits[i]);
+  }
+  return buffer.toString();
+}
+
 String _two(int n) => n.toString().padLeft(2, '0');
 
 String formatDate(DateTime d) => '${_two(d.day)}/${_two(d.month)}/${d.year}';

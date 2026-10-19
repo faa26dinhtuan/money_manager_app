@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -17,7 +17,7 @@ class GoalEntryDialog extends StatefulWidget {
 
 class _GoalEntryDialogState extends State<GoalEntryDialog> {
   final _store = AppStore.instance;
-  final _amountCtrl = TextEditingController();
+  final _amountCtrl = MoneyController();
   final _noteCtrl = TextEditingController();
   late String _walletId = _store.wallets.first.id;
   DateTime _date = DateTime.now();
@@ -41,7 +41,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
   }
 
   void _submit() {
-    final amount = double.tryParse(_amountCtrl.text) ?? 0;
+    final amount = _amountCtrl.amount;
     if (amount <= 0) {
       setState(() => _error = 'Vui lòng nhập số tiền');
       return;
@@ -79,11 +79,9 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
+            MoneyField(
               controller: _amountCtrl,
-              autofocus: true,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              title: widget.deposit ? 'Số tiền nạp' : 'Số tiền rút',
               onChanged: (_) {
                 if (_error != null) setState(() => _error = null);
               },
@@ -98,7 +96,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
               ActionChip(
                 label: Text('Đủ mục tiêu: ${formatMoney(remaining)}'),
                 onPressed: () => setState(() {
-                  _amountCtrl.text = remaining.round().toString();
+                  _amountCtrl.amount = remaining;
                   _error = null;
                 }),
               ),

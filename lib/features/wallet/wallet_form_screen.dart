@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -40,7 +40,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
 
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
-  final _balanceCtrl = TextEditingController();
+  final _balanceCtrl = MoneyController();
 
   late IconData _icon = widget.wallet?.icon ?? _icons.first;
   late Color _color = widget.wallet?.color ?? _colors.first;
@@ -62,7 +62,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
     final wallet = widget.wallet;
     if (wallet != null) {
       _nameCtrl.text = wallet.name;
-      _balanceCtrl.text = wallet.initialBalance.round().toString();
+      _balanceCtrl.amount = wallet.initialBalance;
     }
   }
 
@@ -88,7 +88,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
       name: name,
       icon: _icon,
       color: _color,
-      initialBalance: double.tryParse(_balanceCtrl.text) ?? 0,
+      initialBalance: _balanceCtrl.amount,
     );
     if (_isEditing) {
       _store.updateWallet(wallet);
@@ -160,10 +160,9 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          TextField(
+          MoneyField(
             controller: _balanceCtrl,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            title: 'Số dư ban đầu',
             decoration: const InputDecoration(
               labelText: 'Số dư ban đầu',
               hintText: '0',
