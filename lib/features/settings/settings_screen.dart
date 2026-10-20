@@ -3,6 +3,7 @@ import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/features/settings/backup_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -62,7 +63,9 @@ class SettingsScreen extends StatelessWidget {
             Icons.cloud_upload_outlined,
             'Sao lưu & khôi phục',
             '',
-            () => _soon(context),
+            () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const BackupScreen()),
+            ),
           ),
           (
             Icons.file_download_outlined,

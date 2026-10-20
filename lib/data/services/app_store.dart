@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
+import 'package:money_manager_app/data/models/backup_data.dart';
 import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/debt.dart';
@@ -604,6 +605,44 @@ class AppStore extends ChangeNotifier {
     _themeMode = mode;
     _prefs.setString(_themeModeKey, mode.name);
     notifyListeners();
+  }
+
+  BackupData createBackup() {
+    return BackupData(
+      categories: List.of(_categories),
+      transactions: List.of(_transactions),
+      wallets: List.of(_wallets),
+      budgets: List.of(_budgets),
+      goals: List.of(_goals),
+      debts: List.of(_debts),
+      recurrings: List.of(_recurrings),
+    );
+  }
+
+  Future<void> restoreBackup(BackupData data) async {
+    _categories
+      ..clear()
+      ..addAll(data.categories);
+    _transactions
+      ..clear()
+      ..addAll(data.transactions);
+    _wallets
+      ..clear()
+      ..addAll(data.wallets);
+    _budgets
+      ..clear()
+      ..addAll(data.budgets);
+    _goals
+      ..clear()
+      ..addAll(data.goals);
+    _debts
+      ..clear()
+      ..addAll(data.debts);
+    _recurrings
+      ..clear()
+      ..addAll(data.recurrings);
+    notifyListeners();
+    await _save();
   }
 
   void completeOnboarding([Wallet? wallet]) {
