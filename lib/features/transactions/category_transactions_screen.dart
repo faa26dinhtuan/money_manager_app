@@ -31,7 +31,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
       builder: (context, _) {
         final category = store.categoryById(categoryId);
         final items = store
-            .query(type, range)
+            .query(type, range, walletId: store.selectedWalletId)
             .where((t) => t.categoryId == categoryId)
             .toList();
         final total = items.fold<double>(0, (sum, t) => sum + t.amount);

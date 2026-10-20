@@ -24,6 +24,7 @@ class AppStore extends ChangeNotifier {
   static const _recurringsKey = 'recurrings';
   static const _onboardedKey = 'onboarded';
   static const _themeModeKey = 'themeMode';
+  static const _selectedWalletKey = 'selectedWallet';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -43,6 +44,7 @@ class AppStore extends ChangeNotifier {
   final List<RecurringTransaction> _recurrings = [];
   bool _onboarded = false;
   ThemeMode _themeMode = ThemeMode.light;
+  String? _selectedWalletId;
 
   bool get onboarded => _onboarded;
 
@@ -54,6 +56,7 @@ class AppStore extends ChangeNotifier {
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
         ThemeMode.light;
+    _selectedWalletId = _prefs.getString(_selectedWalletKey);
     final rawRecurrings = _prefs.getString(_recurringsKey);
     if (rawRecurrings != null) {
       try {
@@ -181,10 +184,15 @@ class AppStore extends ChangeNotifier {
     return null;
   }
 
-  List<Transaction> query(TxType type, DateRange range) {
+  List<Transaction> query(TxType type, DateRange range, {String? walletId}) {
     final list =
         _transactions
-            .where((t) => t.type == type && range.contains(t.date))
+            .where(
+              (t) =>
+                  t.type == type &&
+                  range.contains(t.date) &&
+                  (walletId == null || t.walletId == walletId),
+            )
             .toList()
           ..sort((a, b) => b.date.compareTo(a.date));
     return list;
@@ -241,6 +249,31 @@ class AppStore extends ChangeNotifier {
 
   double get balance =>
       _wallets.fold<double>(0, (sum, w) => sum + walletBalance(w.id));
+
+  String? get selectedWalletId {
+    final id = _selectedWalletId;
+    return id != null && walletById(id) != null ? id : null;
+  }
+
+  Wallet? get selectedWallet {
+    final id = selectedWalletId;
+    return id == null ? null : walletById(id);
+  }
+
+  double get selectedBalance {
+    final id = selectedWalletId;
+    return id == null ? balance : walletBalance(id);
+  }
+
+  void selectWallet(String? id) {
+    _selectedWalletId = id;
+    if (id == null) {
+      _prefs.remove(_selectedWalletKey);
+    } else {
+      _prefs.setString(_selectedWalletKey, id);
+    }
+    notifyListeners();
+  }
 
   void addWallet(Wallet w) {
     _wallets.add(w);

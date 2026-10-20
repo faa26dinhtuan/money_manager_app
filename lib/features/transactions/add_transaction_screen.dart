@@ -42,7 +42,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void initState() {
     super.initState();
     final t = widget.transaction;
-    _walletId = t?.walletId ?? _store.wallets.first.id;
+    _walletId =
+        t?.walletId ?? _store.selectedWalletId ?? _store.wallets.first.id;
     if (t != null) {
       _amountCtrl.amount = t.amount;
       _noteCtrl.text = t.note;

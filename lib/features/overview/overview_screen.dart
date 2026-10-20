@@ -8,6 +8,7 @@ import 'package:money_manager_app/core/widgets/donut_chart.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
+import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/category_transactions_screen.dart';
@@ -30,7 +31,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
-        final items = _store.query(_type, DateRange.of(_period, _anchor));
+        final items = _store.query(
+          _type,
+          DateRange.of(_period, _anchor),
+          walletId: _store.selectedWalletId,
+        );
 
         final totals = <String, double>{};
         for (final t in items) {
@@ -52,7 +57,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
           body: Column(
             children: [
               _Header(
-                balance: _store.balance,
+                balance: _store.selectedBalance,
                 type: _type,
                 onTypeChanged: (t) => setState(() => _type = t),
               ),
@@ -173,12 +178,19 @@ class _Header extends StatelessWidget {
           children: [
             const SizedBox(
               height: 48,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 4),
-                  child: SettingsButton(color: Colors.white),
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: WalletSelector(),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: SettingsButton(color: Colors.white),
+                  ),
+                ],
               ),
             ),
             const Text(
