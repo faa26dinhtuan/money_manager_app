@@ -4,6 +4,7 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/settings/backup_screen.dart';
+import 'package:money_manager_app/features/settings/export_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -71,7 +72,9 @@ class SettingsScreen extends StatelessWidget {
             Icons.file_download_outlined,
             'Xuất dữ liệu',
             'CSV',
-            () => _soon(context),
+            () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ExportScreen()),
+            ),
           ),
           (
             Icons.info_outline,

@@ -199,6 +199,8 @@ class AppStore extends ChangeNotifier {
     return list;
   }
 
+  List<Transaction> get transactions => List.unmodifiable(_transactions);
+
   List<Wallet> get wallets => List.unmodifiable(_wallets);
 
   Wallet? walletById(String id) {
