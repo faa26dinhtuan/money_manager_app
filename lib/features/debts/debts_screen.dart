@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -124,8 +125,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Column(
                     children: [
-                      const Icon(Icons.request_quote_outlined,
-                          size: 56, color: Colors.black26),
+                      Icon(Icons.request_quote_outlined,
+                          size: 56, color: context.textDisabled),
                       const SizedBox(height: 12),
                       Text(
                         _showSettled
@@ -133,7 +134,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                             : _type == DebtType.lend
                                 ? 'Chưa có khoản cho vay nào'
                                 : 'Chưa có khoản đi vay nào',
-                        style: const TextStyle(color: Colors.black54),
+                        style: TextStyle(color: context.textSecondary),
                       ),
                     ],
                   ),
@@ -242,7 +243,7 @@ class _DebtTile extends StatelessWidget {
     final barColor = state == DebtState.ongoing ? debt.type.color : state.color;
 
     return Card(
-      color: Colors.white,
+      color: context.surfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -290,8 +291,8 @@ class _DebtTile extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '${debt.type.paidLabel} ${formatMoney(debt.paid)} / ${formatMoney(debt.amount)}',
-                            style: const TextStyle(
-                              color: Colors.black54,
+                            style: TextStyle(
+                              color: context.textSecondary,
                               fontSize: 12,
                             ),
                           ),

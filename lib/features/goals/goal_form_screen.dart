@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -225,7 +226,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             ),
           ],
           const SizedBox(height: 20),
-          const Text('Thời hạn', style: TextStyle(color: Colors.black54)),
+          Text('Thời hạn', style: TextStyle(color: context.textSecondary)),
           InkWell(
             onTap: _pickDeadline,
             child: Padding(
@@ -239,7 +240,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                           : formatDate(_deadline!),
                       style: TextStyle(
                         color: _deadline == null
-                            ? Colors.black45
+                            ? context.textTertiary
                             : AppTheme.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -256,7 +257,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('Biểu tượng', style: TextStyle(color: Colors.black54)),
+          Text('Biểu tượng', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -275,7 +276,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Text('Màu sắc', style: TextStyle(color: Colors.black54)),
+          Text('Màu sắc', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,

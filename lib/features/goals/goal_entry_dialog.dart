@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
@@ -104,7 +105,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
             const SizedBox(height: 16),
             Text(
               widget.deposit ? 'Trừ từ ví' : 'Cộng vào ví',
-              style: const TextStyle(color: Colors.black54),
+              style: TextStyle(color: context.textSecondary),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -123,7 +124,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
                     selectedColor: w.color,
                     showCheckmark: false,
                     labelStyle: TextStyle(
-                      color: _walletId == w.id ? Colors.white : Colors.black87,
+                      color: _walletId == w.id ? Colors.white : context.textPrimary,
                     ),
                     onSelected: (_) => setState(() => _walletId = w.id),
                   ),
@@ -134,7 +135,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
               'Số dư ví: ${formatMoney(walletBalance)}',
               style: TextStyle(
                 fontSize: 12,
-                color: walletBalance < 0 ? Colors.red.shade400 : Colors.black45,
+                color: walletBalance < 0 ? Colors.red.shade400 : context.textTertiary,
               ),
             ),
             const SizedBox(height: 8),
@@ -149,7 +150,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   children: [
-                    const Icon(Icons.event, size: 20, color: Colors.black54),
+                    Icon(Icons.event, size: 20, color: context.textSecondary),
                     const SizedBox(width: 8),
                     Text(
                       formatDate(_date),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/goal_status.dart';
@@ -88,15 +89,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 const SizedBox(height: 12),
               ],
               if (all.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      Icon(Icons.flag_outlined, size: 56, color: Colors.black26),
+                      Icon(Icons.flag_outlined, size: 56, color: context.textDisabled),
                       SizedBox(height: 12),
                       Text(
                         'Chưa có mục tiêu nào',
-                        style: TextStyle(color: Colors.black54),
+                        style: TextStyle(color: context.textSecondary),
                       ),
                     ],
                   ),
@@ -109,7 +110,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       _showDone
                           ? 'Chưa có mục tiêu nào hoàn thành'
                           : 'Không có mục tiêu đang thực hiện',
-                      style: const TextStyle(color: Colors.black54),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                   ),
                 ),
@@ -209,7 +210,7 @@ class _GoalTile extends StatelessWidget {
     final percent = goal.progress.clamp(0.0, 1.0) * 100;
 
     return Card(
-      color: Colors.white,
+      color: context.surfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -253,8 +254,8 @@ class _GoalTile extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '${formatMoney(goal.saved)} / ${formatMoney(goal.target)}',
-                            style: const TextStyle(
-                              color: Colors.black54,
+                            style: TextStyle(
+                              color: context.textSecondary,
                               fontSize: 12,
                             ),
                           ),

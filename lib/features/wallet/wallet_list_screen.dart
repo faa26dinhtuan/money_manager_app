@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -56,7 +57,7 @@ class _WalletTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: context.surfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -84,8 +85,8 @@ class _WalletTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '$transactionCount giao dịch',
-                      style: const TextStyle(
-                        color: Colors.black45,
+                      style: TextStyle(
+                        color: context.textTertiary,
                         fontSize: 12,
                       ),
                     ),

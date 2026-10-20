@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -47,7 +48,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             children: [
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -68,7 +69,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                           children: [
                             Text(
                               rangeLabel,
-                              style: const TextStyle(color: Colors.black54),
+                              style: TextStyle(color: context.textSecondary),
                             ),
                             const SizedBox(height: 4),
                             FittedBox(
@@ -87,7 +88,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(
                         '${items.length} giao dịch',
-                        style: const TextStyle(color: Colors.black45),
+                        style: TextStyle(color: context.textTertiary),
                       ),
                     ],
                   ),
@@ -95,7 +96,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -106,11 +107,11 @@ class CategoryTransactionsScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       if (groups.isEmpty)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 32),
                           child: Text(
                             'Chưa có giao dịch',
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(color: context.textSecondary),
                           ),
                         ),
                       for (final entry in groups.entries) ...[
@@ -156,7 +157,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                                       fontWeight: FontWeight.w600,
                                       color: type == TxType.income
                                           ? AppTheme.primary
-                                          : Colors.black87,
+                                          : context.textPrimary,
                                     ),
                                   ),
                                 ],

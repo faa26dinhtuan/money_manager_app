@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -69,15 +70,15 @@ class _RecurringScreenState extends State<RecurringScreen> {
               _Summary(expense: expense, income: income),
               const SizedBox(height: 16),
               if (items.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 40),
                   child: Column(
                     children: [
-                      Icon(Icons.autorenew, size: 56, color: Colors.black26),
+                      Icon(Icons.autorenew, size: 56, color: context.textDisabled),
                       SizedBox(height: 12),
                       Text(
                         'Chưa có giao dịch định kỳ nào',
-                        style: TextStyle(color: Colors.black54),
+                        style: TextStyle(color: context.textSecondary),
                       ),
                     ],
                   ),
@@ -177,7 +178,7 @@ class _RecurringTile extends StatelessWidget {
     final title = item.note.isEmpty ? (category?.name ?? 'Khác') : item.note;
 
     return Card(
-      color: Colors.white,
+      color: context.surfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -209,15 +210,15 @@ class _RecurringTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         '${item.frequency.label} • ${wallet?.name ?? 'Ví'}',
-                        style: const TextStyle(
-                          color: Colors.black54,
+                        style: TextStyle(
+                          color: context.textSecondary,
                           fontSize: 12,
                         ),
                       ),
                       Text(
                         _status(),
-                        style: const TextStyle(
-                          color: Colors.black45,
+                        style: TextStyle(
+                          color: context.textTertiary,
                           fontSize: 12,
                         ),
                       ),

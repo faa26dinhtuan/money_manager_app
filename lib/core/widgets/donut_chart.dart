@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 
 class DonutSlice {
   const DonutSlice(this.value, this.color);
@@ -28,7 +29,7 @@ class DonutChart extends StatelessWidget {
       width: size,
       height: size,
       child: CustomPaint(
-        painter: _DonutPainter(slices, thickness),
+        painter: _DonutPainter(slices, thickness, context.outlineColor),
         child: Center(child: center),
       ),
     );
@@ -36,10 +37,11 @@ class DonutChart extends StatelessWidget {
 }
 
 class _DonutPainter extends CustomPainter {
-  _DonutPainter(this.slices, this.thickness);
+  _DonutPainter(this.slices, this.thickness, this.trackColor);
 
   final List<DonutSlice> slices;
   final double thickness;
+  final Color trackColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -55,7 +57,7 @@ class _DonutPainter extends CustomPainter {
 
     final total = slices.fold<double>(0, (s, e) => s + e.value);
     if (total <= 0) {
-      paint.color = Colors.black12;
+      paint.color = trackColor;
       canvas.drawArc(rect, 0, 2 * math.pi, false, paint);
       return;
     }
@@ -78,5 +80,7 @@ class _DonutPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DonutPainter old) =>
-      old.slices != slices || old.thickness != thickness;
+      old.slices != slices ||
+      old.thickness != thickness ||
+      old.trackColor != trackColor;
 }

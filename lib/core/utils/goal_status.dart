@@ -14,7 +14,7 @@ enum GoalState {
       case GoalState.overdue:
         return Colors.red.shade400;
       case GoalState.ongoing:
-        return Colors.black54;
+        return Colors.grey.shade600;
     }
   }
 }

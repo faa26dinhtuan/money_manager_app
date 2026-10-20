@@ -23,6 +23,7 @@ class AppStore extends ChangeNotifier {
   static const _debtsKey = 'debts';
   static const _recurringsKey = 'recurrings';
   static const _onboardedKey = 'onboarded';
+  static const _themeModeKey = 'themeMode';
 
   static const _cashWallet = Wallet(
     id: 'cash',
@@ -41,12 +42,18 @@ class AppStore extends ChangeNotifier {
   final List<Debt> _debts = [];
   final List<RecurringTransaction> _recurrings = [];
   bool _onboarded = false;
+  ThemeMode _themeMode = ThemeMode.light;
 
   bool get onboarded => _onboarded;
+
+  ThemeMode get themeMode => _themeMode;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
+    _themeMode =
+        ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
+        ThemeMode.light;
     final rawRecurrings = _prefs.getString(_recurringsKey);
     if (rawRecurrings != null) {
       try {
@@ -558,6 +565,12 @@ class AppStore extends ChangeNotifier {
       _save();
     }
     return created;
+  }
+
+  void setThemeMode(ThemeMode mode) {
+    _themeMode = mode;
+    _prefs.setString(_themeModeKey, mode.name);
+    notifyListeners();
   }
 
   void completeOnboarding([Wallet? wallet]) {

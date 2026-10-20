@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 
@@ -73,7 +74,7 @@ Future<double?> showMoneyKeypad(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: Colors.white,
+    backgroundColor: context.surfaceColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
@@ -117,7 +118,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Material(
-          color: AppTheme.background,
+          color: context.backgroundColor,
           borderRadius: BorderRadius.circular(14),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -146,7 +147,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Material(
-          color: AppTheme.background,
+          color: context.backgroundColor,
           borderRadius: BorderRadius.circular(14),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -175,7 +176,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.black12,
+                color: context.outlineColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -185,7 +186,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
                 Expanded(
                   child: Text(
                     widget.title,
-                    style: const TextStyle(color: Colors.black54),
+                    style: TextStyle(color: context.textSecondary),
                   ),
                 ),
                 TextButton(
@@ -201,7 +202,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: _digits.isEmpty ? Colors.black26 : AppTheme.primary,
+                  color: _digits.isEmpty ? context.textDisabled : AppTheme.primary,
                 ),
               ),
             ),

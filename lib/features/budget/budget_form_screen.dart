@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -114,8 +115,8 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text('Hạn mức mỗi tháng',
-              style: TextStyle(color: Colors.black54)),
+          Text('Hạn mức mỗi tháng',
+              style: TextStyle(color: context.textSecondary)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -142,14 +143,14 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Text('Danh mục', style: TextStyle(color: Colors.black54)),
+          Text('Danh mục', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           if (choices.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 'Tất cả danh mục chi tiêu đã có ngân sách',
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: context.textSecondary),
               ),
             )
           else
@@ -183,7 +184,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
                               fontSize: 12,
                               color: _categoryId == c.id
                                   ? c.color
-                                  : Colors.black54,
+                                  : context.textSecondary,
                             ),
                           ),
                         ],

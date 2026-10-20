@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class WalletPicker extends StatelessWidget {
@@ -26,7 +27,7 @@ class WalletPicker extends StatelessWidget {
             selectedColor: Colors.blueGrey.shade400,
             showCheckmark: false,
             labelStyle: TextStyle(
-              color: selectedId == null ? Colors.white : Colors.black87,
+              color: selectedId == null ? Colors.white : context.textPrimary,
             ),
             onSelected: (_) => onChanged(null),
           ),
@@ -42,7 +43,7 @@ class WalletPicker extends StatelessWidget {
             selectedColor: w.color,
             showCheckmark: false,
             labelStyle: TextStyle(
-              color: selectedId == w.id ? Colors.white : Colors.black87,
+              color: selectedId == w.id ? Colors.white : context.textPrimary,
             ),
             onSelected: (_) => onChanged(w.id),
           ),

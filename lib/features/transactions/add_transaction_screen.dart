@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
@@ -196,7 +197,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text('Ví', style: TextStyle(color: Colors.black54)),
+          Text('Ví', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -214,14 +215,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   selectedColor: w.color,
                   showCheckmark: false,
                   labelStyle: TextStyle(
-                    color: _walletId == w.id ? Colors.white : Colors.black87,
+                    color: _walletId == w.id ? Colors.white : context.textPrimary,
                   ),
                   onSelected: (_) => setState(() => _walletId = w.id),
                 ),
             ],
           ),
           const SizedBox(height: 20),
-          const Text('Danh mục', style: TextStyle(color: Colors.black54)),
+          Text('Danh mục', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -247,7 +248,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _categoryId == c.id ? c.color : Colors.black54,
+                            color: _categoryId == c.id ? c.color : context.textSecondary,
                           ),
                         ),
                       ],
@@ -257,7 +258,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Text('Ngày', style: TextStyle(color: Colors.black54)),
+          Text('Ngày', style: TextStyle(color: context.textSecondary)),
           InkWell(
             onTap: _pickDate,
             child: Padding(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -171,7 +172,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('Biểu tượng', style: TextStyle(color: Colors.black54)),
+          Text('Biểu tượng', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -190,7 +191,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Text('Màu sắc', style: TextStyle(color: Colors.black54)),
+          Text('Màu sắc', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,

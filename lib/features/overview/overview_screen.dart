@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -60,7 +61,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                   children: [
                     Card(
-                      color: Colors.white,
+                      color: context.surfaceColor,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -90,8 +91,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                     _type == TxType.expense
                                         ? 'Đã chi'
                                         : 'Đã thu',
-                                    style: const TextStyle(
-                                      color: Colors.black45,
+                                    style: TextStyle(
+                                      color: context.textTertiary,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -111,12 +112,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     ),
                     const SizedBox(height: 12),
                     if (entries.isEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                           child: Text(
                             'Chưa có giao dịch trong khoảng này',
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(color: context.textSecondary),
                           ),
                         ),
                       ),
@@ -227,7 +228,7 @@ class _CategoryRow extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -246,7 +247,7 @@ class _CategoryRow extends StatelessWidget {
             ),
             Text(
               formatPercent(percent),
-              style: const TextStyle(color: Colors.black45),
+              style: TextStyle(color: context.textTertiary),
             ),
             const SizedBox(width: 16),
             Text(

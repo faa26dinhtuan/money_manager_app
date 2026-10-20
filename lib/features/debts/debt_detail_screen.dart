@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
@@ -92,7 +93,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -159,7 +160,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                           _Stat(
                             label: 'Số tiền gốc',
                             value: debt.amount,
-                            color: Colors.black87,
+                            color: context.textPrimary,
                           ),
                           _Stat(
                             label: debt.type.paidLabel,
@@ -224,7 +225,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               ),
               const SizedBox(height: 16),
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -312,7 +313,7 @@ class _Stat extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Colors.black54, fontSize: 12),
+            style: TextStyle(color: context.textSecondary, fontSize: 12),
           ),
           const SizedBox(height: 4),
           FittedBox(
@@ -337,7 +338,7 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? Colors.black54;
+    final c = color ?? context.textSecondary;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -389,7 +390,7 @@ class _HistoryTile extends StatelessWidget {
                   walletName == null
                       ? formatDate(date)
                       : '${formatDate(date)} · $walletName',
-                  style: const TextStyle(color: Colors.black45, fontSize: 12),
+                  style: TextStyle(color: context.textTertiary, fontSize: 12),
                 ),
               ],
             ),

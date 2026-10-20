@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -137,16 +138,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppTheme.background,
+                decoration: BoxDecoration(
+                  color: context.backgroundColor,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
                 child: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    const Text(
+                    Text(
                       'Gợi ý nhanh',
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -186,9 +187,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'Biểu tượng',
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                     const SizedBox(height: 12),
                     Wrap(
@@ -210,9 +211,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'Màu sắc',
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                     const SizedBox(height: 12),
                     Wrap(

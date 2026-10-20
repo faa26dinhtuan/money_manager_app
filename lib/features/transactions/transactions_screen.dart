@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -133,7 +134,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           },
                         ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: context.surfaceColor,
                   contentPadding: const EdgeInsets.symmetric(vertical: 0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -143,7 +144,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
               const SizedBox(height: 12),
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -181,7 +182,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             _query.trim().isEmpty
                                 ? 'Chưa có giao dịch'
                                 : 'Không tìm thấy giao dịch',
-                            style: const TextStyle(color: Colors.black54),
+                            style: TextStyle(color: context.textSecondary),
                           ),
                         ),
                       for (final entry in groups.entries) ...[
@@ -268,7 +269,7 @@ class _TransactionTile extends StatelessWidget {
                 if (transaction.note.isNotEmpty)
                   Text(
                     transaction.note,
-                    style: const TextStyle(color: Colors.black45, fontSize: 12),
+                    style: TextStyle(color: context.textTertiary, fontSize: 12),
                   ),
               ],
             ),
@@ -277,7 +278,7 @@ class _TransactionTile extends StatelessWidget {
             '${isIncome ? '+' : '-'}${formatMoney(transaction.amount)}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: isIncome ? AppTheme.primary : Colors.black87,
+              color: isIncome ? AppTheme.primary : context.textPrimary,
             ),
           ),
         ],
@@ -334,7 +335,7 @@ class _SummaryItem extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Colors.black54, fontSize: 12),
+            style: TextStyle(color: context.textSecondary, fontSize: 12),
           ),
           const SizedBox(height: 4),
           FittedBox(

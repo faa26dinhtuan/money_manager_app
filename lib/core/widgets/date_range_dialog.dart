@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -134,7 +135,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.white,
+      backgroundColor: context.surfaceColor,
       surfaceTintColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ConstrainedBox(
@@ -196,8 +197,8 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
                       child: Center(
                         child: Text(
                           w,
-                          style: const TextStyle(
-                            color: Colors.black45,
+                          style: TextStyle(
+                            color: context.textTertiary,
                             fontSize: 12,
                           ),
                         ),
@@ -256,7 +257,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: active ? AppTheme.primary : Colors.black26,
+            color: active ? AppTheme.primary : context.textDisabled,
             width: active ? 2 : 1,
           ),
         ),
@@ -318,7 +319,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
             child: Text(
               '$dayNumber',
               style: TextStyle(
-                color: selected ? Colors.white : Colors.black87,
+                color: selected ? Colors.white : context.textPrimary,
                 fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

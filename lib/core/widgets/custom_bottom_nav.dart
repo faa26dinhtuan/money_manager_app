@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 
@@ -23,7 +24,7 @@ class CustomBottomNav extends StatelessWidget {
       height: barHeight + bottomInset,
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surfaceColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -34,23 +35,29 @@ class CustomBottomNav extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _item(0, Icons.donut_large_outlined, Icons.donut_large,
+          _item(context, 0, Icons.donut_large_outlined, Icons.donut_large,
               AppConstants.tabOverview),
-          _item(1, Icons.receipt_long_outlined, Icons.receipt_long,
+          _item(context, 1, Icons.receipt_long_outlined, Icons.receipt_long,
               AppConstants.tabTransactions),
           const Expanded(child: SizedBox.shrink()),
-          _item(2, Icons.category_outlined, Icons.category,
+          _item(context, 2, Icons.category_outlined, Icons.category,
               AppConstants.tabCategories),
-          _item(3, Icons.account_balance_wallet_outlined,
+          _item(context, 3, Icons.account_balance_wallet_outlined,
               Icons.account_balance_wallet, AppConstants.tabWallet),
         ],
       ),
     );
   }
 
-  Widget _item(int index, IconData icon, IconData selectedIcon, String label) {
+  Widget _item(
+    BuildContext context,
+    int index,
+    IconData icon,
+    IconData selectedIcon,
+    String label,
+  ) {
     final selected = index == currentIndex;
-    final color = selected ? AppTheme.primary : Colors.black54;
+    final color = selected ? AppTheme.primary : context.textSecondary;
     return Expanded(
       child: InkResponse(
         onTap: () => onTap(index),
@@ -88,7 +95,7 @@ class AddNavButton extends StatelessWidget {
       height: CustomBottomNav.buttonSize,
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: AppTheme.background,
+        color: context.backgroundColor,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 
@@ -63,7 +64,7 @@ class PeriodBar extends StatelessWidget {
                         style: TextStyle(
                           color: p == period
                               ? AppTheme.primary
-                              : Colors.black54,
+                              : context.textSecondary,
                           fontWeight: p == period
                               ? FontWeight.bold
                               : FontWeight.normal,

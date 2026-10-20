@@ -18,14 +18,20 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppConstants.appName,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      home: SplashScreen(
-        next: AppStore.instance.onboarded && !AppConstants.alwaysShowOnboarding
-            ? const MainShell()
-            : const IntroScreen(next: OnboardingScreen(next: MainShell())),
+    return ListenableBuilder(
+      listenable: AppStore.instance,
+      builder: (context, _) => MaterialApp(
+        title: AppConstants.appName,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: AppStore.instance.themeMode,
+        home: SplashScreen(
+          next:
+              AppStore.instance.onboarded && !AppConstants.alwaysShowOnboarding
+              ? const MainShell()
+              : const IntroScreen(next: OnboardingScreen(next: MainShell())),
+        ),
       ),
     );
   }

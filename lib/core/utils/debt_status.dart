@@ -34,7 +34,7 @@ enum DebtState {
       case DebtState.overdue:
         return Colors.red.shade400;
       case DebtState.ongoing:
-        return Colors.black54;
+        return Colors.grey.shade600;
     }
   }
 }

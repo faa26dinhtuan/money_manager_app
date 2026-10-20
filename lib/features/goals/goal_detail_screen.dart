@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -70,7 +71,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
         final shownSaved = goal.saved > goal.target ? goal.target : goal.saved;
         final slices = <DonutSlice>[
           if (shownSaved > 0) DonutSlice(shownSaved, goal.color),
-          if (goal.remaining > 0) DonutSlice(goal.remaining, Colors.black12),
+          if (goal.remaining > 0) DonutSlice(goal.remaining, context.outlineColor),
         ];
         final perDay = goal.requiredPerDay(now);
         final days = goal.daysLeft(now);
@@ -92,7 +93,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -135,7 +136,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           _Stat(
                             label: 'Mục tiêu',
                             value: goal.target,
-                            color: Colors.black87,
+                            color: context.textPrimary,
                           ),
                           _Stat(
                             label: 'Còn thiếu',
@@ -180,7 +181,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             days >= 30
                                 ? 'Cần tiết kiệm khoảng ${formatMoney(perDay * 30)}/tháng'
                                 : 'Cần tiết kiệm khoảng ${formatMoney(perDay)}/ngày',
-                            style: const TextStyle(color: Colors.black54),
+                            style: TextStyle(color: context.textSecondary),
                           ),
                         ),
                       ],
@@ -229,7 +230,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
               ),
               const SizedBox(height: 16),
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -250,12 +251,12 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                         ),
                       ),
                       if (entries.isEmpty)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: Center(
                             child: Text(
                               'Chưa có khoản nạp nào',
-                              style: TextStyle(color: Colors.black54),
+                              style: TextStyle(color: context.textSecondary),
                             ),
                           ),
                         ),
@@ -309,7 +310,7 @@ class _Stat extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Colors.black54, fontSize: 12),
+            style: TextStyle(color: context.textSecondary, fontSize: 12),
           ),
           const SizedBox(height: 4),
           FittedBox(
@@ -358,7 +359,7 @@ class _EntryTile extends StatelessWidget {
                   walletName == null
                       ? formatDate(entry.date)
                       : '${formatDate(entry.date)} · $walletName',
-                  style: const TextStyle(color: Colors.black45, fontSize: 12),
+                  style: TextStyle(color: context.textTertiary, fontSize: 12),
                 ),
               ],
             ),

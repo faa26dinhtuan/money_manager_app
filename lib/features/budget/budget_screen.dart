@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -88,7 +89,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
               Card(
-                color: Colors.white,
+                color: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -116,7 +117,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: _isCurrentMonth
-                                  ? Colors.black87
+                                  ? context.textPrimary
                                   : AppTheme.primary,
                             ),
                           ),
@@ -134,16 +135,16 @@ class _BudgetScreenState extends State<BudgetScreen> {
               ),
               const SizedBox(height: 12),
               if (rows.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
                       Icon(Icons.pie_chart_outline,
-                          size: 56, color: Colors.black26),
+                          size: 56, color: context.textDisabled),
                       SizedBox(height: 12),
                       Text(
                         'Chưa có ngân sách nào',
-                        style: TextStyle(color: Colors.black54),
+                        style: TextStyle(color: context.textSecondary),
                       ),
                     ],
                   ),
@@ -287,7 +288,7 @@ class _BudgetTile extends StatelessWidget {
         : 'Còn ${formatMoney(limit - row.spent)}';
 
     return Card(
-      color: Colors.white,
+      color: context.surfaceColor,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -333,8 +334,8 @@ class _BudgetTile extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '${formatMoney(row.spent)} / ${formatMoney(limit)}',
-                            style: const TextStyle(
-                              color: Colors.black54,
+                            style: TextStyle(
+                              color: context.textSecondary,
                               fontSize: 12,
                             ),
                           ),
@@ -354,7 +355,7 @@ class _BudgetTile extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.receipt_long_outlined),
-                color: Colors.black45,
+                color: context.textTertiary,
                 tooltip: 'Xem giao dịch',
                 onPressed: onViewTransactions,
               ),

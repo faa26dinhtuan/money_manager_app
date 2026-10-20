@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -192,14 +193,14 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text('Ví', style: TextStyle(color: Colors.black54)),
+          Text('Ví', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 8),
           WalletPicker(
             selectedId: _walletId,
             onChanged: (id) => setState(() => _walletId = id),
           ),
           const SizedBox(height: 20),
-          const Text('Danh mục', style: TextStyle(color: Colors.black54)),
+          Text('Danh mục', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -227,7 +228,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _categoryId == c.id ? c.color : Colors.black54,
+                            color: _categoryId == c.id ? c.color : context.textSecondary,
                           ),
                         ),
                       ],
@@ -237,7 +238,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Text('Chu kỳ lặp', style: TextStyle(color: Colors.black54)),
+          Text('Chu kỳ lặp', style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -252,7 +253,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          const Text('Bắt đầu từ ngày', style: TextStyle(color: Colors.black54)),
+          Text('Bắt đầu từ ngày', style: TextStyle(color: context.textSecondary)),
           InkWell(
             onTap: _pickStart,
             child: Padding(
@@ -268,7 +269,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text('Kết thúc (không bắt buộc)', style: TextStyle(color: Colors.black54)),
+          Text('Kết thúc (không bắt buộc)', style: TextStyle(color: context.textSecondary)),
           Row(
             children: [
               InkWell(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
@@ -172,7 +173,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.black54)),
+        Text(label, style: TextStyle(color: context.textSecondary)),
         InkWell(
           onTap: onTap,
           child: Padding(
@@ -183,7 +184,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
                   child: Text(
                     value == null ? empty : formatDate(value),
                     style: TextStyle(
-                      color: value == null ? Colors.black45 : AppTheme.primary,
+                      color: value == null ? context.textTertiary : AppTheme.primary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -250,7 +251,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           const SizedBox(height: 20),
           Text(
             isLend ? 'Lấy tiền từ ví' : 'Nhận tiền vào ví',
-            style: const TextStyle(color: Colors.black54),
+            style: TextStyle(color: context.textSecondary),
           ),
           const SizedBox(height: 8),
           WalletPicker(
