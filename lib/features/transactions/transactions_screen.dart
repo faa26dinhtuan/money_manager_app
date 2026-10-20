@@ -10,6 +10,7 @@ import 'package:money_manager_app/core/widgets/date_range_dialog.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
+import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -88,8 +89,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       listenable: _store,
       builder: (context, _) {
         final range = DateRange.of(_period, _anchor, _customRange);
-        final incomeItems = _filter(_store.query(TxType.income, range));
-        final expenseItems = _filter(_store.query(TxType.expense, range));
+        final walletId = _store.selectedWalletId;
+        final incomeItems = _filter(
+          _store.query(TxType.income, range, walletId: walletId),
+        );
+        final expenseItems = _filter(
+          _store.query(TxType.expense, range, walletId: walletId),
+        );
         final items = _type == TxType.income ? incomeItems : expenseItems;
         final income = _sum(incomeItems);
         final expense = _sum(expenseItems);
@@ -102,6 +108,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
         return Scaffold(
           appBar: AppBar(
+            leadingWidth: 156,
+            leading: const Align(
+              alignment: Alignment.centerLeft,
+              child: WalletSelector(),
+            ),
             title: const Text('Giao dịch'),
             actions: const [SettingsButton()],
             bottom: PreferredSize(
