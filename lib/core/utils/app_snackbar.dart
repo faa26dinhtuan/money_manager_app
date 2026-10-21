@@ -8,6 +8,7 @@ extension AppSnackBar on ScaffoldMessengerState {
         content: Text(message),
         duration: const Duration(seconds: 3),
         persist: false,
+        behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
         action: action,
       ),
