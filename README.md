@@ -1,17 +1,4 @@
-# money_manager_app
+# 
 
-A new Flutter project.
+cần sửa lại tính năng chuyển đổi tiền tệ khi đã có sẵn ví(cho lựa chọn có muốn đổi tiền trong ví hiện tại sang tiền tệ khác hay k), nếu k đổi thì tức là phải tạo ví mới lúc đó sẽ bắt người dùng phải sao lưu lại thông tin ví cũ để tránh việc bị trùng lặp thông tin ví và sai lệch giữa các loại tiền tệ, nếu có thể thì cho mỗi tiền tệ chỉ lưu đúng loại ví/nợ/goal... của đúng loại tiền tệ đó.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

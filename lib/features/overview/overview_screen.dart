@@ -95,6 +95,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             const SizedBox(height: 12),
                             DonutChart(
                               slices: slices,
+                              size: 240,
+                              thickness: 40,
+                              showLabels: true,
+                              interactive: true,
                               center: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
