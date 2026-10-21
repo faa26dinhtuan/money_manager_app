@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/data/services/exchange_rates.dart';
@@ -18,10 +17,6 @@ class SettingsScreen extends StatelessWidget {
     ThemeMode.dark: 'Tối',
     ThemeMode.system: 'Theo hệ thống',
   };
-
-  void _soon(BuildContext context) {
-    ScaffoldMessenger.of(context).showApp('Tính năng sẽ có ở bước sau');
-  }
 
   Future<void> _pickTheme(BuildContext context) {
     final store = AppStore.instance;
@@ -141,7 +136,7 @@ class SettingsScreen extends StatelessWidget {
             Icons.info_outline,
             'Giới thiệu',
             'Phiên bản 1.0.0',
-            () => _soon(context),
+            () {},
           ),
         ];
 
