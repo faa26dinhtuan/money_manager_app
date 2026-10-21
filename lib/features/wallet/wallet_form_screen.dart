@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
@@ -165,10 +166,10 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
           MoneyField(
             controller: _balanceCtrl,
             title: 'Số dư ban đầu',
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Số dư ban đầu',
               hintText: '0',
-              suffixText: '₫',
+              suffixText: currencySymbol,
             ),
           ),
           const SizedBox(height: 24),

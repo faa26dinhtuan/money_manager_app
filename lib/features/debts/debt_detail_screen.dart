@@ -248,17 +248,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       for (final p in payments)
                         Dismissible(
                           key: ValueKey(p.id),
-                          direction: DismissDirection.horizontal,
+                          direction: DismissDirection.endToStart,
                           background: Container(
-                            color: Colors.red.shade400,
-                            alignment: Alignment.centerLeft,
-                            padding: const EdgeInsets.only(left: 20),
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
-                          secondaryBackground: Container(
                             color: Colors.red.shade400,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 20),

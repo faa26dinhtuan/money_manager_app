@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/wallet_picker.dart';
@@ -89,7 +90,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
               },
               decoration: InputDecoration(
                 labelText: 'Số tiền',
-                suffixText: '₫',
+                suffixText: currencySymbol,
                 errorText: _error,
               ),
             ),

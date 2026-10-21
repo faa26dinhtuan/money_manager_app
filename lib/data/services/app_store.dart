@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
+import 'package:money_manager_app/data/models/backup_data.dart';
 import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/debt.dart';
@@ -24,6 +26,7 @@ class AppStore extends ChangeNotifier {
   static const _recurringsKey = 'recurrings';
   static const _onboardedKey = 'onboarded';
   static const _themeModeKey = 'themeMode';
+  static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
 
   static const _cashWallet = Wallet(
@@ -44,11 +47,14 @@ class AppStore extends ChangeNotifier {
   final List<RecurringTransaction> _recurrings = [];
   bool _onboarded = false;
   ThemeMode _themeMode = ThemeMode.light;
+  AppCurrency _currency = AppCurrency.vnd;
   String? _selectedWalletId;
 
   bool get onboarded => _onboarded;
 
   ThemeMode get themeMode => _themeMode;
+
+  AppCurrency get currency => _currency;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -56,6 +62,8 @@ class AppStore extends ChangeNotifier {
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
         ThemeMode.light;
+    _currency = AppCurrency.byCode(_prefs.getString(_currencyKey));
+    AppCurrency.current = _currency;
     _selectedWalletId = _prefs.getString(_selectedWalletKey);
     final rawRecurrings = _prefs.getString(_recurringsKey);
     if (rawRecurrings != null) {
@@ -197,6 +205,8 @@ class AppStore extends ChangeNotifier {
           ..sort((a, b) => b.date.compareTo(a.date));
     return list;
   }
+
+  List<Transaction> get transactions => List.unmodifiable(_transactions);
 
   List<Wallet> get wallets => List.unmodifiable(_wallets);
 
@@ -604,6 +614,138 @@ class AppStore extends ChangeNotifier {
     _themeMode = mode;
     _prefs.setString(_themeModeKey, mode.name);
     notifyListeners();
+  }
+
+  void setCurrency(AppCurrency currency) {
+    _currency = currency;
+    AppCurrency.current = currency;
+    _prefs.setString(_currencyKey, currency.code);
+    notifyListeners();
+  }
+
+  Future<void> convertCurrency(AppCurrency to, double factor) async {
+    final scale = to.scale;
+    double conv(double value) {
+      final minor = (value * factor * scale).round();
+      if (minor == 0 && value != 0) return value.sign / scale;
+      return minor / scale;
+    }
+
+    for (var i = 0; i < _transactions.length; i++) {
+      final t = _transactions[i];
+      _transactions[i] = Transaction(
+        id: t.id,
+        type: t.type,
+        categoryId: t.categoryId,
+        walletId: t.walletId,
+        amount: conv(t.amount),
+        date: t.date,
+        note: t.note,
+      );
+    }
+    for (var i = 0; i < _wallets.length; i++) {
+      final w = _wallets[i];
+      _wallets[i] = Wallet(
+        id: w.id,
+        name: w.name,
+        icon: w.icon,
+        color: w.color,
+        initialBalance: conv(w.initialBalance),
+      );
+    }
+    for (var i = 0; i < _budgets.length; i++) {
+      final b = _budgets[i];
+      _budgets[i] = Budget(
+        id: b.id,
+        categoryId: b.categoryId,
+        limit: conv(b.limit),
+      );
+    }
+    for (var i = 0; i < _goals.length; i++) {
+      final g = _goals[i];
+      _goals[i] = g.copyWith(
+        target: conv(g.target),
+        entries: [
+          for (final e in g.entries)
+            GoalEntry(
+              id: e.id,
+              amount: conv(e.amount),
+              date: e.date,
+              note: e.note,
+              walletId: e.walletId,
+            ),
+        ],
+      );
+    }
+    for (var i = 0; i < _debts.length; i++) {
+      final d = _debts[i];
+      _debts[i] = d.copyWith(
+        amount: conv(d.amount),
+        payments: [
+          for (final p in d.payments)
+            DebtPayment(
+              id: p.id,
+              amount: conv(p.amount),
+              date: p.date,
+              note: p.note,
+              walletId: p.walletId,
+            ),
+        ],
+      );
+    }
+    for (var i = 0; i < _recurrings.length; i++) {
+      final r = _recurrings[i];
+      _recurrings[i] = r.copyWith(amount: conv(r.amount));
+    }
+    _currency = to;
+    AppCurrency.current = to;
+    _prefs.setString(_currencyKey, to.code);
+    notifyListeners();
+    await _save();
+  }
+
+  BackupData createBackup() {
+    return BackupData(
+      categories: List.of(_categories),
+      transactions: List.of(_transactions),
+      wallets: List.of(_wallets),
+      budgets: List.of(_budgets),
+      goals: List.of(_goals),
+      debts: List.of(_debts),
+      recurrings: List.of(_recurrings),
+      currency: _currency.code,
+    );
+  }
+
+  Future<void> restoreBackup(BackupData data) async {
+    _categories
+      ..clear()
+      ..addAll(data.categories);
+    _transactions
+      ..clear()
+      ..addAll(data.transactions);
+    _wallets
+      ..clear()
+      ..addAll(data.wallets);
+    _budgets
+      ..clear()
+      ..addAll(data.budgets);
+    _goals
+      ..clear()
+      ..addAll(data.goals);
+    _debts
+      ..clear()
+      ..addAll(data.debts);
+    _recurrings
+      ..clear()
+      ..addAll(data.recurrings);
+    if (data.currency != null) {
+      _currency = AppCurrency.byCode(data.currency);
+      AppCurrency.current = _currency;
+      _prefs.setString(_currencyKey, _currency.code);
+    }
+    notifyListeners();
+    await _save();
   }
 
   void completeOnboarding([Wallet? wallet]) {
