@@ -6,6 +6,7 @@ import 'package:money_manager_app/core/utils/debt_status.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/budget_progress_bar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/confirm_delete_dialog.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/debts/debt_form_screen.dart';
@@ -41,13 +42,6 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
 
   void _removePayment(Debt debt, DebtPayment payment) {
     _store.removeDebtPayment(debt.id, payment.id);
-    ScaffoldMessenger.of(context).showApp(
-      'Đã xóa khoản thanh toán',
-      action: SnackBarAction(
-        label: 'Hoàn tác',
-        onPressed: () => _store.addDebtPayment(debt.id, payment),
-      ),
-    );
   }
 
   void _edit(Debt debt) {
@@ -257,6 +251,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                               Icons.delete,
                               color: Colors.white,
                             ),
+                          ),
+                          confirmDismiss: (_) => confirmDelete(
+                            context,
+                            title: 'Xóa lần thanh toán?',
+                            message: 'Số tiền còn lại của khoản nợ sẽ được tính lại.',
                           ),
                           onDismissed: (_) => _removePayment(debt, p),
                           child: _HistoryTile(

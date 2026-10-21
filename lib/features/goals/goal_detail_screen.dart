@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/goal_status.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/confirm_delete_dialog.dart';
 import 'package:money_manager_app/core/widgets/donut_chart.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -41,13 +42,6 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
 
   void _removeEntry(Goal goal, GoalEntry entry) {
     _store.removeGoalEntry(goal.id, entry.id);
-    ScaffoldMessenger.of(context).showApp(
-      'Đã xóa khoản ${entry.isDeposit ? 'nạp' : 'rút'}',
-      action: SnackBarAction(
-        label: 'Hoàn tác',
-        onPressed: () => _store.addGoalEntry(goal.id, entry),
-      ),
-    );
   }
 
   void _edit(Goal goal) {
@@ -269,6 +263,11 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 20),
                             child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          confirmDismiss: (_) => confirmDelete(
+                            context,
+                            title: e.isDeposit ? 'Xóa lần nạp?' : 'Xóa lần rút?',
+                            message: 'Số tiền đã tiết kiệm sẽ được tính lại.',
                           ),
                           onDismissed: (_) => _removeEntry(goal, e),
                           child: _EntryTile(

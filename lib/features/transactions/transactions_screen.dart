@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/text_utils.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/confirm_delete_dialog.dart';
 import 'package:money_manager_app/core/widgets/date_range_dialog.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
@@ -71,13 +71,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   void _delete(Transaction t) {
     _store.removeTransaction(t.id);
-    ScaffoldMessenger.of(context).showApp(
-      'Đã xóa giao dịch',
-      action: SnackBarAction(
-        label: 'Hoàn tác',
-        onPressed: () => _store.addTransaction(t),
-      ),
-    );
   }
 
   double _sum(List<Transaction> list) =>
@@ -220,6 +213,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
                               child: const Icon(Icons.delete, color: Colors.white),
+                            ),
+                            confirmDismiss: (_) => confirmDelete(
+                              context,
+                              title: 'Xóa giao dịch?',
+                              message: 'Giao dịch này sẽ bị xóa khỏi danh sách.',
                             ),
                             onDismissed: (_) => _delete(t),
                             child: InkWell(
