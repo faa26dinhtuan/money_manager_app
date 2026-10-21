@@ -1,15 +1,4 @@
-import 'package:money_manager_app/core/utils/formatters.dart';
-
-enum Period {
-  day('Ngày'),
-  week('Tuần'),
-  month('Tháng'),
-  year('Năm'),
-  custom('Kỳ');
-
-  const Period(this.label);
-  final String label;
-}
+enum Period { day, week, month, year, custom }
 
 class DateRange {
   const DateRange(this.start, this.end);
@@ -55,27 +44,6 @@ class DateRange {
         return DateTime(a.year + delta);
       case Period.custom:
         return a;
-    }
-  }
-
-  static String label(Period p, DateTime a, [DateRange? custom]) {
-    switch (p) {
-      case Period.day:
-        return isSameDay(a, DateTime.now())
-            ? 'Hôm nay, ${formatDayMonth(a)}'
-            : formatDate(a);
-      case Period.week:
-        final r = of(p, a);
-        final last = r.end.subtract(const Duration(days: 1));
-        return '${formatDayMonth(r.start)} – ${formatDayMonth(last)}';
-      case Period.month:
-        return 'Tháng ${a.month}, ${a.year}';
-      case Period.year:
-        return 'Năm ${a.year}';
-      case Period.custom:
-        if (custom == null) return 'Chọn khoảng thời gian';
-        final customLast = custom.end.subtract(const Duration(days: 1));
-        return '${formatDate(custom.start)} – ${formatDate(customLast)}';
     }
   }
 }

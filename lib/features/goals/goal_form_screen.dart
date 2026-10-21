@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -21,21 +22,15 @@ class GoalFormScreen extends StatefulWidget {
 
 class _GoalFormScreenState extends State<GoalFormScreen> {
   static const _icons = <AppIconData>[
-    AppIcons.flag,
-    AppIcons.flight,
-    AppIcons.beach,
-    AppIcons.home,
+    AppIcons.savings,
     AppIcons.car,
-    AppIcons.motorcycle,
+    AppIcons.home,
+    AppIcons.flight,
     AppIcons.laptop,
     AppIcons.phone,
-    AppIcons.camera,
     AppIcons.school,
-    AppIcons.savings,
-    AppIcons.diamond,
-    AppIcons.celebration,
     AppIcons.favorite,
-    AppIcons.health,
+    AppIcons.shoppingCart,
     AppIcons.gift,
   ];
 
@@ -56,7 +51,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   final _initialCtrl = MoneyController();
 
   late AppIconData _icon = widget.goal?.icon ?? _icons.first;
-  late Color _color = widget.goal?.color ?? _colors[1];
+  late Color _color = widget.goal?.color ?? _colors.first;
   late DateTime? _deadline = widget.goal?.deadline;
 
   late final List<AppIconData> _iconChoices = [
@@ -99,14 +94,15 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final name = _nameCtrl.text.trim();
     final target = _targetCtrl.amount;
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showApp('Vui lòng nhập tên mục tiêu');
+      ScaffoldMessenger.of(context).showApp(l.pleaseEnterGoalName);
       return;
     }
     if (target <= 0) {
-      ScaffoldMessenger.of(context).showApp('Vui lòng nhập số tiền mục tiêu');
+      ScaffoldMessenger.of(context).showApp(l.pleaseEnterTarget);
       return;
     }
     if (_isEditing) {
@@ -138,7 +134,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                     id: '${id}_init',
                     amount: initial,
                     date: DateTime.now(),
-                    note: 'Số tiền ban đầu',
+                    note: l.initialDeposit,
                   ),
                 ]
               : const [],
@@ -149,31 +145,22 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   }
 
   Future<void> _confirmDelete() async {
+    final l = context.l10n;
     final goal = _store.goalById(widget.goal!.id) ?? widget.goal!;
-    final count = goal.entries.length;
-    final linked = goal.entries.where((e) => e.walletId != null).length;
-    final message = StringBuffer(
-      count == 0
-          ? 'Mục tiêu "${goal.name}" sẽ bị xóa.'
-          : 'Mục tiêu "${goal.name}" cùng $count lần nạp/rút sẽ bị xóa.',
-    );
-    if (linked > 0) {
-      message.write(' Các khoản nạp/rút qua ví sẽ được hoàn về ví tương ứng.');
-    }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Xóa mục tiêu?'),
-        content: Text(message.toString()),
+        title: Text(l.deleteGoalTitle),
+        content: Text(l.deleteGoalMessage(goal.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Xóa'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -188,8 +175,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Sửa mục tiêu' : 'Thêm mục tiêu')),
+      appBar: AppBar(title: Text(_isEditing ? l.editGoal : l.addGoal)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -200,7 +188,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
               Expanded(
                 child: TextField(
                   controller: _nameCtrl,
-                  decoration: const InputDecoration(hintText: 'Tên mục tiêu'),
+                  decoration: InputDecoration(hintText: l.goalName),
                 ),
               ),
             ],
@@ -208,9 +196,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
           const SizedBox(height: 16),
           MoneyField(
             controller: _targetCtrl,
-            title: 'Số tiền mục tiêu',
+            title: l.targetAmount,
             decoration: InputDecoration(
-              labelText: 'Số tiền mục tiêu',
+              labelText: l.targetAmount,
               hintText: '0',
               suffixText: currencySymbol,
             ),
@@ -219,16 +207,16 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             const SizedBox(height: 16),
             MoneyField(
               controller: _initialCtrl,
-              title: 'Số tiền đã có',
+              title: l.initialAmount,
               decoration: InputDecoration(
-                labelText: 'Số tiền đã có (không bắt buộc)',
+                labelText: l.initialAmountOptional,
                 hintText: '0',
                 suffixText: currencySymbol,
               ),
             ),
           ],
           const SizedBox(height: 20),
-          Text('Thời hạn', style: TextStyle(color: context.textSecondary)),
+          Text(l.deadline, style: TextStyle(color: context.textSecondary)),
           InkWell(
             onTap: _pickDeadline,
             child: Padding(
@@ -238,7 +226,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                   Expanded(
                     child: Text(
                       _deadline == null
-                          ? 'Chưa đặt thời hạn'
+                          ? l.noDeadline
                           : formatDate(_deadline!),
                       style: TextStyle(
                         color: _deadline == null
@@ -259,7 +247,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Text('Biểu tượng', style: TextStyle(color: context.textSecondary)),
+          Text(l.icon, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -278,7 +266,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Text('Màu sắc', style: TextStyle(color: context.textSecondary)),
+          Text(l.color, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -310,7 +298,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
               ),
               onPressed: _submit,
               child: Text(
-                _isEditing ? 'Lưu' : 'Thêm',
+                _isEditing ? l.save : l.add,
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -328,8 +316,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                   ),
                 ),
                 onPressed: _confirmDelete,
-                child: const Text('Xóa mục tiêu',
-                    style: TextStyle(fontSize: 16)),
+                child: Text(l.deleteGoal, style: const TextStyle(fontSize: 16)),
               ),
             ),
           ],

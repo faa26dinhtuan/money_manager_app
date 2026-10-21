@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -78,9 +78,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: const Center(child: FlutterLogo(size: 72)),
               ),
               const SizedBox(height: 24),
-              const Text(
-                AppConstants.appName,
-                style: TextStyle(
+              Text(
+                context.l10n.appName,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -88,9 +88,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Quản lý chi tiêu cá nhân',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+              Text(
+                context.l10n.splashTagline,
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ],
           ),

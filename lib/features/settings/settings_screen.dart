@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -13,20 +15,24 @@ import 'package:money_manager_app/features/settings/export_screen.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  static const _modeLabels = <ThemeMode, String>{
-    ThemeMode.light: 'Sáng',
-    ThemeMode.dark: 'Tối',
-    ThemeMode.system: 'Theo hệ thống',
-  };
+  Map<ThemeMode, String> _modeLabels(BuildContext context) {
+    final l = context.l10n;
+    return {
+      ThemeMode.light: l.themeLight,
+      ThemeMode.dark: l.themeDark,
+      ThemeMode.system: l.themeSystem,
+    };
+  }
 
   Future<void> _pickTheme(BuildContext context) {
     final store = AppStore.instance;
+    final labels = _modeLabels(context);
     return showDialog<void>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Giao diện'),
+        title: Text(context.l10n.theme),
         children: [
-          for (final entry in _modeLabels.entries)
+          for (final entry in labels.entries)
             ListTile(
               title: Text(entry.value),
               trailing: store.themeMode == entry.key
@@ -42,23 +48,65 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _pickCurrency(BuildContext context) {
+  String _localeLabel(BuildContext context, Locale? locale) {
+    final l = context.l10n;
+    if (locale == null) return l.langSystem;
+    return switch (locale.languageCode) {
+      'vi' => l.langVi,
+      'en' => l.langEn,
+      _ => locale.languageCode,
+    };
+  }
+
+  Future<void> _pickLanguage(BuildContext context) {
     final store = AppStore.instance;
+    final l = context.l10n;
+    final options = <(String, Locale?)>[
+      (l.langSystem, null),
+      (l.langVi, const Locale('vi')),
+      (l.langEn, const Locale('en')),
+    ];
+
     return showDialog<void>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Tiền tệ mặc định'),
+        title: Text(l.language),
+        children: [
+          for (final (label, loc) in options)
+            ListTile(
+              title: Text(label),
+              trailing: (loc == null && store.locale == null) ||
+                      (loc != null && store.locale?.languageCode == loc.languageCode)
+                  ? const AppIcon(AppIcons.check, color: AppTheme.primary)
+                  : null,
+              onTap: () {
+                store.setLocale(loc);
+                Navigator.of(ctx).pop();
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickCurrency(BuildContext context) {
+    final store = AppStore.instance;
+    final l = context.l10n;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(l.currencyDefault),
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
             child: Text(
-              'Chỉ đổi cách hiển thị, số tiền đã nhập không được quy đổi.',
+              l.currencyDefaultNotice,
               style: TextStyle(color: ctx.textSecondary),
             ),
           ),
           for (final currency in AppCurrency.all)
             ListTile(
-              title: Text(currency.name),
+              title: Text(currency.localizedName(context)),
               subtitle: Text(currency.label),
               trailing: store.currency.code == currency.code
                   ? const AppIcon(AppIcons.check, color: AppTheme.primary)
@@ -94,17 +142,18 @@ class SettingsScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: AppStore.instance,
       builder: (context, _) {
+        final l = context.l10n;
         final items = <(AppIconData, String, String, VoidCallback)>[
           (
             AppIcons.dollar,
-            'Tiền tệ mặc định',
+            l.currencyDefault,
             AppStore.instance.currency.label,
             () => _pickCurrency(context),
           ),
           (
             AppIcons.exchange,
-            'Đổi tiền tệ',
-            'Quy đổi theo tỷ giá',
+            l.currencyConverter,
+            l.currencyConverterSubtitle,
             () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => const CurrencyConverterScreen(),
@@ -113,13 +162,19 @@ class SettingsScreen extends StatelessWidget {
           ),
           (
             AppIcons.brush,
-            'Giao diện',
-            _modeLabels[AppStore.instance.themeMode]!,
+            l.theme,
+            _modeLabels(context)[AppStore.instance.themeMode]!,
             () => _pickTheme(context),
           ),
           (
+            AppIcons.flag,
+            l.language,
+            _localeLabel(context, AppStore.instance.locale),
+            () => _pickLanguage(context),
+          ),
+          (
             AppIcons.upload,
-            'Sao lưu & khôi phục',
+            l.backupAndRestore,
             '',
             () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const BackupScreen()),
@@ -127,7 +182,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           (
             AppIcons.download,
-            'Xuất dữ liệu',
+            l.exportData,
             'CSV',
             () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ExportScreen()),
@@ -135,14 +190,14 @@ class SettingsScreen extends StatelessWidget {
           ),
           (
             AppIcons.info,
-            'Giới thiệu',
-            'Phiên bản 1.0.0',
+            l.about,
+            l.appVersion('1.0.0'),
             () {},
           ),
         ];
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Cài đặt')),
+          appBar: AppBar(title: Text(l.settings)),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [

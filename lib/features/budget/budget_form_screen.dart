@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -58,13 +60,14 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final limit = _limitCtrl.amount;
     if (_categoryId == null) {
-      _toast('Vui lòng chọn danh mục');
+      _toast(l.pleaseSelectCategory);
       return;
     }
     if (limit <= 0) {
-      _toast('Vui lòng nhập hạn mức');
+      _toast(l.pleaseEnterLimit);
       return;
     }
     final budget = Budget(
@@ -81,21 +84,22 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
   }
 
   Future<void> _confirmDelete() async {
-    final name = _store.categoryById(widget.budget!.categoryId)?.name ?? 'Khác';
+    final l = context.l10n;
+    final name = _store.categoryById(widget.budget!.categoryId)?.localizedName(context) ?? l.other;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Xóa ngân sách?'),
-        content: Text('Ngân sách của danh mục "$name" sẽ bị xóa.'),
+        title: Text(l.deleteBudgetTitle),
+        content: Text(l.deleteBudgetMessage(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Xóa'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -108,15 +112,16 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final choices = _choices;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Sửa ngân sách' : 'Thêm ngân sách'),
+        title: Text(_isEditing ? l.editBudget : l.addBudget),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text('Hạn mức mỗi tháng',
+          Text(l.monthlyLimit,
               style: TextStyle(color: context.textSecondary)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -124,7 +129,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
               Expanded(
                 child: MoneyField(
                   controller: _limitCtrl,
-                  title: 'Hạn mức mỗi tháng',
+                  title: l.monthlyLimit,
                   style:
                       const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
@@ -144,13 +149,13 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Text('Danh mục', style: TextStyle(color: context.textSecondary)),
+          Text(l.category, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           if (choices.isEmpty)
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                'Tất cả danh mục chi tiêu đã có ngân sách',
+                l.allCategoriesHaveBudgets,
                 style: TextStyle(color: context.textSecondary),
               ),
             )
@@ -178,7 +183,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            c.name,
+                            c.localizedName(context),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -207,7 +212,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
               ),
               onPressed: _submit,
               child: Text(
-                _isEditing ? 'Lưu' : 'Thêm',
+                _isEditing ? l.save : l.add,
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -225,8 +230,8 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
                   ),
                 ),
                 onPressed: _confirmDelete,
-                child: const Text('Xóa ngân sách',
-                    style: TextStyle(fontSize: 16)),
+                child: Text(l.deleteBudget,
+                    style: const TextStyle(fontSize: 16)),
               ),
             ),
           ],

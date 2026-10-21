@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
@@ -21,13 +23,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
         final categories = _store.categoriesOf(_type);
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Danh mục'),
+            title: Text(l.categories),
             actions: const [SettingsButton()],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
@@ -86,7 +89,7 @@ class _CategoryTile extends StatelessWidget {
           CategoryIcon(icon: category.icon, color: category.color, size: 56),
           const SizedBox(height: 6),
           Text(
-            category.name,
+            category.localizedName(context),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 12),
@@ -117,7 +120,7 @@ class _AddTile extends StatelessWidget {
             child: AppIcon(AppIcons.add, color: context.textTertiary),
           ),
           const SizedBox(height: 6),
-          const Text('Thêm', style: TextStyle(fontSize: 12)),
+          Text(context.l10n.add, style: const TextStyle(fontSize: 12)),
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -27,6 +29,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = AppStore.instance;
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: store,
       builder: (context, _) {
@@ -43,8 +46,10 @@ class CategoryTransactionsScreen extends StatelessWidget {
           groups.putIfAbsent(key, () => []).add(t);
         }
 
+        final categoryTitle = category?.localizedName(context) ?? l.other;
+
         return Scaffold(
-          appBar: AppBar(title: Text(category?.name ?? 'Khác')),
+          appBar: AppBar(title: Text(categoryTitle)),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -88,7 +93,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        '${items.length} giao dịch',
+                        l.transactionCount(items.length),
                         style: TextStyle(color: context.textTertiary),
                       ),
                     ],
@@ -109,9 +114,9 @@ class CategoryTransactionsScreen extends StatelessWidget {
                     children: [
                       if (groups.isEmpty)
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 32),
+                          padding: const EdgeInsets.symmetric(vertical: 32),
                           child: Text(
-                            'Chưa có giao dịch',
+                            l.noTransactions,
                             style: TextStyle(color: context.textSecondary),
                           ),
                         ),
@@ -147,9 +152,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      t.note.isEmpty
-                                          ? (category?.name ?? 'Khác')
-                                          : t.note,
+                                      t.note.isEmpty ? categoryTitle : t.note,
                                     ),
                                   ),
                                   Text(

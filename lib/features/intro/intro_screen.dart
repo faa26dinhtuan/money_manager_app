@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -12,37 +13,8 @@ class IntroScreen extends StatefulWidget {
 }
 
 class _IntroScreenState extends State<IntroScreen> {
-  static const _pages = <_IntroPage>[
-    _IntroPage(
-      icon: AppIcons.overview,
-      title: 'Theo dõi thu chi',
-      description:
-          'Ghi lại mọi khoản thu và chi, xem biểu đồ theo danh mục để biết tiền của bạn đang đi đâu.',
-    ),
-    _IntroPage(
-      icon: AppIcons.wallet,
-      title: 'Quản lý nhiều ví',
-      description:
-          'Tách riêng tiền mặt, ngân hàng, ví điện tử và xem số dư của từng ví một cách rõ ràng.',
-    ),
-    _IntroPage(
-      icon: AppIcons.flag,
-      title: 'Ngân sách & mục tiêu',
-      description:
-          'Đặt hạn mức chi tiêu mỗi tháng, nhận cảnh báo khi sắp vượt và tiết kiệm cho kế hoạch của bạn.',
-    ),
-    _IntroPage(
-      icon: AppIcons.repeat,
-      title: 'Sổ nợ & giao dịch định kỳ',
-      description:
-          'Theo dõi các khoản cho vay, đi vay và để các khoản lặp lại như tiền nhà, lương tự động được ghi.',
-    ),
-  ];
-
   final _controller = PageController();
   int _index = 0;
-
-  bool get _isLast => _index == _pages.length - 1;
 
   @override
   void dispose() {
@@ -62,8 +34,8 @@ class _IntroScreenState extends State<IntroScreen> {
     );
   }
 
-  void _onContinue() {
-    if (_isLast) {
+  void _onContinue(int total) {
+    if (_index == total - 1) {
       _goNext();
       return;
     }
@@ -75,6 +47,31 @@ class _IntroScreenState extends State<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final pages = [
+      _IntroPage(
+        icon: AppIcons.overview,
+        title: l.introTrackTitle,
+        description: l.introTrackDesc,
+      ),
+      _IntroPage(
+        icon: AppIcons.wallet,
+        title: l.introWalletTitle,
+        description: l.introWalletDesc,
+      ),
+      _IntroPage(
+        icon: AppIcons.flag,
+        title: l.introBudgetTitle,
+        description: l.introBudgetDesc,
+      ),
+      _IntroPage(
+        icon: AppIcons.repeat,
+        title: l.introRecurringTitle,
+        description: l.introRecurringDesc,
+      ),
+    ];
+    final isLast = _index == pages.length - 1;
+
     return Scaffold(
       backgroundColor: AppTheme.primary,
       body: SafeArea(
@@ -83,15 +80,15 @@ class _IntroScreenState extends State<IntroScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (i) => setState(() => _index = i),
-                itemBuilder: (_, i) => _PageContent(page: _pages[i]),
+                itemBuilder: (_, i) => _PageContent(page: pages[i]),
               ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (var i = 0; i < _pages.length; i++)
+                for (var i = 0; i < pages.length; i++)
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -117,9 +114,9 @@ class _IntroScreenState extends State<IntroScreen> {
                       borderRadius: BorderRadius.circular(26),
                     ),
                   ),
-                  onPressed: _onContinue,
+                  onPressed: () => _onContinue(pages.length),
                   child: Text(
-                    _isLast ? 'Bắt đầu' : 'Tiếp tục',
+                    isLast ? l.start : l.continueText,
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -29,11 +31,10 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
 
   late TxType _type = widget.recurring?.type ?? TxType.expense;
   late Frequency _frequency = widget.recurring?.frequency ?? Frequency.monthly;
-  late DateTime _start =
-      widget.recurring?.startDate ?? RecurringTransaction.dateOnly(DateTime.now());
+  late DateTime _start = widget.recurring?.startDate ?? DateTime.now();
   late DateTime? _end = widget.recurring?.endDate;
-  late String? _walletId = widget.recurring?.walletId ?? _store.wallets.first.id;
-  late String? _categoryId = widget.recurring?.categoryId;
+  String? _categoryId;
+  String? _walletId;
 
   bool get _isEditing => widget.recurring != null;
 
@@ -41,9 +42,11 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
   void initState() {
     super.initState();
     final r = widget.recurring;
+    _walletId = r?.walletId ?? _store.wallets.first.id;
     if (r != null) {
       _amountCtrl.amount = r.amount;
       _noteCtrl.text = r.note;
+      _categoryId = r.categoryId;
     }
   }
 
@@ -52,6 +55,10 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
     _amountCtrl.dispose();
     _noteCtrl.dispose();
     super.dispose();
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showApp(msg);
   }
 
   Future<void> _pickStart() async {
@@ -65,32 +72,30 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
   }
 
   Future<void> _pickEnd() async {
+    final initial = _end ?? _start.add(const Duration(days: 90));
     final picked = await showDatePicker(
       context: context,
-      initialDate: _end ?? _start.add(const Duration(days: 365)),
-      firstDate: DateTime(2000),
+      initialDate: initial.isBefore(_start) ? _start : initial,
+      firstDate: _start,
       lastDate: DateTime(2100),
     );
     if (picked != null) setState(() => _end = picked);
   }
 
-  void _toast(String message) {
-    ScaffoldMessenger.of(context).showApp(message);
-  }
-
   void _submit() {
+    final l = context.l10n;
     final amount = _amountCtrl.amount;
     if (amount <= 0) {
-      _toast('Vui lòng nhập số tiền');
+      _toast(l.pleaseEnterAmount);
       return;
     }
     if (_categoryId == null) {
-      _toast('Vui lòng chọn danh mục');
+      _toast(l.pleaseSelectCategory);
       return;
     }
     final end = _end;
     if (end != null && end.isBefore(_start)) {
-      _toast('Ngày kết thúc phải sau ngày bắt đầu');
+      _toast(l.mustBeAfterStartDate);
       return;
     }
     final existing = widget.recurring;
@@ -115,27 +120,26 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
         : _store.addRecurring(item);
     Navigator.of(context).pop();
     if (created > 0) {
-      messenger.showApp('Đã tự động thêm $created giao dịch định kỳ');
+      messenger.showApp(l.autoAddedRecurring(created));
     }
   }
 
   Future<void> _confirmDelete() async {
+    final l = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Xóa giao dịch định kỳ?'),
-        content: const Text(
-          'Các giao dịch đã được tạo trước đó vẫn được giữ lại.',
-        ),
+        title: Text(l.deleteRecurringTitle),
+        content: Text(l.deleteRecurringConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Xóa'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -148,11 +152,12 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final categories = _store.categoriesOf(_type);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Sửa giao dịch định kỳ' : 'Thêm giao dịch định kỳ'),
+        title: Text(_isEditing ? l.editRecurring : l.addRecurring),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Padding(
@@ -176,7 +181,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
               Expanded(
                 child: MoneyField(
                   controller: _amountCtrl,
-                  title: 'Số tiền',
+                  title: l.amount,
                   style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
                 ),
@@ -195,14 +200,14 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Text('Ví', style: TextStyle(color: context.textSecondary)),
+          Text(l.wallet, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 8),
           WalletPicker(
             selectedId: _walletId,
             onChanged: (id) => setState(() => _walletId = id),
           ),
           const SizedBox(height: 20),
-          Text('Danh mục', style: TextStyle(color: context.textSecondary)),
+          Text(l.category, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -225,7 +230,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          c.name,
+                          c.localizedName(context),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -240,7 +245,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Text('Chu kỳ lặp', style: TextStyle(color: context.textSecondary)),
+          Text(l.repeatCycle, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -248,14 +253,14 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             children: [
               for (final f in Frequency.values)
                 ChoiceChip(
-                  label: Text(f.label),
+                  label: Text(f.localizedLabel(context)),
                   selected: _frequency == f,
                   onSelected: (_) => setState(() => _frequency = f),
                 ),
             ],
           ),
           const SizedBox(height: 20),
-          Text('Bắt đầu từ ngày', style: TextStyle(color: context.textSecondary)),
+          Text(l.startsOn, style: TextStyle(color: context.textSecondary)),
           InkWell(
             onTap: _pickStart,
             child: Padding(
@@ -271,7 +276,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Text('Kết thúc (không bắt buộc)', style: TextStyle(color: context.textSecondary)),
+          Text(l.endsOn, style: TextStyle(color: context.textSecondary)),
           Row(
             children: [
               InkWell(
@@ -279,7 +284,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    _end == null ? 'Không giới hạn' : formatDate(_end!),
+                    _end == null ? l.noEndDate : formatDate(_end!),
                     style: const TextStyle(
                       color: AppTheme.primary,
                       fontSize: 16,
@@ -298,7 +303,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
           const SizedBox(height: 16),
           TextField(
             controller: _noteCtrl,
-            decoration: const InputDecoration(labelText: 'Ghi chú'),
+            decoration: InputDecoration(labelText: l.note),
           ),
           const SizedBox(height: 32),
           SizedBox(
@@ -312,7 +317,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
                 ),
               ),
               onPressed: _submit,
-              child: Text(_isEditing ? 'Lưu' : 'Thêm', style: const TextStyle(fontSize: 16)),
+              child: Text(_isEditing ? l.save : l.add, style: const TextStyle(fontSize: 16)),
             ),
           ),
           if (_isEditing) ...[
@@ -328,7 +333,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
                   ),
                 ),
                 onPressed: _confirmDelete,
-                child: const Text('Xóa giao dịch định kỳ', style: TextStyle(fontSize: 16)),
+                child: Text(l.deleteRecurring, style: const TextStyle(fontSize: 16)),
               ),
             ),
           ],

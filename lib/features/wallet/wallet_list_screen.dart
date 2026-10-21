@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -14,11 +16,12 @@ class WalletListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = AppStore.instance;
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: store,
       builder: (context, _) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Ví của tôi')),
+          appBar: AppBar(title: Text(l.myWallets)),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -33,7 +36,7 @@ class WalletListScreen extends StatelessWidget {
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
-            label: const Text('Thêm ví'),
+            label: Text(l.addWallet),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const WalletFormScreen()),
             ),
@@ -80,12 +83,12 @@ class _WalletTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      wallet.name,
+                      wallet.localizedName(context),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$transactionCount giao dịch',
+                      context.l10n.transactionCount(transactionCount),
                       style: TextStyle(
                         color: context.textTertiary,
                         fontSize: 12,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
@@ -29,7 +30,6 @@ class _DateRangeDialog extends StatefulWidget {
 class _DateRangeDialogState extends State<_DateRangeDialog> {
   static const _minYear = 2000;
   static const _maxYear = 2100;
-  static const _weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
   final _startCtrl = TextEditingController();
   final _endCtrl = TextEditingController();
@@ -108,15 +108,16 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
     });
   }
 
-  String? _errorFor(_Field field) {
+  String? _errorFor(BuildContext context, _Field field) {
+    final l = context.l10n;
     final isStart = field == _Field.start;
     final text = (isStart ? _startCtrl : _endCtrl).text;
     final date = isStart ? _start : _end;
-    if (text.length == 10 && date == null) return 'Ngày không hợp lệ';
+    if (text.length == 10 && date == null) return l.invalidDate;
     final start = _start;
     final end = _end;
     if (!isStart && start != null && end != null && end.isBefore(start)) {
-      return 'Phải sau ngày bắt đầu';
+      return l.mustBeAfterStartDate;
     }
     return null;
   }
@@ -135,6 +136,17 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final weekdays = [
+      l.weekdayMon,
+      l.weekdayTue,
+      l.weekdayWed,
+      l.weekdayThu,
+      l.weekdayFri,
+      l.weekdaySat,
+      l.weekdaySun,
+    ];
+
     return Dialog(
       backgroundColor: context.surfaceColor,
       surfaceTintColor: Colors.transparent,
@@ -149,10 +161,10 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Chọn khoảng thời gian',
-                      style: TextStyle(
+                      l.selectDateRange,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -168,9 +180,9 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _dateField(_Field.start)),
+                  Expanded(child: _dateField(context, _Field.start)),
                   const SizedBox(width: 12),
-                  Expanded(child: _dateField(_Field.end)),
+                  Expanded(child: _dateField(context, _Field.end)),
                 ],
               ),
               const SizedBox(height: 12),
@@ -181,7 +193,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        'Tháng ${_month.month}, ${_month.year}',
+                        l.monthLabel(_month.month, _month.year),
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
@@ -193,7 +205,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  for (final w in _weekdays)
+                  for (final w in weekdays)
                     Expanded(
                       child: Center(
                         child: Text(
@@ -222,7 +234,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
                             DateTimeRange(start: _start!, end: _end!),
                           )
                       : null,
-                  child: const Text('Xác nhận'),
+                  child: Text(l.confirm),
                 ),
               ),
             ],
@@ -241,7 +253,8 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
     );
   }
 
-  Widget _dateField(_Field field) {
+  Widget _dateField(BuildContext context, _Field field) {
+    final l = context.l10n;
     final isStart = field == _Field.start;
     final active = _active == field;
     return TextField(
@@ -251,9 +264,9 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
       onTap: () => setState(() => _active = field),
       onChanged: (text) => _onTextChanged(field, text),
       decoration: InputDecoration(
-        labelText: isStart ? 'Từ ngày' : 'Đến ngày',
-        hintText: 'dd/mm/yyyy',
-        errorText: _errorFor(field),
+        labelText: isStart ? l.startDate : l.endDate,
+        hintText: l.dateFormatHint,
+        errorText: _errorFor(context, field),
         isDense: true,
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(

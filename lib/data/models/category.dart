@@ -2,13 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/utils/category_icons.dart';
 
-enum TxType {
-  expense('CHI TIÊU'),
-  income('THU NHẬP');
-
-  const TxType(this.label);
-  final String label;
-}
+enum TxType { expense, income }
 
 class Category {
   const Category({

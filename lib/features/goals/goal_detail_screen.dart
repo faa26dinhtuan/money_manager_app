@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -37,7 +38,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     final updated = _store.goalById(goal.id);
     if (!wasDone && updated != null && updated.isCompleted) {
       ScaffoldMessenger.of(context)
-          .showApp('Chúc mừng! Bạn đã đạt mục tiêu "${goal.name}"');
+          .showApp(context.l10n.congratsGoalCompleted(goal.name));
     }
   }
 
@@ -53,6 +54,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -79,7 +81,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
             actions: [
               IconButton(
                 icon: const AppIcon(AppIcons.edit),
-                tooltip: 'Sửa mục tiêu',
+                tooltip: l.editGoal,
                 onPressed: () => _edit(goal),
               ),
             ],
@@ -124,17 +126,17 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                       Row(
                         children: [
                           _Stat(
-                            label: 'Đã có',
+                            label: l.savedLabel,
                             value: goal.saved,
                             color: AppTheme.primary,
                           ),
                           _Stat(
-                            label: 'Mục tiêu',
+                            label: l.targetAmount,
                             value: goal.target,
                             color: context.textPrimary,
                           ),
                           _Stat(
-                            label: 'Còn thiếu',
+                            label: l.remaining,
                             value: goal.remaining,
                             color: goal.remaining > 0
                                 ? Colors.red.shade400
@@ -156,10 +158,10 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           Expanded(
                             child: Text(
                               goal.deadline == null
-                                  ? goalDeadlineText(goal, now)
+                                  ? goalDeadlineText(goal, now, context.l10n)
                                   : state == GoalState.completed
-                                      ? 'Đã hoàn thành · hạn ${formatDate(goal.deadline!)}'
-                                      : 'Hạn ${formatDate(goal.deadline!)} · ${goalDeadlineText(goal, now)}',
+                                      ? '${l.completed} · ${formatDate(goal.deadline!)}'
+                                      : '${formatDate(goal.deadline!)} · ${goalDeadlineText(goal, now, context.l10n)}',
                               style: TextStyle(
                                 color: state.color,
                                 fontWeight: FontWeight.w600,
@@ -174,8 +176,8 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             days >= 30
-                                ? 'Cần tiết kiệm khoảng ${formatMoney(perDay * 30)}/tháng'
-                                : 'Cần tiết kiệm khoảng ${formatMoney(perDay)}/ngày',
+                                ? '${l.amount}: ${formatMoney(perDay * 30)}/${l.month}'
+                                : '${l.amount}: ${formatMoney(perDay)}/${l.day}',
                             style: TextStyle(color: context.textSecondary),
                           ),
                         ),
@@ -199,7 +201,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           ),
                         ),
                         icon: const AppIcon(AppIcons.add),
-                        label: const Text('Nạp tiền'),
+                        label: Text(l.deposit),
                         onPressed: () => _openEntry(goal, true),
                       ),
                     ),
@@ -215,7 +217,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           ),
                         ),
                         icon: const AppIcon(AppIcons.remove),
-                        label: const Text('Rút tiền'),
+                        label: Text(l.withdraw),
                         onPressed:
                             goal.saved > 0 ? () => _openEntry(goal, false) : null,
                       ),
@@ -235,11 +237,11 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 4, bottom: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 8),
                         child: Text(
-                          'Lịch sử',
-                          style: TextStyle(
+                          l.history,
+                          style: const TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.w600,
                           ),
@@ -247,10 +249,10 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                       ),
                       if (entries.isEmpty)
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
+                          padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Center(
                             child: Text(
-                              'Chưa có khoản nạp nào',
+                              l.noTransactions,
                               style: TextStyle(color: context.textSecondary),
                             ),
                           ),
@@ -267,8 +269,8 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           ),
                           confirmDismiss: (_) => confirmDelete(
                             context,
-                            title: e.isDeposit ? 'Xóa lần nạp?' : 'Xóa lần rút?',
-                            message: 'Số tiền đã tiết kiệm sẽ được tính lại.',
+                            title: e.isDeposit ? l.deleteEntryTitle : l.deleteEntryTitle,
+                            message: l.deleteEntryMessage,
                           ),
                           onDismissed: (_) => _removeEntry(goal, e),
                           child: _EntryTile(
@@ -328,6 +330,7 @@ class _EntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final deposit = entry.isDeposit;
     final color = deposit ? AppTheme.primary : Colors.red.shade400;
     return Padding(
@@ -346,7 +349,7 @@ class _EntryTile extends StatelessWidget {
               children: [
                 Text(
                   entry.note.isEmpty
-                      ? (deposit ? 'Nạp tiền' : 'Rút tiền')
+                      ? (deposit ? l.deposit : l.withdraw)
                       : entry.note,
                 ),
                 Text(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
@@ -46,6 +48,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -77,7 +80,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             .length;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Sổ nợ')),
+          appBar: AppBar(title: Text(l.debts)),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -93,11 +96,11 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   segments: [
                     ButtonSegment(
                       value: DebtType.lend,
-                      label: Text('Cho vay ($openLend)'),
+                      label: Text(l.lendCount(openLend)),
                     ),
                     ButtonSegment(
                       value: DebtType.borrow,
-                      label: Text('Đi vay ($openBorrow)'),
+                      label: Text(l.borrowCount(openBorrow)),
                     ),
                   ],
                   selected: {_type},
@@ -109,12 +112,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
                 spacing: 8,
                 children: [
                   ChoiceChip(
-                    label: Text('Chưa xong (${open.length})'),
+                    label: Text(l.openDebtsCount(open.length)),
                     selected: !_showSettled,
                     onSelected: (_) => setState(() => _showSettled = false),
                   ),
                   ChoiceChip(
-                    label: Text('Đã tất toán (${settled.length})'),
+                    label: Text(l.settledDebtsCount(settled.length)),
                     selected: _showSettled,
                     onSelected: (_) => setState(() => _showSettled = true),
                   ),
@@ -131,10 +134,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       const SizedBox(height: 12),
                       Text(
                         _showSettled
-                            ? 'Chưa có khoản nào đã tất toán'
+                            ? l.noSettledDebts
                             : _type == DebtType.lend
-                                ? 'Chưa có khoản cho vay nào'
-                                : 'Chưa có khoản đi vay nào',
+                                ? l.noLendDebts
+                                : l.noBorrowDebts,
                         style: TextStyle(color: context.textSecondary),
                       ),
                     ],
@@ -147,7 +150,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
-            label: const Text('Thêm khoản nợ'),
+            label: Text(l.addDebt),
             onPressed: _openForm,
           ),
         );
@@ -192,6 +195,7 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -203,9 +207,9 @@ class _Summary extends StatelessWidget {
         children: [
           Row(
             children: [
-              _item('Phải thu', receivable),
+              _item(l.receivable, receivable),
               const SizedBox(width: 16),
-              _item('Phải trả', payable),
+              _item(l.payable, payable),
             ],
           ),
           if (overdue > 0) ...[
@@ -216,7 +220,7 @@ class _Summary extends StatelessWidget {
                     color: Colors.white, size: 18),
                 const SizedBox(width: 6),
                 Text(
-                  '$overdue khoản quá hạn',
+                  l.overdueCount(overdue),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -291,7 +295,7 @@ class _DebtTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            '${debt.type.paidLabel} ${formatMoney(debt.paid)} / ${formatMoney(debt.amount)}',
+                            '${debt.type.localizedPaidLabel(context)} ${formatMoney(debt.paid)} / ${formatMoney(debt.amount)}',
                             style: TextStyle(
                               color: context.textSecondary,
                               fontSize: 12,
@@ -299,7 +303,7 @@ class _DebtTile extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          debtDueText(debt, now),
+                          debtDueText(debt, now, context.l10n),
                           style: TextStyle(
                             color: state.color,
                             fontSize: 12,

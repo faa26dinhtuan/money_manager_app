@@ -37,6 +37,42 @@ const Map<String, AppIconData> categoryIcons = {
   'health_and_safety': AppIcons.health,
 };
 
+const List<AppIconData> availableCategoryIcons = [
+  AppIcons.restaurant,
+  AppIcons.coffee,
+  AppIcons.shoppingBasket,
+  AppIcons.shoppingCart,
+  AppIcons.home,
+  AppIcons.bus,
+  AppIcons.car,
+  AppIcons.motorcycle,
+  AppIcons.flight,
+  AppIcons.bolt,
+  AppIcons.favorite,
+  AppIcons.health,
+  AppIcons.fitness,
+  AppIcons.family,
+  AppIcons.pets,
+  AppIcons.gift,
+  AppIcons.celebration,
+  AppIcons.movie,
+  AppIcons.beach,
+  AppIcons.camera,
+  AppIcons.brush,
+  AppIcons.school,
+  AppIcons.phone,
+  AppIcons.laptop,
+  AppIcons.creditCard,
+  AppIcons.bank,
+  AppIcons.wallet,
+  AppIcons.savings,
+  AppIcons.payments,
+  AppIcons.dollar,
+  AppIcons.diamond,
+  AppIcons.trendingUp,
+  AppIcons.flag,
+];
+
 String iconToKey(AppIconData icon) {
   for (final entry in categoryIcons.entries) {
     if (entry.value == icon) return entry.key;

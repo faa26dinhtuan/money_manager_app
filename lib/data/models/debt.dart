@@ -1,12 +1,4 @@
-enum DebtType {
-  lend('Cho vay', 'Thu nợ', 'Đã thu'),
-  borrow('Đi vay', 'Trả nợ', 'Đã trả');
-
-  const DebtType(this.label, this.paymentLabel, this.paidLabel);
-  final String label;
-  final String paymentLabel;
-  final String paidLabel;
-}
+enum DebtType { lend, borrow }
 
 class DebtPayment {
   const DebtPayment({

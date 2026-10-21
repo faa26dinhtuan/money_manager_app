@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/data/models/goal.dart';
+import 'package:money_manager_app/l10n/app_localizations.dart';
 
 enum GoalState {
   completed,
@@ -26,11 +27,11 @@ GoalState goalStateOf(Goal goal, DateTime now) {
   return GoalState.ongoing;
 }
 
-String goalDeadlineText(Goal goal, DateTime now) {
-  if (goal.isCompleted) return 'Đã hoàn thành';
+String goalDeadlineText(Goal goal, DateTime now, AppLocalizations l) {
+  if (goal.isCompleted) return l.completed;
   final days = goal.daysLeft(now);
-  if (days == null) return 'Không giới hạn thời gian';
-  if (days > 0) return 'Còn $days ngày';
-  if (days == 0) return 'Hết hạn hôm nay';
-  return 'Quá hạn ${-days} ngày';
+  if (days == null) return l.noDeadline;
+  if (days > 0) return l.daysRemaining(days);
+  if (days == 0) return l.dueToday;
+  return l.daysOverdue(-days);
 }

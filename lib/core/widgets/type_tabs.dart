@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/data/models/category.dart';
@@ -37,7 +38,7 @@ class TypeTabs extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    t.label,
+                    t.localizedLabel(context),
                     style: TextStyle(
                       color: t == type ? selectedColor : idleColor,
                       fontWeight: FontWeight.w600,

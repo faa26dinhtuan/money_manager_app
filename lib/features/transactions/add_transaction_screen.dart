@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -72,13 +74,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final amount = _amountCtrl.amount;
     if (amount <= 0) {
-      _toast('Vui lòng nhập số tiền');
+      _toast(l.pleaseEnterAmount);
       return;
     }
     if (_categoryId == null) {
-      _toast('Vui lòng chọn danh mục');
+      _toast(l.pleaseSelectCategory);
       return;
     }
     final transaction = Transaction(
@@ -109,34 +112,37 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       t.categoryId,
       DateRange.of(Period.month, t.date),
     );
-    final name = _store.categoryById(t.categoryId)?.name ?? 'Khác';
+    final name =
+        _store.categoryById(t.categoryId)?.localizedName(context) ??
+        context.l10n.other;
     final level = BudgetLevel.of(spent, budget.limit);
     if (level == BudgetLevel.over) {
-      return 'Đã vượt ngân sách "$name" ${formatMoney(spent - budget.limit)}';
+      return context.l10n.budgetExceeded(name, formatMoney(spent - budget.limit));
     }
     if (level == BudgetLevel.warning) {
       final percent = formatPercent(spent / budget.limit * 100);
       final remaining = formatMoney(budget.limit - spent);
-      return 'Ngân sách "$name" đã dùng $percent, còn lại $remaining';
+      return context.l10n.budgetWarning(name, percent, remaining);
     }
     return null;
   }
 
   Future<void> _confirmDelete() async {
+    final l = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Xóa giao dịch?'),
-        content: const Text('Giao dịch này sẽ bị xóa và không thể khôi phục.'),
+        title: Text(l.deleteTransactionTitle),
+        content: Text(l.deleteTransactionPermanent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Xóa'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -153,11 +159,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final categories = _store.categoriesOf(_type);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Sửa giao dịch' : 'Thêm giao dịch'),
+        title: Text(_isEditing ? l.editTransaction : l.addTransaction),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Padding(
@@ -181,7 +188,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               Expanded(
                 child: MoneyField(
                   controller: _amountCtrl,
-                  title: 'Số tiền',
+                  title: l.amount,
                   style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(hintText: '0'),
                 ),
@@ -200,7 +207,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Text('Ví', style: TextStyle(color: context.textSecondary)),
+          Text(l.wallet, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -213,7 +220,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     size: 18,
                     color: _walletId == w.id ? Colors.white : w.color,
                   ),
-                  label: Text(w.name),
+                  label: Text(w.localizedName(context)),
                   selected: _walletId == w.id,
                   selectedColor: w.color,
                   showCheckmark: false,
@@ -225,7 +232,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Text('Danh mục', style: TextStyle(color: context.textSecondary)),
+          Text(l.category, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -246,7 +253,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          c.name,
+                          c.localizedName(context),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -261,7 +268,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Text('Ngày', style: TextStyle(color: context.textSecondary)),
+          Text(l.date, style: TextStyle(color: context.textSecondary)),
           InkWell(
             onTap: _pickDate,
             child: Padding(
@@ -279,7 +286,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           const SizedBox(height: 16),
           TextField(
             controller: _noteCtrl,
-            decoration: const InputDecoration(labelText: 'Ghi chú'),
+            decoration: InputDecoration(labelText: l.note),
           ),
           const SizedBox(height: 32),
           SizedBox(
@@ -293,7 +300,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               onPressed: _submit,
-              child: Text(_isEditing ? 'Lưu' : 'Thêm', style: const TextStyle(fontSize: 16)),
+              child: Text(_isEditing ? l.save : l.add, style: const TextStyle(fontSize: 16)),
             ),
           ),
           if (_isEditing) ...[
@@ -309,9 +316,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                 ),
                 onPressed: _confirmDelete,
-                child: const Text(
-                  'Xóa giao dịch',
-                  style: TextStyle(fontSize: 16),
+                child: Text(
+                  l.deleteTransaction,
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),

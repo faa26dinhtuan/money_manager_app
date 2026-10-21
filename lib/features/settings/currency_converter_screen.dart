@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -49,14 +51,15 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   }
 
   Future<AppCurrency?> _pick(AppCurrency selected) {
+    final l = context.l10n;
     return showDialog<AppCurrency>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Chọn tiền tệ'),
+        title: Text(l.selectCurrency),
         children: [
           for (final c in AppCurrency.all)
             ListTile(
-              title: Text(c.name),
+              title: Text(c.localizedName(context)),
               subtitle: Text(c.label),
               trailing: c.code == selected.code
                   ? const AppIcon(AppIcons.check, color: AppTheme.primary)
@@ -69,10 +72,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   }
 
   Future<void> _refresh() async {
+    final l = context.l10n;
     final ok = await _rates.refresh();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showApp(
-      ok ? 'Đã cập nhật tỷ giá' : 'Không có kết nối, đang dùng tỷ giá đã lưu',
+      ok ? l.ratesUpdated : l.ratesOffline,
     );
   }
 
@@ -111,7 +115,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                     ),
                   ),
                   Text(
-                    '${value.code} · ${value.name}',
+                    '${value.code} · ${value.localizedName(context)}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -129,8 +133,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Đổi tiền tệ')),
+      appBar: AppBar(title: Text(l.currencyConverter)),
       body: ListenableBuilder(
         listenable: _rates,
         builder: (context, _) {
@@ -164,14 +169,14 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Số tiền',
+                          labelText: l.amount,
                           hintText: '0',
                           suffixText: _from.symbol,
                         ),
                       ),
                       const SizedBox(height: 8),
                       _currencyTile(
-                        'Từ',
+                        l.fromCurrency,
                         _from,
                         (c) => setState(() => _from = c),
                       ),
@@ -185,7 +190,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                           ),
                         ),
                       ),
-                      _currencyTile('Sang', _to, (c) => setState(() => _to = c)),
+                      _currencyTile(l.toCurrency, _to, (c) => setState(() => _to = c)),
                     ],
                   ),
                 ),
@@ -226,8 +231,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       const SizedBox(height: 4),
                       Text(
                         updated == null
-                            ? 'Đang dùng tỷ giá mặc định có sẵn trong app, có thể đã cũ. Kết nối mạng và bấm cập nhật để lấy tỷ giá mới nhất.'
-                            : 'Cập nhật lần cuối: ${formatUpdatedAt(updated)}',
+                            ? l.defaultRatesWarning
+                            : l.lastUpdated(formatUpdatedAt(updated)),
                         style: TextStyle(
                           color: context.textSecondary,
                           height: 1.4,
@@ -249,12 +254,12 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const AppIcon(AppIcons.refresh),
-                  label: const Text('Cập nhật tỷ giá'),
+                  label: Text(l.refreshRates),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Tỷ giá cung cấp bởi ExchangeRate-API (exchangerate-api.com), cập nhật mỗi ngày, chỉ mang tính tham khảo.',
+                l.currencyDisclaimer,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: context.textSecondary, fontSize: 12),
               ),

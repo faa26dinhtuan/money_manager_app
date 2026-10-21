@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -44,13 +46,14 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final amount = _amountCtrl.amount;
     if (amount <= 0) {
-      setState(() => _error = 'Vui lòng nhập số tiền');
+      setState(() => _error = l.pleaseEnterAmount);
       return;
     }
     if (!widget.deposit && amount > widget.goal.saved) {
-      setState(() => _error = 'Vượt quá số tiền đã tiết kiệm');
+      setState(() => _error = l.exceedsSavedAmount);
       return;
     }
     final now = DateTime.now();
@@ -73,10 +76,11 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final remaining = widget.goal.remaining;
     final walletBalance = _store.walletBalance(_walletId);
     return AlertDialog(
-      title: Text(widget.deposit ? 'Nạp tiền' : 'Rút tiền'),
+      title: Text(widget.deposit ? l.deposit : l.withdraw),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -84,12 +88,12 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
           children: [
             MoneyField(
               controller: _amountCtrl,
-              title: widget.deposit ? 'Số tiền nạp' : 'Số tiền rút',
+              title: widget.deposit ? l.depositAmount : l.withdrawAmount,
               onChanged: (_) {
                 if (_error != null) setState(() => _error = null);
               },
               decoration: InputDecoration(
-                labelText: 'Số tiền',
+                labelText: l.amount,
                 suffixText: currencySymbol,
                 errorText: _error,
               ),
@@ -97,7 +101,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
             if (widget.deposit && remaining > 0) ...[
               const SizedBox(height: 8),
               ActionChip(
-                label: Text('Đủ mục tiêu: ${formatMoney(remaining)}'),
+                label: Text(l.reachGoalAmount(formatMoney(remaining))),
                 onPressed: () => setState(() {
                   _amountCtrl.amount = remaining;
                   _error = null;
@@ -106,7 +110,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
             ],
             const SizedBox(height: 16),
             Text(
-              widget.deposit ? 'Trừ từ ví' : 'Cộng vào ví',
+              widget.deposit ? l.debitFromWallet : l.creditToWallet,
               style: TextStyle(color: context.textSecondary),
             ),
             const SizedBox(height: 8),
@@ -121,7 +125,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
                       size: 18,
                       color: _walletId == w.id ? Colors.white : w.color,
                     ),
-                    label: Text(w.name),
+                    label: Text(w.localizedName(context)),
                     selected: _walletId == w.id,
                     selectedColor: w.color,
                     showCheckmark: false,
@@ -134,7 +138,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Số dư ví: ${formatMoney(walletBalance)}',
+              l.walletBalanceLabel(formatMoney(walletBalance)),
               style: TextStyle(
                 fontSize: 12,
                 color: walletBalance < 0 ? Colors.red.shade400 : context.textTertiary,
@@ -143,7 +147,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
             const SizedBox(height: 8),
             TextField(
               controller: _noteCtrl,
-              decoration: const InputDecoration(labelText: 'Ghi chú'),
+              decoration: InputDecoration(labelText: l.note),
             ),
             const SizedBox(height: 16),
             InkWell(
@@ -171,9 +175,9 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
+          child: Text(l.cancel),
         ),
-        TextButton(onPressed: _submit, child: const Text('Lưu')),
+        TextButton(onPressed: _submit, child: Text(l.save)),
       ],
     );
   }

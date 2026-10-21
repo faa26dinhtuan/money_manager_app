@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -45,13 +47,14 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final amount = _amountCtrl.amount;
     if (amount <= 0) {
-      setState(() => _error = 'Vui lòng nhập số tiền');
+      setState(() => _error = l.pleaseEnterAmount);
       return;
     }
     if (amount > widget.debt.remaining) {
-      setState(() => _error = 'Vượt quá số tiền còn lại');
+      setState(() => _error = l.exceedsRemainingAmount);
       return;
     }
     final now = DateTime.now();
@@ -75,9 +78,10 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final debt = widget.debt;
     return AlertDialog(
-      title: Text(debt.type.paymentLabel),
+      title: Text(debt.type.localizedPaymentLabel(context)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -85,12 +89,12 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
           children: [
             MoneyField(
               controller: _amountCtrl,
-              title: 'Số tiền ${debt.type.paymentLabel.toLowerCase()}',
+              title: '${l.amount} (${debt.type.localizedPaymentLabel(context).toLowerCase()})',
               onChanged: (_) {
                 if (_error != null) setState(() => _error = null);
               },
               decoration: InputDecoration(
-                labelText: 'Số tiền',
+                labelText: l.amount,
                 suffixText: currencySymbol,
                 errorText: _error,
               ),
@@ -98,7 +102,9 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
             const SizedBox(height: 8),
             ActionChip(
               label: Text(
-                '${_isLend ? 'Thu hết' : 'Trả hết'}: ${formatMoney(debt.remaining)}',
+                _isLend
+                    ? l.collectAll(formatMoney(debt.remaining))
+                    : l.payAll(formatMoney(debt.remaining)),
               ),
               onPressed: () => setState(() {
                 _amountCtrl.amount = debt.remaining;
@@ -107,7 +113,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
             ),
             const SizedBox(height: 16),
             Text(
-              _isLend ? 'Cộng vào ví' : 'Trừ từ ví',
+              _isLend ? l.creditToWallet : l.debitFromWallet,
               style: TextStyle(color: context.textSecondary),
             ),
             const SizedBox(height: 8),
@@ -119,7 +125,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
             const SizedBox(height: 8),
             TextField(
               controller: _noteCtrl,
-              decoration: const InputDecoration(labelText: 'Ghi chú'),
+              decoration: InputDecoration(labelText: l.note),
             ),
             const SizedBox(height: 16),
             InkWell(
@@ -147,9 +153,9 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
+          child: Text(l.cancel),
         ),
-        TextButton(onPressed: _submit, child: const Text('Lưu')),
+        TextButton(onPressed: _submit, child: Text(l.save)),
       ],
     );
   }

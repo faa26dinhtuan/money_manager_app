@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 
 class PeriodBar extends StatelessWidget {
@@ -61,7 +62,7 @@ class PeriodBar extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        p.label,
+                        p.localizedLabel(context),
                         style: TextStyle(
                           color: p == period
                               ? AppTheme.primary
@@ -93,7 +94,7 @@ class PeriodBar extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 child: Center(
                   child: Text(
-                    DateRange.label(period, anchor, customRange),
+                    localizedDateRangeLabel(context, period, anchor, customRange),
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),

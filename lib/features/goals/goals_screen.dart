@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -45,6 +46,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -57,7 +59,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         final totalTarget = all.fold<double>(0, (s, g) => s + g.target);
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Mục tiêu kiếm tiền')),
+          appBar: AppBar(title: Text(l.goals)),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -75,11 +77,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     segments: [
                       ButtonSegment(
                         value: false,
-                        label: Text('Đang thực hiện (${active.length})'),
+                        label: Text(l.activeGoalsCount(active.length)),
                       ),
                       ButtonSegment(
                         value: true,
-                        label: Text('Hoàn thành (${done.length})'),
+                        label: Text(l.doneGoalsCount(done.length)),
                       ),
                     ],
                     selected: {_showDone},
@@ -91,13 +93,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
               ],
               if (all.isEmpty)
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 48),
+                  padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
                       AppIcon(AppIcons.flag, size: 56, color: context.textDisabled),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
-                        'Chưa có mục tiêu nào',
+                        l.noGoalsYet,
                         style: TextStyle(color: context.textSecondary),
                       ),
                     ],
@@ -108,9 +110,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Center(
                     child: Text(
-                      _showDone
-                          ? 'Chưa có mục tiêu nào hoàn thành'
-                          : 'Không có mục tiêu đang thực hiện',
+                      _showDone ? l.noGoalsCompleted : l.noGoalsActive,
                       style: TextStyle(color: context.textSecondary),
                     ),
                   ),
@@ -122,7 +122,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
-            label: const Text('Thêm mục tiêu'),
+            label: Text(l.addGoal),
             onPressed: _openForm,
           ),
         );
@@ -146,6 +146,7 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -155,8 +156,8 @@ class _Summary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Tổng đã tiết kiệm',
-              style: TextStyle(color: Colors.white70)),
+          Text(l.totalSaved,
+              style: const TextStyle(color: Colors.white70)),
           const SizedBox(height: 6),
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -181,12 +182,12 @@ class _Summary extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Mục tiêu ${formatMoney(target)}',
+                  l.targetLabel(formatMoney(target)),
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
               Text(
-                '$done/$total hoàn thành',
+                l.goalsCompletedCount(done, total),
                 style: const TextStyle(color: Colors.white70),
               ),
             ],
@@ -262,7 +263,7 @@ class _GoalTile extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          goalDeadlineText(goal, now),
+                          goalDeadlineText(goal, now, context.l10n),
                           style: TextStyle(
                             color: state.color,
                             fontSize: 12,

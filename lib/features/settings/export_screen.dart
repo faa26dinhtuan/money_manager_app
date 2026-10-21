@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/csv_export.dart';
@@ -63,7 +65,7 @@ class _ExportScreenState extends State<ExportScreen> {
         '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
     final name = 'money_manager_$stamp.csv';
     final bytes = Uint8List.fromList(
-      utf8.encode('\uFEFF${exportToCsv(_store, _selected)}'),
+      utf8.encode('\uFEFF${exportToCsv(_store, _selected, context.l10n)}'),
     );
     await SharePlus.instance.share(
       ShareParams(
@@ -76,12 +78,13 @@ class _ExportScreenState extends State<ExportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
         final allSelected = _selected.length == ExportSection.values.length;
         return Scaffold(
-          appBar: AppBar(title: const Text('Xuất dữ liệu')),
+          appBar: AppBar(title: Text(l.exportData)),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -96,18 +99,16 @@ class _ExportScreenState extends State<ExportScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Xuất ra file CSV',
-                        style: TextStyle(
+                      Text(
+                        l.exportCsvTitle,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'CSV là file bảng tính dạng văn bản đơn giản. Chọn các phần dữ liệu muốn xuất bên dưới, mỗi phần sẽ có tiêu đề riêng trong file. '
-                        'Bạn có thể mở bằng Excel hoặc Google Sheets để xem, lọc và tính toán.\n\n'
-                        'Khác với Sao lưu, file này dùng để xem và phân tích dữ liệu, không dùng để khôi phục lại vào app.',
+                        l.exportExplainBody,
                         style: TextStyle(
                           color: context.textSecondary,
                           height: 1.4,
@@ -134,9 +135,9 @@ class _ExportScreenState extends State<ExportScreen> {
                       tristate: true,
                       activeColor: AppTheme.primary,
                       controlAffinity: ListTileControlAffinity.leading,
-                      title: const Text(
-                        'Chọn tất cả',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      title: Text(
+                        l.selectAll,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       onChanged: (_) => _toggleAll(),
                     ),
@@ -146,7 +147,7 @@ class _ExportScreenState extends State<ExportScreen> {
                         value: _selected.contains(section),
                         activeColor: AppTheme.primary,
                         controlAffinity: ListTileControlAffinity.leading,
-                        title: Text(section.label),
+                        title: Text(section.localizedLabel(context)),
                         secondary: Text(
                           '${_count(section)}',
                           style: TextStyle(color: context.textSecondary),
@@ -168,10 +169,10 @@ class _ExportScreenState extends State<ExportScreen> {
                     ),
                   ),
                   onPressed: _selected.isEmpty ? null : _export,
-                  icon: const AppIcon(AppIcons.download),
-                  label: const Text(
-                    'Xuất file CSV',
-                    style: TextStyle(fontSize: 16),
+                  icon: const AppIcon(AppIcons.upload),
+                  label: Text(
+                    l.exportCsv,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),

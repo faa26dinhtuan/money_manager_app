@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -32,12 +34,12 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
       builder: (_) => DebtPaymentDialog(debt: debt),
     );
     if (payment == null || !mounted) return;
-    final wasSettled = debt.isSettled;
     _store.addDebtPayment(debt.id, payment);
     final updated = _store.debtById(debt.id);
-    if (!wasSettled && updated != null && updated.isSettled) {
-      ScaffoldMessenger.of(context)
-          .showApp('Đã tất toán khoản của "${debt.person}"');
+    if (updated != null && updated.isSettled && mounted) {
+      ScaffoldMessenger.of(context).showApp(
+        context.l10n.debtSettledNotification(debt.person),
+      );
     }
   }
 
@@ -50,11 +52,15 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
         .push(MaterialPageRoute(builder: (_) => DebtFormScreen(debt: debt)));
   }
 
-  String? _walletName(String? id) =>
-      id == null ? null : _store.walletById(id)?.name;
+  String? _walletName(BuildContext context, String? id) {
+    if (id == null) return null;
+    final w = _store.walletById(id);
+    return w?.localizedName(context);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -70,7 +76,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
         final percent = (debt.progress * 100).clamp(0.0, 100.0);
         final payments = [...debt.payments]
           ..sort((a, b) => b.date.compareTo(a.date));
-        final walletName = _walletName(debt.walletId);
+        final walletName = _walletName(context, debt.walletId);
         final isLend = debt.type == DebtType.lend;
 
         return Scaffold(
@@ -79,7 +85,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             actions: [
               IconButton(
                 icon: const AppIcon(AppIcons.edit),
-                tooltip: 'Sửa khoản nợ',
+                tooltip: l.editDebt,
                 onPressed: () => _edit(debt),
               ),
             ],
@@ -111,7 +117,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  debt.type.label,
+                                  debt.type.localizedLabel(context),
                                   style: TextStyle(
                                     color: debt.type.color,
                                     fontWeight: FontWeight.w600,
@@ -120,8 +126,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   debt.isSettled
-                                      ? 'Đã tất toán'
-                                      : 'Còn ${formatMoney(debt.remaining)}',
+                                      ? l.settled
+                                      : l.stillNeeded(formatMoney(debt.remaining)),
                                   style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -153,17 +159,17 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       Row(
                         children: [
                           _Stat(
-                            label: 'Số tiền gốc',
+                            label: l.principalAmount,
                             value: debt.amount,
                             color: context.textPrimary,
                           ),
                           _Stat(
-                            label: debt.type.paidLabel,
+                            label: debt.type.localizedPaidLabel(context),
                             value: debt.paid,
                             color: AppTheme.primary,
                           ),
                           _Stat(
-                            label: 'Còn lại',
+                            label: l.remaining,
                             value: debt.remaining,
                             color: debt.remaining > 0
                                 ? Colors.red.shade400
@@ -174,24 +180,26 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       const Divider(height: 28),
                       _InfoRow(
                         icon: AppIcons.calendar,
-                        text:
-                            '${isLend ? 'Cho vay' : 'Vay'} ngày ${formatDate(debt.date)}',
+                        text: l.debtCreatedDate(
+                          debt.type.localizedLabel(context),
+                          formatDate(debt.date),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       _InfoRow(
                         icon: AppIcons.clock,
                         color: state.color,
                         text: debt.dueDate == null
-                            ? 'Không có hạn trả'
+                            ? l.noDueDate
                             : debt.isSettled
-                            ? 'Hạn trả ${formatDate(debt.dueDate!)}'
-                            : 'Hạn trả ${formatDate(debt.dueDate!)} · ${debtDueText(debt, now)}',
+                            ? l.duePrefix(formatDate(debt.dueDate!))
+                            : '${l.duePrefix(formatDate(debt.dueDate!))} · ${debtDueText(debt, now, context.l10n)}',
                       ),
                       if (walletName != null) ...[
                         const SizedBox(height: 8),
                         _InfoRow(
                           icon: AppIcons.wallet,
-                          text: 'Ví: $walletName',
+                          text: '${l.wallet}: $walletName',
                         ),
                       ],
                       if (debt.note.isNotEmpty) ...[
@@ -214,7 +222,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                     ),
                   ),
                   icon: const AppIcon(AppIcons.payments),
-                  label: Text(debt.type.paymentLabel),
+                  label: Text(debt.type.localizedPaymentLabel(context)),
                   onPressed: debt.isSettled ? null : () => _openPayment(debt),
                 ),
               ),
@@ -230,11 +238,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 4, bottom: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 8),
                         child: Text(
-                          'Lịch sử',
-                          style: TextStyle(
+                          l.history,
+                          style: const TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.w600,
                           ),
@@ -255,25 +263,25 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                           ),
                           confirmDismiss: (_) => confirmDelete(
                             context,
-                            title: 'Xóa lần thanh toán?',
-                            message: 'Số tiền còn lại của khoản nợ sẽ được tính lại.',
+                            title: l.deletePaymentConfirmTitle,
+                            message: l.deletePaymentConfirmMessage,
                           ),
                           onDismissed: (_) => _removePayment(debt, p),
                           child: _HistoryTile(
                             icon: AppIcons.payments,
                             color: AppTheme.primary,
                             title: p.note.isEmpty
-                                ? debt.type.paymentLabel
+                                ? debt.type.localizedPaymentLabel(context)
                                 : p.note,
                             date: p.date,
-                            walletName: _walletName(p.walletId),
+                            walletName: _walletName(context, p.walletId),
                             amount: debt.paymentFlow(p),
                           ),
                         ),
                       _HistoryTile(
                         icon: debt.type.icon,
                         color: debt.type.color,
-                        title: isLend ? 'Khoản cho vay' : 'Khoản đi vay',
+                        title: isLend ? l.lentItem : l.borrowedItem,
                         date: debt.date,
                         walletName: walletName,
                         amount: debt.principalFlow,
@@ -329,16 +337,17 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? context.textSecondary;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppIcon(icon, size: 20, color: c),
+        AppIcon(icon, size: 18, color: color ?? context.textSecondary),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
-            style: TextStyle(color: c, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: color ?? context.textPrimary,
+              fontSize: 13,
+            ),
           ),
         ),
       ],
@@ -365,32 +374,31 @@ class _HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final positive = amount > 0;
+    final isPos = amount >= 0;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: Row(
         children: [
-          CategoryIcon(icon: icon, color: color, size: 34),
-          const SizedBox(width: 12),
+          CategoryIcon(icon: icon, color: color, size: 36),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title),
+                Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 2),
                 Text(
-                  walletName == null
-                      ? formatDate(date)
-                      : '${formatDate(date)} · $walletName',
-                  style: TextStyle(color: context.textTertiary, fontSize: 12),
+                  '${formatDate(date)}${walletName == null ? '' : ' • $walletName'}',
+                  style: TextStyle(color: context.textSecondary, fontSize: 11),
                 ),
               ],
             ),
           ),
           Text(
-            '${positive ? '+' : '-'}${formatMoney(amount.abs())}',
+            '${isPos ? '+' : ''}${formatMoney(amount)}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: positive ? AppTheme.primary : Colors.red.shade400,
+              color: isPos ? AppTheme.primary : context.textPrimary,
             ),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/features/settings/settings_screen.dart';
 
 class SettingsButton extends StatelessWidget {
@@ -11,7 +12,7 @@ class SettingsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: AppIcon(AppIcons.settings, color: color),
-      tooltip: 'Cài đặt',
+      tooltip: context.l10n.settings,
       onPressed: () => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const SettingsScreen()),
       ),

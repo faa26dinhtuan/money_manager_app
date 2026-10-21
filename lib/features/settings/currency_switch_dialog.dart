@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -64,27 +65,24 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
   Future<void> _refresh() async {
     final ok = await _rates.refresh();
     if (!mounted || ok) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showApp('Không có kết nối, đang dùng tỷ giá đã lưu');
+    ScaffoldMessenger.of(context).showApp(context.l10n.ratesOffline);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _rates,
       builder: (context, _) {
         final updated = _rates.updatedAt;
         return AlertDialog(
-          title: Text('Đổi sang ${widget.to.code}'),
+          title: Text(l.convertCurrencyTitle(widget.to.code)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Quy đổi toàn bộ số tiền hiện có (giao dịch, ví, ngân sách, mục tiêu, sổ nợ, định kỳ) theo tỷ giá, hay chỉ đổi cách hiển thị?',
-                ),
+                Text(l.convertCurrencyPrompt),
                 const SizedBox(height: 12),
                 Text(
                   formatRateLine(
@@ -100,8 +98,8 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
                 const SizedBox(height: 4),
                 Text(
                   updated == null
-                      ? 'Tỷ giá mặc định có sẵn trong app, có thể đã cũ'
-                      : 'Cập nhật: ${formatUpdatedAt(updated)}',
+                      ? l.defaultRatesWarning
+                      : l.lastUpdated(formatUpdatedAt(updated)),
                   style: TextStyle(color: context.textSecondary),
                 ),
                 Align(
@@ -115,11 +113,11 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const AppIcon(AppIcons.refresh),
-                    label: const Text('Cập nhật tỷ giá'),
+                    label: Text(l.refreshRates),
                   ),
                 ),
                 Text(
-                  'Số tiền được làm tròn theo loại tiền mới nên không thể khôi phục chính xác. Nên sao lưu trước khi quy đổi.',
+                  l.currencyConvertWarning,
                   style: TextStyle(color: context.textSecondary, fontSize: 12),
                 ),
               ],
@@ -128,17 +126,17 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Hủy'),
+              child: Text(l.cancel),
             ),
             TextButton(
               onPressed: () =>
                   Navigator.of(context).pop(CurrencySwitchChoice.displayOnly),
-              child: const Text('Chỉ đổi hiển thị'),
+              child: Text(l.displayOnly),
             ),
             FilledButton(
               onPressed: () =>
                   Navigator.of(context).pop(CurrencySwitchChoice.convert),
-              child: const Text('Quy đổi'),
+              child: Text(l.convertAll),
             ),
           ],
         );

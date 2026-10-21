@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -26,14 +27,14 @@ class MoneyField extends StatelessWidget {
   const MoneyField({
     super.key,
     required this.controller,
-    this.title = 'Nhập số tiền',
+    this.title,
     this.decoration = const InputDecoration(hintText: '0'),
     this.style,
     this.onChanged,
   });
 
   final MoneyController controller;
-  final String title;
+  final String? title;
   final InputDecoration decoration;
   final TextStyle? style;
   final ValueChanged<double>? onChanged;
@@ -43,7 +44,7 @@ class MoneyField extends StatelessWidget {
     final result = await showMoneyKeypad(
       context,
       initial: controller.amount,
-      title: title,
+      title: title ?? context.l10n.enterAmount,
     );
     if (result == null) return;
     controller.amount = result;
@@ -67,7 +68,7 @@ class MoneyField extends StatelessWidget {
 Future<double?> showMoneyKeypad(
   BuildContext context, {
   double initial = 0,
-  String title = 'Nhập số tiền',
+  String? title,
 }) {
   return showModalBottomSheet<double>(
     context: context,
@@ -77,7 +78,10 @@ Future<double?> showMoneyKeypad(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (_) => _MoneyKeypad(initial: initial, title: title),
+    builder: (_) => _MoneyKeypad(
+      initial: initial,
+      title: title ?? context.l10n.enterAmount,
+    ),
   );
 }
 
@@ -194,7 +198,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
                 ),
                 TextButton(
                   onPressed: _digits.isEmpty ? null : _clear,
-                  child: const Text('Xóa hết'),
+                  child: Text(context.l10n.clearAll),
                 ),
               ],
             ),
@@ -247,7 +251,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
                   ),
                 ),
                 onPressed: () => Navigator.of(context).pop(_amount),
-                child: const Text('Xong', style: TextStyle(fontSize: 16)),
+                child: Text(context.l10n.done, style: const TextStyle(fontSize: 16)),
               ),
             ),
           ],

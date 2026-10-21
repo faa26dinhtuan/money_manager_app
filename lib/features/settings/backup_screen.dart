@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -15,42 +16,39 @@ class BackupScreen extends StatelessWidget {
     final code = AppStore.instance.createBackup().encode();
     await Clipboard.setData(ClipboardData(text: code));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showApp('Đã sao chép bản sao lưu. Hãy dán vào nơi an toàn để lưu lại');
+    ScaffoldMessenger.of(context).showApp(context.l10n.backupCopied);
   }
 
   Future<void> _restore(BuildContext context) async {
+    final l = context.l10n;
     final clip = await Clipboard.getData(Clipboard.kTextPlain);
     if (!context.mounted) return;
     final BackupData backup;
     try {
       backup = BackupData.parse(clip?.text ?? '');
     } on FormatException {
-      ScaffoldMessenger.of(
-        context,
-      ).showApp('Không tìm thấy bản sao lưu hợp lệ trong bộ nhớ tạm');
+      ScaffoldMessenger.of(context).showApp(l.restoreNotFound);
       return;
     }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Khôi phục dữ liệu?'),
+        title: Text(l.restoreConfirmTitle),
         content: Text(
-          'Bản sao lưu${backup.exportedAt == null ? '' : ' ngày ${formatDate(backup.exportedAt!)}'} '
-          'có ${backup.wallets.length} ví, ${backup.transactions.length} giao dịch, '
-          '${backup.categories.length} danh mục.\n\n'
-          'Toàn bộ dữ liệu hiện tại sẽ bị thay thế.',
+          '${backup.exportedAt == null ? '' : '${formatDate(backup.exportedAt!)}\n'}'
+          '${backup.wallets.length} ${l.wallet}, ${backup.transactions.length} ${l.transactions}, '
+          '${backup.categories.length} ${l.categories}.\n\n'
+          '${l.restoreConfirmMessage}',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Khôi phục'),
+            child: Text(l.restoreData),
           ),
         ],
       ),
@@ -58,7 +56,7 @@ class BackupScreen extends StatelessWidget {
     if (confirmed != true) return;
     await AppStore.instance.restoreBackup(backup);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showApp('Đã khôi phục dữ liệu');
+    ScaffoldMessenger.of(context).showApp(l.restoreSuccess);
   }
 
   Widget _row(BuildContext context, String label, int value) {
@@ -86,12 +84,13 @@ class BackupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = AppStore.instance;
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: store,
       builder: (context, _) {
         final data = store.createBackup();
         return Scaffold(
-          appBar: AppBar(title: const Text('Sao lưu & khôi phục')),
+          appBar: AppBar(title: Text(l.backupAndRestore)),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -106,19 +105,16 @@ class BackupScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Tính năng này để làm gì?',
-                        style: TextStyle(
+                      Text(
+                        l.backupExplainTitle,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Dữ liệu chỉ nằm trên máy này. Nếu bạn đổi điện thoại hoặc xóa app, dữ liệu sẽ mất.\n\n'
-                        'Sao lưu: tạo một đoạn mã chứa toàn bộ dữ liệu và chép vào bộ nhớ tạm. '
-                        'Hãy dán nó vào Ghi chú, Zalo hoặc email gửi cho chính mình.\n\n'
-                        'Khôi phục: chép lại đoạn mã đó rồi bấm Khôi phục để đưa dữ liệu về.',
+                        l.backupExplainBody,
                         style: TextStyle(
                           color: context.textSecondary,
                           height: 1.4,
@@ -139,17 +135,13 @@ class BackupScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      _row(context, 'Ví', data.wallets.length),
-                      _row(context, 'Giao dịch', data.transactions.length),
-                      _row(context, 'Danh mục', data.categories.length),
-                      _row(context, 'Ngân sách', data.budgets.length),
-                      _row(context, 'Mục tiêu tiết kiệm', data.goals.length),
-                      _row(context, 'Khoản nợ', data.debts.length),
-                      _row(
-                        context,
-                        'Giao dịch định kỳ',
-                        data.recurrings.length,
-                      ),
+                      _row(context, l.wallet, data.wallets.length),
+                      _row(context, l.transactions, data.transactions.length),
+                      _row(context, l.categories, data.categories.length),
+                      _row(context, l.budget, data.budgets.length),
+                      _row(context, l.goals, data.goals.length),
+                      _row(context, l.debts, data.debts.length),
+                      _row(context, l.recurring, data.recurrings.length),
                     ],
                   ),
                 ),
@@ -161,9 +153,9 @@ class BackupScreen extends StatelessWidget {
                   style: _style(AppTheme.primary),
                   onPressed: () => _backup(context),
                   icon: const AppIcon(AppIcons.upload),
-                  label: const Text(
-                    'Sao lưu dữ liệu',
-                    style: TextStyle(fontSize: 16),
+                  label: Text(
+                    l.backupData,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
@@ -174,9 +166,9 @@ class BackupScreen extends StatelessWidget {
                   style: _style(AppTheme.accent),
                   onPressed: () => _restore(context),
                   icon: const AppIcon(AppIcons.download),
-                  label: const Text(
-                    'Khôi phục từ bộ nhớ tạm',
-                    style: TextStyle(fontSize: 16),
+                  label: Text(
+                    l.restoreFromClipboard,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),

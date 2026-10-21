@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -60,13 +62,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     });
   }
 
-  List<Transaction> _filter(List<Transaction> list) {
+  List<Transaction> _filter(List<Transaction> list, BuildContext context) {
     final query = normalizeText(_query.trim());
     if (query.isEmpty) return list;
     return list.where((t) {
-      final name = _store.categoryById(t.categoryId)?.name ?? '';
+      final cat = _store.categoryById(t.categoryId);
+      final name = cat?.name ?? '';
+      final locName = cat?.localizedName(context) ?? '';
       return normalizeText(t.note).contains(query) ||
-          normalizeText(name).contains(query);
+          normalizeText(name).contains(query) ||
+          normalizeText(locName).contains(query);
     }).toList();
   }
 
@@ -79,6 +84,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -86,9 +92,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         final walletId = _store.selectedWalletId;
         final incomeItems = _filter(
           _store.query(TxType.income, range, walletId: walletId),
+          context,
         );
         final expenseItems = _filter(
           _store.query(TxType.expense, range, walletId: walletId),
+          context,
         );
         final items = _type == TxType.income ? incomeItems : expenseItems;
         final income = _sum(incomeItems);
@@ -107,7 +115,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               alignment: Alignment.centerLeft,
               child: WalletSelector(),
             ),
-            title: const Text('Giao dịch'),
+            title: Text(l.transactions),
             actions: const [SettingsButton()],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
@@ -127,7 +135,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 controller: _searchCtrl,
                 onChanged: (value) => setState(() => _query = value),
                 decoration: InputDecoration(
-                  hintText: 'Tìm theo danh mục hoặc ghi chú',
+                  hintText: l.searchCategoryOrNote,
                   prefixIcon: const AppIcon(AppIcons.search),
                   suffixIcon: _query.isEmpty
                       ? null
@@ -185,8 +193,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 32),
                           child: Text(
                             _query.trim().isEmpty
-                                ? 'Chưa có giao dịch'
-                                : 'Không tìm thấy giao dịch',
+                                ? l.noTransactions
+                                : l.noTransactionsFound,
                             style: TextStyle(color: context.textSecondary),
                           ),
                         ),
@@ -217,8 +225,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             ),
                             confirmDismiss: (_) => confirmDelete(
                               context,
-                              title: 'Xóa giao dịch?',
-                              message: 'Giao dịch này sẽ bị xóa khỏi danh sách.',
+                              title: l.deleteTransactionTitle,
+                              message: l.deleteTransactionMessage,
                             ),
                             onDismissed: (_) => _delete(t),
                             child: InkWell(
@@ -269,7 +277,7 @@ class _TransactionTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(category?.name ?? 'Khác'),
+                Text(category?.localizedName(context) ?? context.l10n.other),
                 if (transaction.note.isNotEmpty)
                   Text(
                     transaction.note,
@@ -299,19 +307,20 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final balance = income - expense;
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: Row(
         children: [
-          _SummaryItem(label: 'Thu', value: income, color: AppTheme.primary),
+          _SummaryItem(label: l.incomeSummary, value: income, color: AppTheme.primary),
           _SummaryItem(
-            label: 'Chi',
+            label: l.expenseSummary,
             value: expense,
             color: Colors.red.shade400,
           ),
           _SummaryItem(
-            label: 'Chênh lệch',
+            label: l.difference,
             value: balance,
             color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,
           ),

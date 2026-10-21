@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -23,7 +25,7 @@ class WalletPicker extends StatelessWidget {
       children: [
         if (allowNone)
           ChoiceChip(
-            label: const Text('Không gắn ví'),
+            label: Text(context.l10n.noWalletAttached),
             selected: selectedId == null,
             selectedColor: Colors.blueGrey.shade400,
             showCheckmark: false,
@@ -39,7 +41,7 @@ class WalletPicker extends StatelessWidget {
               size: 18,
               color: selectedId == w.id ? Colors.white : w.color,
             ),
-            label: Text(w.name),
+            label: Text(w.localizedName(context)),
             selected: selectedId == w.id,
             selectedColor: w.color,
             showCheckmark: false,

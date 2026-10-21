@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -13,14 +15,10 @@ import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class DebtFormScreen extends StatefulWidget {
-  const DebtFormScreen({
-    super.key,
-    this.initialType = DebtType.lend,
-    this.debt,
-  });
+  const DebtFormScreen({super.key, this.debt, this.initialType = DebtType.lend});
 
-  final DebtType initialType;
   final Debt? debt;
+  final DebtType initialType;
 
   @override
   State<DebtFormScreen> createState() => _DebtFormScreenState();
@@ -35,8 +33,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   late DebtType _type = widget.debt?.type ?? widget.initialType;
   late DateTime _date = widget.debt?.date ?? DateTime.now();
   late DateTime? _dueDate = widget.debt?.dueDate;
-  late String? _walletId =
-      widget.debt != null ? widget.debt!.walletId : _store.wallets.first.id;
+  late String? _walletId = widget.debt?.walletId;
 
   bool get _isEditing => widget.debt != null;
 
@@ -70,9 +67,10 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   }
 
   Future<void> _pickDueDate() async {
+    final initial = _dueDate ?? _date.add(const Duration(days: 30));
     final picked = await showDatePicker(
       context: context,
-      initialDate: _dueDate ?? _date.add(const Duration(days: 30)),
+      initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -84,14 +82,15 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final person = _personCtrl.text.trim();
     final amount = _amountCtrl.amount;
     if (person.isEmpty) {
-      _toast('Vui lòng nhập tên người vay/cho vay');
+      _toast(l.pleaseEnterPerson);
       return;
     }
     if (amount <= 0) {
-      _toast('Vui lòng nhập số tiền');
+      _toast(l.pleaseEnterAmount);
       return;
     }
     final date = DateTime(_date.year, _date.month, _date.day);
@@ -99,7 +98,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     if (_isEditing) {
       final current = _store.debtById(widget.debt!.id) ?? widget.debt!;
       if (amount < current.paid) {
-        _toast('Số tiền không được nhỏ hơn số đã thanh toán');
+        _toast(l.amountCannotBeLessThanPaid);
         return;
       }
       _store.updateDebt(
@@ -132,32 +131,22 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   }
 
   Future<void> _confirmDelete() async {
+    final l = context.l10n;
     final debt = _store.debtById(widget.debt!.id) ?? widget.debt!;
-    final count = debt.payments.length;
-    final linked = debt.walletId != null ||
-        debt.payments.any((p) => p.walletId != null);
-    final message = StringBuffer(
-      count == 0
-          ? 'Khoản "${debt.person}" sẽ bị xóa.'
-          : 'Khoản "${debt.person}" cùng $count lần thanh toán sẽ bị xóa.',
-    );
-    if (linked) {
-      message.write(' Các giao dịch qua ví sẽ được hoàn về ví tương ứng.');
-    }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Xóa khoản nợ?'),
-        content: Text(message.toString()),
+        title: Text(l.deleteDebtTitle),
+        content: Text(l.deleteDebtMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Xóa'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -207,10 +196,11 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final isLend = _type == DebtType.lend;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Sửa khoản nợ' : 'Thêm khoản nợ'),
+        title: Text(_isEditing ? l.editDebt : l.addDebt),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -218,7 +208,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           SegmentedButton<DebtType>(
             segments: [
               for (final t in DebtType.values)
-                ButtonSegment(value: t, label: Text(t.label)),
+                ButtonSegment(value: t, label: Text(t.localizedLabel(context))),
             ],
             selected: {_type},
             onSelectionChanged:
@@ -234,7 +224,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
                   controller: _personCtrl,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
-                    hintText: isLend ? 'Người vay' : 'Người cho vay',
+                    hintText: isLend ? l.borrower : l.lender,
                   ),
                 ),
               ),
@@ -243,16 +233,16 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           const SizedBox(height: 16),
           MoneyField(
             controller: _amountCtrl,
-            title: 'Số tiền',
+            title: l.amount,
             decoration: InputDecoration(
-              labelText: 'Số tiền',
+              labelText: l.amount,
               hintText: '0',
               suffixText: currencySymbol,
             ),
           ),
           const SizedBox(height: 20),
           Text(
-            isLend ? 'Lấy tiền từ ví' : 'Nhận tiền vào ví',
+            isLend ? l.walletSourceLend : l.walletSourceBorrow,
             style: TextStyle(color: context.textSecondary),
           ),
           const SizedBox(height: 8),
@@ -263,22 +253,22 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           ),
           const SizedBox(height: 20),
           _dateRow(
-            isLend ? 'Ngày cho vay' : 'Ngày vay',
+            isLend ? l.debtDateLend : l.debtDateBorrow,
             _date,
             _pickDate,
           ),
           const SizedBox(height: 8),
           _dateRow(
-            'Hạn trả',
+            l.dueDate,
             _dueDate,
             _pickDueDate,
             onClear: () => setState(() => _dueDate = null),
-            empty: 'Chưa đặt hạn',
+            empty: l.noDueDate,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _noteCtrl,
-            decoration: const InputDecoration(labelText: 'Ghi chú'),
+            decoration: InputDecoration(labelText: l.note),
           ),
           const SizedBox(height: 32),
           SizedBox(
@@ -293,7 +283,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
               ),
               onPressed: _submit,
               child: Text(
-                _isEditing ? 'Lưu' : 'Thêm',
+                _isEditing ? l.save : l.add,
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -311,8 +301,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
                   ),
                 ),
                 onPressed: _confirmDelete,
-                child: const Text('Xóa khoản nợ',
-                    style: TextStyle(fontSize: 16)),
+                child: Text(l.deleteDebt, style: const TextStyle(fontSize: 16)),
               ),
             ),
           ],

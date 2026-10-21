@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -55,7 +57,7 @@ class WalletSelector extends StatelessWidget {
                       const SizedBox(width: 6),
                       Flexible(
                         child: Text(
-                          wallet?.name ?? 'Tất cả ví',
+                          wallet?.localizedName(context) ?? context.l10n.allWallets,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -89,6 +91,7 @@ class _WalletSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final store = AppStore.instance;
     final selectedId = store.selectedWalletId;
+    final l = context.l10n;
 
     void choose(String? id) {
       store.selectWallet(id);
@@ -99,11 +102,11 @@ class _WalletSheet extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
           child: Text(
-            'Chọn ví',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            l.selectWallet,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
         Flexible(
@@ -114,7 +117,7 @@ class _WalletSheet extends StatelessWidget {
               _WalletOption(
                 icon: AppIcons.wallet,
                 color: AppTheme.primary,
-                name: 'Tất cả ví',
+                name: l.allWallets,
                 balance: store.balance,
                 selected: selectedId == null,
                 onTap: () => choose(null),
@@ -123,7 +126,7 @@ class _WalletSheet extends StatelessWidget {
                 _WalletOption(
                   icon: w.icon,
                   color: w.color,
-                  name: w.name,
+                  name: w.localizedName(context),
                   balance: store.walletBalance(w.id),
                   selected: selectedId == w.id,
                   onTap: () => choose(w.id),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
@@ -52,7 +54,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
           categoryId: categoryId,
           type: TxType.expense,
           range: range,
-          rangeLabel: DateRange.label(Period.month, _anchor),
+          rangeLabel: localizedDateRangeLabel(context, Period.month, _anchor),
         ),
       ),
     );
@@ -60,6 +62,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -85,7 +88,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Ngân sách')),
+          appBar: AppBar(title: Text(l.budget)),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -114,7 +117,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                 }),
                         child: Center(
                           child: Text(
-                            DateRange.label(Period.month, _anchor),
+                            localizedDateRangeLabel(context, Period.month, _anchor),
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: _isCurrentMonth
@@ -137,14 +140,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
               const SizedBox(height: 12),
               if (rows.isEmpty)
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 48),
+                  padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
                       AppIcon(AppIcons.overview,
                           size: 56, color: context.textDisabled),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
-                        'Chưa có ngân sách nào',
+                        l.noBudgetsYet,
                         style: TextStyle(color: context.textSecondary),
                       ),
                     ],
@@ -171,7 +174,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
-            label: const Text('Thêm ngân sách'),
+            label: Text(l.addBudget),
             onPressed: _openForm,
           ),
         );
@@ -195,6 +198,7 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final over = spent > limit;
     final remaining = limit - spent;
     return Container(
@@ -207,7 +211,7 @@ class _Summary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            over ? 'Đã vượt ngân sách' : 'Còn lại',
+            over ? l.exceeded : l.remaining,
             style: const TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 6),
@@ -234,13 +238,13 @@ class _Summary extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Đã chi ${formatMoney(spent)}',
+                  l.spentOfLimit(formatMoney(spent)),
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
               Expanded(
                 child: Text(
-                  'Hạn mức ${formatMoney(limit)}',
+                  l.limitAmount(formatMoney(limit)),
                   textAlign: TextAlign.right,
                   style: const TextStyle(color: Colors.white70),
                 ),
@@ -250,14 +254,14 @@ class _Summary extends StatelessWidget {
           if (perDay != null) ...[
             const SizedBox(height: 10),
             Text(
-              'Có thể chi ${formatMoney(perDay!)}/ngày',
+              l.canSpendPerDay(formatMoney(perDay!)),
               style: const TextStyle(color: Colors.white70),
             ),
           ],
           if (outside > 0) ...[
             const SizedBox(height: 6),
             Text(
-              'Chi ngoài ngân sách: ${formatMoney(outside)}',
+              l.outsideBudget(formatMoney(outside)),
               style: const TextStyle(color: Colors.white70),
             ),
           ],
@@ -280,13 +284,14 @@ class _BudgetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final limit = row.budget.limit;
     final level = BudgetLevel.of(row.spent, limit);
     final color = level.color;
     final category = row.category;
     final statusText = level == BudgetLevel.over
-        ? 'Vượt ${formatMoney(row.spent - limit)}'
-        : 'Còn ${formatMoney(limit - row.spent)}';
+        ? l.statusOver(formatMoney(row.spent - limit))
+        : l.statusRemaining(formatMoney(limit - row.spent));
 
     return Card(
       color: context.surfaceColor,
@@ -314,7 +319,7 @@ class _BudgetTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            category?.name ?? 'Khác',
+                            category?.localizedName(context) ?? l.other,
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -357,7 +362,7 @@ class _BudgetTile extends StatelessWidget {
               IconButton(
                 icon: const AppIcon(AppIcons.transactions),
                 color: context.textTertiary,
-                tooltip: 'Xem giao dịch',
+                tooltip: l.viewTransactions,
                 onPressed: onViewTransactions,
               ),
             ],

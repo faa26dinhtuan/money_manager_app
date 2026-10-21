@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/constants.dart';
+
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 
 class CustomBottomNav extends StatelessWidget {
   const CustomBottomNav({
@@ -33,14 +34,14 @@ class CustomBottomNav extends StatelessWidget {
       child: Row(
         children: [
           _item(context, 0, AppIcons.overview, AppIcons.overview,
-              AppConstants.tabOverview),
+              context.l10n.overview),
           _item(context, 1, AppIcons.transactions, AppIcons.transactions,
-              AppConstants.tabTransactions),
+              context.l10n.transactions),
           const Expanded(child: SizedBox.shrink()),
           _item(context, 2, AppIcons.categories, AppIcons.categories,
-              AppConstants.tabCategories),
+              context.l10n.categories),
           _item(context, 3, AppIcons.wallet,
-              AppIcons.wallet, AppConstants.tabWallet),
+              AppIcons.wallet, context.l10n.wallet),
         ],
       ),
     );

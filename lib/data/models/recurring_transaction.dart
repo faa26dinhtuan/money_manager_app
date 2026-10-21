@@ -1,14 +1,6 @@
 import 'package:money_manager_app/data/models/category.dart';
 
-enum Frequency {
-  daily('Hằng ngày'),
-  weekly('Hằng tuần'),
-  monthly('Hằng tháng'),
-  yearly('Hằng năm');
-
-  const Frequency(this.label);
-  final String label;
-}
+enum Frequency { daily, weekly, monthly, yearly }
 
 class RecurringTransaction {
   const RecurringTransaction({

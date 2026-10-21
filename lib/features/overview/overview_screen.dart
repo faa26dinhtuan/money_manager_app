@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -98,8 +100,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                 children: [
                                   Text(
                                     _type == TxType.expense
-                                        ? 'Đã chi'
-                                        : 'Đã thu',
+                                        ? context.l10n.spent
+                                        : context.l10n.received,
                                     style: TextStyle(
                                       color: context.textTertiary,
                                     ),
@@ -122,10 +124,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     const SizedBox(height: 12),
                     if (entries.isEmpty)
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
+                        padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                           child: Text(
-                            'Chưa có giao dịch trong khoảng này',
+                            context.l10n.noTransactionsInRange,
                             style: TextStyle(color: context.textSecondary),
                           ),
                         ),
@@ -141,7 +143,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               categoryId: e.key,
                               type: _type,
                               range: DateRange.of(_period, _anchor),
-                              rangeLabel: DateRange.label(_period, _anchor),
+                              rangeLabel: localizedDateRangeLabel(
+                                context,
+                                _period,
+                                _anchor,
+                              ),
                             ),
                           ),
                         ),
@@ -198,9 +204,9 @@ class _Header extends StatelessWidget {
                 ],
               ),
             ),
-            const Text(
-              'SỐ DƯ',
-              style: TextStyle(color: Colors.white70, letterSpacing: 1.5),
+            Text(
+              context.l10n.balanceUpper,
+              style: const TextStyle(color: Colors.white70, letterSpacing: 1.5),
             ),
             const SizedBox(height: 4),
             Text(
@@ -262,7 +268,7 @@ class _CategoryRow extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                category?.name ?? 'Khác',
+                category?.localizedName(context) ?? context.l10n.other,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),

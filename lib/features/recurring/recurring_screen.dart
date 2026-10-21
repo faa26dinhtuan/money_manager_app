@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -42,12 +44,13 @@ class _RecurringScreenState extends State<RecurringScreen> {
     if (created > 0) {
       ScaffoldMessenger.of(
         context,
-      ).showApp('Đã tự động thêm $created giao dịch định kỳ');
+      ).showApp(context.l10n.autoAddedRecurring(created));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
@@ -64,7 +67,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Giao dịch định kỳ')),
+          appBar: AppBar(title: Text(l.recurring)),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -72,13 +75,13 @@ class _RecurringScreenState extends State<RecurringScreen> {
               const SizedBox(height: 16),
               if (items.isEmpty)
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
+                  padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Column(
                     children: [
                       AppIcon(AppIcons.repeat, size: 56, color: context.textDisabled),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
-                        'Chưa có giao dịch định kỳ nào',
+                        l.noRecurringYet,
                         style: TextStyle(color: context.textSecondary),
                       ),
                     ],
@@ -95,7 +98,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
-            label: const Text('Thêm định kỳ'),
+            label: Text(l.addRecurring),
             onPressed: () => _openForm(),
           ),
         );
@@ -135,6 +138,7 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -143,9 +147,9 @@ class _Summary extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _item('Chi định kỳ / tháng', expense),
+          _item(l.monthlyAvgExpense, expense),
           const SizedBox(width: 16),
-          _item('Thu định kỳ / tháng', income),
+          _item(l.monthlyAvgIncome, income),
         ],
       ),
     );
@@ -163,20 +167,24 @@ class _RecurringTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onToggle;
 
-  String _status() {
-    if (item.isFinished) return 'Đã kết thúc';
-    if (!item.active) return 'Tạm dừng';
-    return 'Lần tới: ${formatDate(item.nextDate)}';
+  String _status(BuildContext context) {
+    final l = context.l10n;
+    if (item.isFinished) return l.finished;
+    if (!item.active) return l.paused;
+    return '${l.nextDate}: ${formatDate(item.nextDate)}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final store = AppStore.instance;
     final category = store.categoryById(item.categoryId);
     final wallet = store.walletById(item.walletId);
     final isExpense = item.type == TxType.expense;
     final dimmed = !item.active || item.isFinished;
-    final title = item.note.isEmpty ? (category?.name ?? 'Khác') : item.note;
+    final title = item.note.isEmpty
+        ? (category?.localizedName(context) ?? l.other)
+        : item.note;
 
     return Card(
       color: context.surfaceColor,
@@ -210,14 +218,14 @@ class _RecurringTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${item.frequency.label} • ${wallet?.name ?? 'Ví'}',
+                        '${item.frequency.localizedLabel(context)} • ${wallet?.localizedName(context) ?? l.wallet}',
                         style: TextStyle(
                           color: context.textSecondary,
                           fontSize: 12,
                         ),
                       ),
                       Text(
-                        _status(),
+                        _status(context),
                         style: TextStyle(
                           color: context.textTertiary,
                           fontSize: 12,

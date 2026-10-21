@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/theme/ios_scroll_behavior.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -14,6 +15,7 @@ import 'package:money_manager_app/features/splash/splash_screen.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_screen.dart';
+import 'package:money_manager_app/l10n/app_localizations.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -23,11 +25,14 @@ class App extends StatelessWidget {
     return ListenableBuilder(
       listenable: AppStore.instance,
       builder: (context, _) => MaterialApp(
-        title: AppConstants.appName,
+        onGenerateTitle: (context) => context.l10n.appName,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: AppStore.instance.themeMode,
+        locale: AppStore.instance.locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         scrollBehavior: const IosScrollBehavior(),
         home: SplashScreen(
           next:
@@ -73,7 +78,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     if (count > 0 && mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showApp('Đã tự động thêm $count giao dịch định kỳ');
+      ).showApp(context.l10n.autoAddedRecurring(count));
     }
   }
 

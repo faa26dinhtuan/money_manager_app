@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -81,9 +82,10 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      _toast('Vui lòng nhập tên ví');
+      _toast(l.pleaseEnterWalletName);
       return;
     }
     final wallet = Wallet(
@@ -102,9 +104,10 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
   }
 
   Future<void> _confirmDelete() async {
+    final l = context.l10n;
     final wallet = widget.wallet!;
     if (_store.wallets.length <= 1) {
-      _toast('Cần giữ lại ít nhất một ví');
+      _toast(l.keepAtLeastOneWallet);
       return;
     }
     final count = _store.transactionCountOfWallet(wallet.id);
@@ -112,28 +115,26 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
         _store.debtEntryCountOfWallet(wallet.id);
     final message = StringBuffer(
       count == 0
-          ? 'Ví "${wallet.name}" sẽ bị xóa.'
-          : 'Ví "${wallet.name}" và $count giao dịch trong ví này sẽ bị xóa.',
+          ? l.deleteWalletMessageSimple(wallet.name)
+          : l.deleteWalletMessageWithTx(wallet.name, count),
     );
     if (linkedCount > 0) {
-      message.write(
-        ' $linkedCount khoản ở mục tiêu và sổ nợ liên quan sẽ được giữ lại nhưng không còn gắn với ví.',
-      );
+      message.write(l.deleteWalletLinkedNotice(linkedCount));
     }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Xóa ví?'),
+        title: Text(l.deleteWalletTitle),
         content: Text(message.toString()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Hủy'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Xóa'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -146,8 +147,9 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Sửa ví' : 'Thêm ví')),
+      appBar: AppBar(title: Text(_isEditing ? l.editWallet : l.addWallet)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -158,7 +160,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
               Expanded(
                 child: TextField(
                   controller: _nameCtrl,
-                  decoration: const InputDecoration(hintText: 'Tên ví'),
+                  decoration: InputDecoration(hintText: l.walletName),
                 ),
               ),
             ],
@@ -166,15 +168,15 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
           const SizedBox(height: 16),
           MoneyField(
             controller: _balanceCtrl,
-            title: 'Số dư ban đầu',
+            title: l.initialBalance,
             decoration: InputDecoration(
-              labelText: 'Số dư ban đầu',
+              labelText: l.initialBalance,
               hintText: '0',
               suffixText: currencySymbol,
             ),
           ),
           const SizedBox(height: 24),
-          Text('Biểu tượng', style: TextStyle(color: context.textSecondary)),
+          Text(l.icon, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -193,7 +195,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Text('Màu sắc', style: TextStyle(color: context.textSecondary)),
+          Text(l.color, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,
@@ -225,7 +227,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
               ),
               onPressed: _submit,
               child: Text(
-                _isEditing ? 'Lưu' : 'Thêm',
+                _isEditing ? l.save : l.add,
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -243,7 +245,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
                   ),
                 ),
                 onPressed: _confirmDelete,
-                child: const Text('Xóa ví', style: TextStyle(fontSize: 16)),
+                child: Text(l.deleteWallet, style: const TextStyle(fontSize: 16)),
               ),
             ),
           ],

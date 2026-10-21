@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
@@ -19,12 +19,13 @@ class WalletScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = AppStore.instance;
+    final l = context.l10n;
     return ListenableBuilder(
       listenable: store,
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text(AppConstants.tabWallet),
+            title: Text(l.wallet),
             actions: const [SettingsButton()],
           ),
           body: ListView(
@@ -39,9 +40,9 @@ class WalletScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Tổng số dư',
-                      style: TextStyle(color: Colors.white70),
+                    Text(
+                      l.totalBalance,
+                      style: const TextStyle(color: Colors.white70),
                     ),
                     const SizedBox(height: 6),
                     FittedBox(
@@ -57,7 +58,7 @@ class WalletScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '${store.wallets.length} ví',
+                      l.walletCount(store.wallets.length),
                       style: const TextStyle(color: Colors.white70),
                     ),
                   ],
@@ -67,8 +68,8 @@ class WalletScreen extends StatelessWidget {
               _SectionTile(
                 icon: AppIcons.wallet,
                 color: AppTheme.primary,
-                title: 'Ví tiền',
-                subtitle: 'Tạo và quản lý các ví của bạn',
+                title: l.manageWallets,
+                subtitle: l.manageWalletsDesc,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const WalletListScreen()),
                 ),
@@ -76,8 +77,8 @@ class WalletScreen extends StatelessWidget {
               _SectionTile(
                 icon: AppIcons.overview,
                 color: const Color(0xFFF5B82E),
-                title: 'Ngân sách theo danh mục',
-                subtitle: 'Đặt hạn mức chi tiêu mỗi tháng',
+                title: l.budgetByCategory,
+                subtitle: l.budgetDesc,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const BudgetScreen()),
                 ),
@@ -85,8 +86,8 @@ class WalletScreen extends StatelessWidget {
               _SectionTile(
                 icon: AppIcons.flag,
                 color: const Color(0xFF9B5DE5),
-                title: 'Mục tiêu kiếm tiền',
-                subtitle: 'Tiết kiệm cho kế hoạch của bạn',
+                title: l.goals,
+                subtitle: l.goalsDesc,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const GoalsScreen()),
                 ),
@@ -94,8 +95,8 @@ class WalletScreen extends StatelessWidget {
               _SectionTile(
                 icon: AppIcons.exchange,
                 color: const Color(0xFFE8506E),
-                title: 'Sổ nợ',
-                subtitle: 'Theo dõi các khoản cho vay và đi vay',
+                title: l.debts,
+                subtitle: l.debtsDesc,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const DebtsScreen()),
                 ),
@@ -103,8 +104,8 @@ class WalletScreen extends StatelessWidget {
               _SectionTile(
                 icon: AppIcons.repeat,
                 color: const Color(0xFF3CC6B0),
-                title: 'Giao dịch định kỳ',
-                subtitle: 'Tự động lặp lại theo chu kỳ',
+                title: l.recurring,
+                subtitle: l.recurringDesc,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const RecurringScreen()),
                 ),

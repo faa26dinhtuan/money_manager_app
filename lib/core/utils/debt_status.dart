@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/data/models/debt.dart';
+import 'package:money_manager_app/l10n/app_localizations.dart';
 
 extension DebtTypeStyle on DebtType {
   Color get color {
@@ -47,11 +48,11 @@ DebtState debtStateOf(Debt debt, DateTime now) {
   return DebtState.ongoing;
 }
 
-String debtDueText(Debt debt, DateTime now) {
-  if (debt.isSettled) return 'Đã tất toán';
+String debtDueText(Debt debt, DateTime now, AppLocalizations l) {
+  if (debt.isSettled) return l.settled;
   final days = debt.daysLeft(now);
-  if (days == null) return 'Không có hạn';
-  if (days > 0) return 'Còn $days ngày';
-  if (days == 0) return 'Đến hạn hôm nay';
-  return 'Quá hạn ${-days} ngày';
+  if (days == null) return l.noDueDate;
+  if (days > 0) return l.daysRemaining(days);
+  if (days == 0) return l.dueToday;
+  return l.daysOverdue(-days);
 }

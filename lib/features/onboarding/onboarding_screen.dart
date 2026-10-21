@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -41,12 +42,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Color(0xFF8E9A93),
   ];
 
-  static const _suggestions = <(String, AppIconData)>[
-    ('Tiền mặt', AppIcons.payments),
-    ('Ngân hàng', AppIcons.bank),
-    ('Ví điện tử', AppIcons.phone),
-  ];
-
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
   final _balanceCtrl = MoneyController();
@@ -83,7 +78,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _submit() {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showApp('Vui lòng nhập tên ví');
+      ScaffoldMessenger.of(context).showApp(context.l10n.pleaseEnterWalletName);
       return;
     }
     _finish(
@@ -99,32 +94,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final suggestions = <(String, AppIconData)>[
+      (l.cashWallet, AppIcons.payments),
+      (l.bankWallet, AppIcons.bank),
+      (l.eWallet, AppIcons.phone),
+    ];
+
     return Scaffold(
       backgroundColor: AppTheme.primary,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Column(
                 children: [
-                  AppIcon(AppIcons.wallet,
+                  const AppIcon(AppIcons.wallet,
                       size: 56, color: Colors.white),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
-                    'Chào mừng bạn!',
-                    style: TextStyle(
+                    l.welcome,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    'Hãy tạo ví đầu tiên để bắt đầu quản lý chi tiêu',
+                    l.welcomeSubtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70),
+                    style: const TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
@@ -134,20 +136,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: context.backgroundColor,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
                 ),
                 child: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
                     Text(
-                      'Gợi ý nhanh',
+                      l.quickSuggestions,
                       style: TextStyle(color: context.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       children: [
-                        for (final s in _suggestions)
+                        for (final s in suggestions)
                           ActionChip(
                             avatar: AppIcon(s.$2, size: 18),
                             label: Text(s.$1),
@@ -163,8 +165,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Expanded(
                           child: TextField(
                             controller: _nameCtrl,
-                            decoration: const InputDecoration(
-                              hintText: 'Tên ví',
+                            decoration: InputDecoration(
+                              hintText: l.walletName,
                             ),
                           ),
                         ),
@@ -173,16 +175,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const SizedBox(height: 16),
                     MoneyField(
                       controller: _balanceCtrl,
-                      title: 'Số dư ban đầu',
+                      title: l.initialBalance,
                       decoration: InputDecoration(
-                        labelText: 'Số dư ban đầu',
+                        labelText: l.initialBalance,
                         hintText: '0',
                         suffixText: currencySymbol,
                       ),
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Biểu tượng',
+                      l.icon,
                       style: TextStyle(color: context.textSecondary),
                     ),
                     const SizedBox(height: 12),
@@ -206,7 +208,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Màu sắc',
+                      l.color,
                       style: TextStyle(color: context.textSecondary),
                     ),
                     const SizedBox(height: 12),
@@ -246,9 +248,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         onPressed: _submit,
-                        child: const Text(
-                          'Tạo ví & bắt đầu',
-                          style: TextStyle(fontSize: 16),
+                        child: Text(
+                          l.createWalletAndStart,
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
@@ -12,6 +13,7 @@ import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
+import 'package:money_manager_app/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStore extends ChangeNotifier {
@@ -29,13 +31,8 @@ class AppStore extends ChangeNotifier {
   static const _themeModeKey = 'themeMode';
   static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
+  static const _localeKey = 'locale';
 
-  static const _cashWallet = Wallet(
-    id: 'cash',
-    name: 'Tiền mặt',
-    icon: AppIcons.payments,
-    color: Color(0xFF2A8C66),
-  );
 
   late final SharedPreferences _prefs;
 
@@ -49,6 +46,7 @@ class AppStore extends ChangeNotifier {
   bool _onboarded = false;
   ThemeMode _themeMode = ThemeMode.system;
   AppCurrency _currency = AppCurrency.vnd;
+  Locale? _locale;
   String? _selectedWalletId;
 
   bool get onboarded => _onboarded;
@@ -56,6 +54,8 @@ class AppStore extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
 
   AppCurrency get currency => _currency;
+
+  Locale? get locale => _locale;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -66,6 +66,10 @@ class AppStore extends ChangeNotifier {
     _currency = AppCurrency.byCode(_prefs.getString(_currencyKey));
     AppCurrency.current = _currency;
     _selectedWalletId = _prefs.getString(_selectedWalletKey);
+    final rawLocale = _prefs.getString(_localeKey);
+    if (rawLocale != null && rawLocale.isNotEmpty) {
+      _locale = Locale(rawLocale);
+    }
     final rawRecurrings = _prefs.getString(_recurringsKey);
     if (rawRecurrings != null) {
       try {
@@ -94,7 +98,7 @@ class AppStore extends ChangeNotifier {
             .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
             .toList();
         final wallets = rawWallets == null
-            ? <Wallet>[_cashWallet]
+            ? <Wallet>[_cashWallet(_seedStrings())]
             : (jsonDecode(rawWallets) as List)
                   .map((e) => Wallet.fromJson(e as Map<String, dynamic>))
                   .toList();
@@ -617,6 +621,16 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setLocale(Locale? locale) {
+    _locale = locale;
+    if (locale == null) {
+      _prefs.remove(_localeKey);
+    } else {
+      _prefs.setString(_localeKey, locale.languageCode);
+    }
+    notifyListeners();
+  }
+
   void setCurrency(AppCurrency currency) {
     _currency = currency;
     AppCurrency.current = currency;
@@ -759,103 +773,121 @@ class AppStore extends ChangeNotifier {
 
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
+  AppLocalizations _seedStrings() {
+    final preferred = _locale ?? PlatformDispatcher.instance.locale;
+    final supported = AppLocalizations.supportedLocales.any(
+      (e) => e.languageCode == preferred.languageCode,
+    );
+    return lookupAppLocalizations(
+      supported ? Locale(preferred.languageCode) : const Locale('en'),
+    );
+  }
+
+  Wallet _cashWallet(AppLocalizations l) => Wallet(
+    id: 'cash',
+    name: l.cashWallet,
+    icon: AppIcons.payments,
+    color: const Color(0xFF2A8C66),
+  );
+
   void _seed() {
+    final l = _seedStrings();
     const e = TxType.expense;
     const i = TxType.income;
-    _categories.addAll(const [
+    _categories.addAll([
       Category(
         id: 'food',
-        name: 'Ăn uống',
+        name: l.catFood,
         icon: AppIcons.restaurant,
-        color: Color(0xFFF5B82E),
+        color: const Color(0xFFF5B82E),
         type: e,
       ),
       Category(
         id: 'grocery',
-        name: 'Đi chợ',
+        name: l.catGrocery,
         icon: AppIcons.shoppingBasket,
-        color: Color(0xFF4C9BE8),
+        color: const Color(0xFF4C9BE8),
         type: e,
       ),
       Category(
         id: 'shop',
-        name: 'Mua sắm',
+        name: l.catShop,
         icon: AppIcons.shoppingCart,
-        color: Color(0xFF9B5DE5),
+        color: const Color(0xFF9B5DE5),
         type: e,
       ),
       Category(
         id: 'home',
-        name: 'Nhà cửa',
+        name: l.catHome,
         icon: AppIcons.home,
-        color: Color(0xFFE8506E),
+        color: const Color(0xFFE8506E),
         type: e,
       ),
       Category(
         id: 'transport',
-        name: 'Di chuyển',
+        name: l.catTransport,
         icon: AppIcons.bus,
-        color: Color(0xFF3CC6B0),
+        color: const Color(0xFF3CC6B0),
         type: e,
       ),
       Category(
         id: 'health',
-        name: 'Sức khỏe',
+        name: l.catHealth,
         icon: AppIcons.favorite,
-        color: Color(0xFFEF6C57),
+        color: const Color(0xFFEF6C57),
         type: e,
       ),
       Category(
         id: 'bill',
-        name: 'Hóa đơn',
+        name: l.catBill,
         icon: AppIcons.bolt,
-        color: Color(0xFF6BB94A),
+        color: const Color(0xFF6BB94A),
         type: e,
       ),
       Category(
         id: 'other_e',
-        name: 'Khác',
+        name: l.other,
         icon: AppIcons.help,
-        color: Color(0xFF8E9A93),
+        color: const Color(0xFF8E9A93),
         type: e,
       ),
       Category(
         id: 'salary',
-        name: 'Lương',
+        name: l.catSalary,
         icon: AppIcons.wallet,
-        color: Color(0xFF2A8C66),
+        color: const Color(0xFF2A8C66),
         type: i,
       ),
       Category(
         id: 'bonus',
-        name: 'Thưởng',
+        name: l.catBonus,
         icon: AppIcons.gift,
-        color: Color(0xFFF5B82E),
+        color: const Color(0xFFF5B82E),
         type: i,
       ),
       Category(
         id: 'invest',
-        name: 'Đầu tư',
+        name: l.catInvest,
         icon: AppIcons.trendingUp,
-        color: Color(0xFF4C9BE8),
+        color: const Color(0xFF4C9BE8),
         type: i,
       ),
       Category(
         id: 'other_i',
-        name: 'Khác',
+        name: l.catOtherIncome,
         icon: AppIcons.help,
-        color: Color(0xFF8E9A93),
+        color: const Color(0xFF8E9A93),
         type: i,
       ),
     ]);
 
-    _wallets.addAll(const [
-      _cashWallet,
+    _wallets.addAll([
+      _cashWallet(l),
       Wallet(
         id: 'bank',
-        name: 'Ngân hàng',
+        name: l.bankWallet,
         icon: AppIcons.bank,
-        color: Color(0xFF4C9BE8),
+        color: const Color(0xFF4C9BE8),
       ),
     ]);
 
@@ -887,24 +919,24 @@ class AppStore extends ChangeNotifier {
     );
 
     _transactions.addAll([
-      tx('1', e, 'food', 85000, 0, 'Cơm trưa'),
-      tx('2', e, 'transport', 30000, 0, 'Grab'),
-      tx('3', e, 'grocery', 220000, 1, 'Rau củ ở chợ'),
-      tx('4', e, 'shop', 450000, 2, 'Áo thun'),
-      tx('5', e, 'food', 120000, 3, 'Cà phê + bánh'),
-      tx('6', e, 'bill', 650000, 5, 'Tiền điện'),
-      tx('7', e, 'home', 3000000, 8, 'Tiền nhà'),
-      tx('8', e, 'health', 180000, 12, 'Thuốc'),
+      tx('1', e, 'food', 85000, 0, l.seedNoteLunch),
+      tx('2', e, 'transport', 30000, 0, l.seedNoteRide),
+      tx('3', e, 'grocery', 220000, 1, l.seedNoteVegetables),
+      tx('4', e, 'shop', 450000, 2, l.seedNoteTshirt),
+      tx('5', e, 'food', 120000, 3, l.seedNoteCoffee),
+      tx('6', e, 'bill', 650000, 5, l.seedNoteElectricity),
+      tx('7', e, 'home', 3000000, 8, l.seedNoteRent),
+      tx('8', e, 'health', 180000, 12, l.seedNoteMedicine),
       tx('9', e, 'food', 95000, 15),
-      tx('10', i, 'salary', 15000000, 4, 'Lương tháng'),
-      tx('11', i, 'bonus', 1000000, 10, 'Thưởng dự án'),
-      tx('12', i, 'invest', 350000, 20, 'Lãi tiết kiệm'),
+      tx('10', i, 'salary', 15000000, 4, l.seedNoteSalary),
+      tx('11', i, 'bonus', 1000000, 10, l.seedNoteProjectBonus),
+      tx('12', i, 'invest', 350000, 20, l.seedNoteInterest),
     ]);
 
     _goals.add(
       Goal(
         id: 'g_trip',
-        name: 'Du lịch Đà Lạt',
+        name: l.seedGoalTrip,
         icon: AppIcons.flight,
         color: const Color(0xFF4C9BE8),
         target: 10000000,
@@ -914,13 +946,13 @@ class AppStore extends ChangeNotifier {
             id: 'ge_1',
             amount: 2000000,
             date: today.subtract(const Duration(days: 20)),
-            note: 'Số tiền ban đầu',
+            note: l.seedGoalInitial,
           ),
           GoalEntry(
             id: 'ge_2',
             amount: 1500000,
             date: today.subtract(const Duration(days: 6)),
-            note: 'Dành dụm tháng này',
+            note: l.seedGoalMonthly,
           ),
         ],
       ),
@@ -930,28 +962,28 @@ class AppStore extends ChangeNotifier {
       Debt(
         id: 'd_minh',
         type: DebtType.lend,
-        person: 'Bạn Minh',
+        person: l.seedPersonMinh,
         amount: 1500000,
         date: today.subtract(const Duration(days: 12)),
         dueDate: today.add(const Duration(days: 18)),
-        note: 'Cho mượn đóng tiền trọ',
+        note: l.seedDebtLendNote,
         payments: [
           DebtPayment(
             id: 'dp_1',
             amount: 500000,
             date: today.subtract(const Duration(days: 4)),
-            note: 'Trả đợt 1',
+            note: l.seedDebtPayment,
           ),
         ],
       ),
       Debt(
         id: 'd_lan',
         type: DebtType.borrow,
-        person: 'Chị Lan',
+        person: l.seedPersonLan,
         amount: 3000000,
         date: today.subtract(const Duration(days: 40)),
         dueDate: today.subtract(const Duration(days: 3)),
-        note: 'Mượn mua xe đạp',
+        note: l.seedDebtBorrowNote,
       ),
     ]);
   }
