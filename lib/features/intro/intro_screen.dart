@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/widgets/welcome_icon_tile.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key, required this.next});
@@ -156,21 +157,11 @@ class _PageContent extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(44),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: AppIcon(page.icon, size: 84, color: AppTheme.primary),
+          WelcomeIconTile(
+            icon: page.icon,
+            size: 160,
+            iconSize: 84,
+            radius: 44,
           ),
           const SizedBox(height: 40),
           Text(

@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
+import 'package:money_manager_app/core/widgets/welcome_icon_tile.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -104,22 +105,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Column(
                 children: [
-                  const AppIcon(AppIcons.wallet,
-                      size: 56, color: Colors.white),
-                  const SizedBox(height: 12),
+                  const WelcomeIconTile(
+                    icon: AppIcons.wallet,
+                    size: 88,
+                    iconSize: 48,
+                    radius: 28,
+                  ),
+                  const SizedBox(height: 20),
                   Text(
                     l.welcome,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     l.welcomeSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white70),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
                   ),
                 ],
               ),
