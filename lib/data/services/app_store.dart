@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/data/models/backup_data.dart';
 import 'package:money_manager_app/data/models/budget.dart';
@@ -25,6 +26,7 @@ class AppStore extends ChangeNotifier {
   static const _recurringsKey = 'recurrings';
   static const _onboardedKey = 'onboarded';
   static const _themeModeKey = 'themeMode';
+  static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
 
   static const _cashWallet = Wallet(
@@ -45,11 +47,14 @@ class AppStore extends ChangeNotifier {
   final List<RecurringTransaction> _recurrings = [];
   bool _onboarded = false;
   ThemeMode _themeMode = ThemeMode.light;
+  AppCurrency _currency = AppCurrency.vnd;
   String? _selectedWalletId;
 
   bool get onboarded => _onboarded;
 
   ThemeMode get themeMode => _themeMode;
+
+  AppCurrency get currency => _currency;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -57,6 +62,8 @@ class AppStore extends ChangeNotifier {
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
         ThemeMode.light;
+    _currency = AppCurrency.byCode(_prefs.getString(_currencyKey));
+    AppCurrency.current = _currency;
     _selectedWalletId = _prefs.getString(_selectedWalletKey);
     final rawRecurrings = _prefs.getString(_recurringsKey);
     if (rawRecurrings != null) {
@@ -609,6 +616,13 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCurrency(AppCurrency currency) {
+    _currency = currency;
+    AppCurrency.current = currency;
+    _prefs.setString(_currencyKey, currency.code);
+    notifyListeners();
+  }
+
   BackupData createBackup() {
     return BackupData(
       categories: List.of(_categories),
@@ -618,6 +632,7 @@ class AppStore extends ChangeNotifier {
       goals: List.of(_goals),
       debts: List.of(_debts),
       recurrings: List.of(_recurrings),
+      currency: _currency.code,
     );
   }
 
@@ -643,6 +658,11 @@ class AppStore extends ChangeNotifier {
     _recurrings
       ..clear()
       ..addAll(data.recurrings);
+    if (data.currency != null) {
+      _currency = AppCurrency.byCode(data.currency);
+      AppCurrency.current = _currency;
+      _prefs.setString(_currencyKey, _currency.code);
+    }
     notifyListeners();
     await _save();
   }

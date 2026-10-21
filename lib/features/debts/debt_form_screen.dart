@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
@@ -242,10 +243,10 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           MoneyField(
             controller: _amountCtrl,
             title: 'Số tiền',
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Số tiền',
               hintText: '0',
-              suffixText: '₫',
+              suffixText: currencySymbol,
             ),
           ),
           const SizedBox(height: 20),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/models/budget.dart';
@@ -129,11 +130,11 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
                   decoration: const InputDecoration(hintText: '0'),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 8, bottom: 12),
+              Padding(
+                padding: const EdgeInsets.only(left: 8, bottom: 12),
                 child: Text(
-                  '₫',
-                  style: TextStyle(
+                  currencySymbol,
+                  style: const TextStyle(
                     color: AppTheme.primary,
                     fontSize: 20,
                     fontWeight: FontWeight.w600,

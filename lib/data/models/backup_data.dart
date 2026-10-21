@@ -19,6 +19,7 @@ class BackupData {
     required this.debts,
     required this.recurrings,
     this.exportedAt,
+    this.currency,
   });
 
   static const _prefix = 'MMBK1:';
@@ -33,6 +34,7 @@ class BackupData {
   final List<Debt> debts;
   final List<RecurringTransaction> recurrings;
   final DateTime? exportedAt;
+  final String? currency;
 
   String encode() {
     final json = jsonEncode({
@@ -46,6 +48,7 @@ class BackupData {
       'goals': goals.map((e) => e.toJson()).toList(),
       'debts': debts.map((e) => e.toJson()).toList(),
       'recurrings': recurrings.map((e) => e.toJson()).toList(),
+      if (currency != null) 'currency': currency,
     });
     return _prefix + base64Encode(gzip.encode(utf8.encode(json)));
   }
@@ -84,6 +87,7 @@ class BackupData {
         debts: read('debts', Debt.fromJson),
         recurrings: read('recurrings', RecurringTransaction.fromJson),
         exportedAt: exported == null ? null : DateTime.tryParse(exported),
+        currency: map['currency'] as String?,
       );
     } on FormatException {
       rethrow;

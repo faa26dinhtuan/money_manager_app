@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
-
-const List<int> moneyQuickAmounts = [
-  500000,
-  1000000,
-  2000000,
-  5000000,
-  10000000,
-];
 
 class MoneyController extends TextEditingController {
   MoneyController([double amount = 0]) {
     this.amount = amount;
   }
 
-  double get amount => double.tryParse(text.replaceAll('.', '')) ?? 0;
+  double _amount = 0;
+
+  double get amount => _amount;
 
   set amount(double value) {
-    text = value <= 0 ? '' : groupDigits(value.round().toString());
+    final scale = AppCurrency.current.scale;
+    final minor = value <= 0 ? 0 : (value * scale).round();
+    _amount = minor / scale;
+    text = minor == 0 ? '' : formatNumber(minor.toString());
   }
 }
 
@@ -95,10 +93,14 @@ class _MoneyKeypad extends StatefulWidget {
 class _MoneyKeypadState extends State<_MoneyKeypad> {
   static const int _maxDigits = 12;
 
-  late String _digits =
-      widget.initial > 0 ? widget.initial.round().toString() : '';
+  final AppCurrency _currency = AppCurrency.current;
 
-  double get _amount => _digits.isEmpty ? 0 : double.parse(_digits);
+  late String _digits = widget.initial > 0
+      ? (widget.initial * _currency.scale).round().toString()
+      : '';
+
+  double get _amount =>
+      _digits.isEmpty ? 0 : double.parse(_digits) / _currency.scale;
 
   void _append(String add) {
     if (_digits.isEmpty && add.startsWith('0')) return;
@@ -198,7 +200,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
-                '${_digits.isEmpty ? '0' : groupDigits(_digits)} ₫',
+                withCurrencySymbol(formatNumber(_digits.isEmpty ? '0' : _digits)),
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
@@ -212,10 +214,11 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
               runSpacing: 4,
               alignment: WrapAlignment.center,
               children: [
-                for (final a in moneyQuickAmounts)
+                for (final a in _currency.quickAmounts)
                   ActionChip(
                     label: Text(groupDigits(a.toString())),
-                    onPressed: () => _append(a.toString()),
+                    onPressed: () =>
+                        _append(a.toString() + '0' * _currency.decimals),
                   ),
               ],
             ),
@@ -223,7 +226,13 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
             Row(children: [_key('1'), _key('2'), _key('3')]),
             Row(children: [_key('4'), _key('5'), _key('6')]),
             Row(children: [_key('7'), _key('8'), _key('9')]),
-            Row(children: [_key('000'), _key('0'), _backspaceKey()]),
+            Row(
+              children: [
+                _key(_currency.decimals == 0 ? '000' : '00'),
+                _key('0'),
+                _backspaceKey(),
+              ],
+            ),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/settings/backup_screen.dart';
 import 'package:money_manager_app/features/settings/export_screen.dart';
@@ -42,6 +43,37 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _pickCurrency(BuildContext context) {
+    final store = AppStore.instance;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: const Text('Tiền tệ mặc định'),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(
+              'Chỉ đổi cách hiển thị, số tiền đã nhập không được quy đổi.',
+              style: TextStyle(color: ctx.textSecondary),
+            ),
+          ),
+          for (final currency in AppCurrency.all)
+            ListTile(
+              title: Text(currency.name),
+              subtitle: Text(currency.label),
+              trailing: store.currency.code == currency.code
+                  ? const Icon(Icons.check, color: AppTheme.primary)
+                  : null,
+              onTap: () {
+                store.setCurrency(currency);
+                Navigator.of(ctx).pop();
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -51,8 +83,8 @@ class SettingsScreen extends StatelessWidget {
           (
             Icons.attach_money,
             'Tiền tệ mặc định',
-            'VND (₫)',
-            () => _soon(context),
+            AppStore.instance.currency.label,
+            () => _pickCurrency(context),
           ),
           (
             Icons.palette_outlined,

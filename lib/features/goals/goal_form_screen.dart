@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
@@ -207,10 +208,10 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
           MoneyField(
             controller: _targetCtrl,
             title: 'Số tiền mục tiêu',
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Số tiền mục tiêu',
               hintText: '0',
-              suffixText: '₫',
+              suffixText: currencySymbol,
             ),
           ),
           if (!_isEditing) ...[
@@ -218,10 +219,10 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             MoneyField(
               controller: _initialCtrl,
               title: 'Số tiền đã có',
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Số tiền đã có (không bắt buộc)',
                 hintText: '0',
-                suffixText: '₫',
+                suffixText: currencySymbol,
               ),
             ),
           ],
