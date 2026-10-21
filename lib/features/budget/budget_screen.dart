@@ -143,7 +143,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      AppIcon(AppIcons.overview,
+                      AppIcon(AppIcons.budget,
                           size: 56, color: context.textDisabled),
                       const SizedBox(height: 12),
                       Text(

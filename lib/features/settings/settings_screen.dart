@@ -161,19 +161,19 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           (
-            AppIcons.brush,
+            AppIcons.theme,
             l.theme,
             _modeLabels(context)[AppStore.instance.themeMode]!,
             () => _pickTheme(context),
           ),
           (
-            AppIcons.flag,
+            AppIcons.language,
             l.language,
             _localeLabel(context, AppStore.instance.locale),
             () => _pickLanguage(context),
           ),
           (
-            AppIcons.upload,
+            AppIcons.backup,
             l.backupAndRestore,
             '',
             () => Navigator.of(context).push(
@@ -181,7 +181,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           (
-            AppIcons.download,
+            AppIcons.exportFile,
             l.exportData,
             'CSV',
             () => Navigator.of(context).push(

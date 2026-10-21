@@ -129,7 +129,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Column(
                     children: [
-                      AppIcon(AppIcons.exchange,
+                      AppIcon(AppIcons.debt,
                           size: 56, color: context.textDisabled),
                       const SizedBox(height: 12),
                       Text(

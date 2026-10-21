@@ -88,6 +88,13 @@ class AppIcons {
   static const diamond = AppIconData('diamond');
   static const trendingUp = AppIconData('trending_up');
   static const help = AppIconData('help');
+  static const theme = AppIconData('theme', scale: 1.2);
+  static const language = AppIconData('language');
+  static const backup = AppIconData('backup');
+  static const exportFile = AppIconData('export_file');
+  static const budget = AppIconData('budget');
+  static const goal = AppIconData('goal');
+  static const debt = AppIconData('debt');
 }
 
 class AppIcon extends StatelessWidget {

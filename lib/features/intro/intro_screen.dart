@@ -60,7 +60,7 @@ class _IntroScreenState extends State<IntroScreen> {
         description: l.introWalletDesc,
       ),
       _IntroPage(
-        icon: AppIcons.flag,
+        icon: AppIcons.budget,
         title: l.introBudgetTitle,
         description: l.introBudgetDesc,
       ),

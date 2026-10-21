@@ -75,7 +75,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: AppIcons.overview,
+                icon: AppIcons.budget,
                 color: const Color(0xFFF5B82E),
                 title: l.budgetByCategory,
                 subtitle: l.budgetDesc,
@@ -84,7 +84,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: AppIcons.flag,
+                icon: AppIcons.goal,
                 color: const Color(0xFF9B5DE5),
                 title: l.goals,
                 subtitle: l.goalsDesc,
@@ -93,7 +93,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: AppIcons.exchange,
+                icon: AppIcons.debt,
                 color: const Color(0xFFE8506E),
                 title: l.debts,
                 subtitle: l.debtsDesc,

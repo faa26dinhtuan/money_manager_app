@@ -96,7 +96,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      AppIcon(AppIcons.flag, size: 56, color: context.textDisabled),
+                      AppIcon(AppIcons.goal, size: 56, color: context.textDisabled),
                       const SizedBox(height: 12),
                       Text(
                         l.noGoalsYet,
