@@ -79,23 +79,6 @@ class _IntroScreenState extends State<IntroScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: 48,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: AnimatedOpacity(
-                  opacity: _isLast ? 0 : 1,
-                  duration: const Duration(milliseconds: 200),
-                  child: TextButton(
-                    onPressed: _isLast ? null : _goNext,
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white70,
-                    ),
-                    child: const Text('Bỏ qua'),
-                  ),
-                ),
-              ),
-            ),
             Expanded(
               child: PageView.builder(
                 controller: _controller,

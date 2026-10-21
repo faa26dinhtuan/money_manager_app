@@ -104,14 +104,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         bottom: false,
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => _finish(null),
-                style: TextButton.styleFrom(foregroundColor: Colors.white70),
-                child: const Text('Bỏ qua'),
-              ),
-            ),
             const Padding(
               padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Column(
