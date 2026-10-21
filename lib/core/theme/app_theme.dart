@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   AppTheme._();
@@ -10,6 +12,13 @@ class AppTheme {
   static const Color darkBackground = Color(0xFF111513);
   static const Color darkSurface = Color(0xFF1B221F);
 
+  static const PageTransitionsTheme _pageTransitions = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    },
+  );
+
   static ThemeData get light {
     final scheme = ColorScheme.fromSeed(
       seedColor: primary,
@@ -19,13 +28,27 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      platform: TargetPlatform.iOS,
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
+      splashFactory: NoSplash.splashFactory,
+      pageTransitionsTheme: _pageTransitions,
       appBarTheme: const AppBarTheme(
-        backgroundColor: primary,
-        foregroundColor: Colors.white,
+        backgroundColor: background,
+        foregroundColor: Colors.black87,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: IconThemeData(color: primary),
+        actionsIconTheme: IconThemeData(color: primary),
+        titleTextStyle: TextStyle(
+          color: Colors.black87,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        shape: Border(bottom: BorderSide(color: Colors.black12, width: 0.5)),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: accent,
@@ -53,14 +76,28 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      platform: TargetPlatform.iOS,
       brightness: Brightness.dark,
       colorScheme: scheme,
       scaffoldBackgroundColor: darkBackground,
+      splashFactory: NoSplash.splashFactory,
+      pageTransitionsTheme: _pageTransitions,
       appBarTheme: const AppBarTheme(
-        backgroundColor: primary,
+        backgroundColor: darkBackground,
         foregroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: IconThemeData(color: primary),
+        actionsIconTheme: IconThemeData(color: primary),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        shape: Border(bottom: BorderSide(color: Colors.white12, width: 0.5)),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: accent,

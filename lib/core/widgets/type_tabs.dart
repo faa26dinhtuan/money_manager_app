@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/theme/app_colors.dart';
+import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/data/models/category.dart';
 
 class TypeTabs extends StatelessWidget {
-  const TypeTabs({super.key, required this.type, required this.onChanged});
+  const TypeTabs({
+    super.key,
+    required this.type,
+    required this.onChanged,
+    this.onPrimary = false,
+  });
 
   final TxType type;
   final ValueChanged<TxType> onChanged;
+  final bool onPrimary;
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = onPrimary ? Colors.white : AppTheme.primary;
+    final idleColor = onPrimary ? Colors.white60 : context.textTertiary;
     return Row(
       children: [
         for (final t in TxType.values)
@@ -20,7 +30,7 @@ class TypeTabs extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: t == type ? Colors.white : Colors.transparent,
+                      color: t == type ? selectedColor : Colors.transparent,
                       width: 3,
                     ),
                   ),
@@ -29,7 +39,7 @@ class TypeTabs extends StatelessWidget {
                   child: Text(
                     t.label,
                     style: TextStyle(
-                      color: t == type ? Colors.white : Colors.white60,
+                      color: t == type ? selectedColor : idleColor,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
                     ),

@@ -25,13 +25,9 @@ class CustomBottomNav extends StatelessWidget {
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        border: Border(
+          top: BorderSide(color: context.outlineColor, width: 0.5),
+        ),
       ),
       child: Row(
         children: [
@@ -71,7 +67,7 @@ class CustomBottomNav extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 color: color,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),

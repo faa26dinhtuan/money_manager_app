@@ -6,7 +6,9 @@ import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class WalletSelector extends StatelessWidget {
-  const WalletSelector({super.key});
+  const WalletSelector({super.key, this.onPrimary = false});
+
+  final bool onPrimary;
 
   void _open(BuildContext context) {
     showModalBottomSheet<void>(
@@ -24,12 +26,17 @@ class WalletSelector extends StatelessWidget {
       listenable: store,
       builder: (context, _) {
         final wallet = store.selectedWallet;
+        final pillColor = onPrimary
+            ? Colors.white.withValues(alpha: 0.18)
+            : AppTheme.primary.withValues(alpha: 0.12);
+        final iconColor = onPrimary ? Colors.white : AppTheme.primary;
+        final textColor = onPrimary ? Colors.white : context.textPrimary;
         return Padding(
           padding: const EdgeInsets.only(left: 12),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 140),
             child: Material(
-              color: Colors.white.withValues(alpha: 0.18),
+              color: pillColor,
               borderRadius: BorderRadius.circular(20),
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
@@ -42,7 +49,7 @@ class WalletSelector extends StatelessWidget {
                       Icon(
                         wallet?.icon ?? Icons.account_balance_wallet,
                         size: 18,
-                        color: Colors.white,
+                        color: iconColor,
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -50,17 +57,17 @@ class WalletSelector extends StatelessWidget {
                           wallet?.name ?? 'Tất cả ví',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: textColor,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.arrow_drop_down,
                         size: 20,
-                        color: Colors.white,
+                        color: iconColor,
                       ),
                     ],
                   ),

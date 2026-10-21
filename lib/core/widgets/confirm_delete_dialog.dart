@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart'
     show CupertinoAlertDialog, CupertinoDialogAction, showCupertinoDialog;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 Future<bool> confirmDelete(
@@ -25,5 +26,7 @@ Future<bool> confirmDelete(
       ],
     ),
   );
-  return result ?? false;
+  final confirmed = result ?? false;
+  if (confirmed) HapticFeedback.mediumImpact();
+  return confirmed;
 }

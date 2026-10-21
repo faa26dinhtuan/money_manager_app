@@ -46,7 +46,7 @@ class AppStore extends ChangeNotifier {
   final List<Debt> _debts = [];
   final List<RecurringTransaction> _recurrings = [];
   bool _onboarded = false;
-  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode _themeMode = ThemeMode.system;
   AppCurrency _currency = AppCurrency.vnd;
   String? _selectedWalletId;
 
@@ -61,7 +61,7 @@ class AppStore extends ChangeNotifier {
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
-        ThemeMode.light;
+        ThemeMode.system;
     _currency = AppCurrency.byCode(_prefs.getString(_currencyKey));
     AppCurrency.current = _currency;
     _selectedWalletId = _prefs.getString(_selectedWalletKey);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -53,7 +54,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
         ];
 
-        return Scaffold(
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light,
+          child: Scaffold(
           body: Column(
             children: [
               _Header(
@@ -147,6 +150,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
               ),
             ],
           ),
+          ),
         );
       },
     );
@@ -183,7 +187,7 @@ class _Header extends StatelessWidget {
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: WalletSelector(),
+                      child: WalletSelector(onPrimary: true),
                     ),
                   ),
                   Padding(
@@ -209,7 +213,11 @@ class _Header extends StatelessWidget {
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TypeTabs(type: type, onChanged: onTypeChanged),
+              child: TypeTabs(
+                type: type,
+                onChanged: onTypeChanged,
+                onPrimary: true,
+              ),
             ),
           ],
         ),

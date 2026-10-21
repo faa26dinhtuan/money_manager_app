@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/theme/ios_scroll_behavior.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
@@ -26,6 +28,7 @@ class App extends StatelessWidget {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: AppStore.instance.themeMode,
+        scrollBehavior: const IosScrollBehavior(),
         home: SplashScreen(
           next:
               AppStore.instance.onboarded && !AppConstants.alwaysShowOnboarding
@@ -87,13 +90,19 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       body: IndexedStack(index: _currentIndex, children: _screens),
       floatingActionButtonLocation: const AddNavButtonLocation(),
       floatingActionButton: AddNavButton(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
-        ),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+          );
+        },
       ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          if (index != _currentIndex) HapticFeedback.selectionClick();
+          setState(() => _currentIndex = index);
+        },
       ),
     );
   }
