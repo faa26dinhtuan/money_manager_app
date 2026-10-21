@@ -623,6 +623,87 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> convertCurrency(AppCurrency to, double factor) async {
+    final scale = to.scale;
+    double conv(double value) {
+      final minor = (value * factor * scale).round();
+      if (minor == 0 && value != 0) return value.sign / scale;
+      return minor / scale;
+    }
+
+    for (var i = 0; i < _transactions.length; i++) {
+      final t = _transactions[i];
+      _transactions[i] = Transaction(
+        id: t.id,
+        type: t.type,
+        categoryId: t.categoryId,
+        walletId: t.walletId,
+        amount: conv(t.amount),
+        date: t.date,
+        note: t.note,
+      );
+    }
+    for (var i = 0; i < _wallets.length; i++) {
+      final w = _wallets[i];
+      _wallets[i] = Wallet(
+        id: w.id,
+        name: w.name,
+        icon: w.icon,
+        color: w.color,
+        initialBalance: conv(w.initialBalance),
+      );
+    }
+    for (var i = 0; i < _budgets.length; i++) {
+      final b = _budgets[i];
+      _budgets[i] = Budget(
+        id: b.id,
+        categoryId: b.categoryId,
+        limit: conv(b.limit),
+      );
+    }
+    for (var i = 0; i < _goals.length; i++) {
+      final g = _goals[i];
+      _goals[i] = g.copyWith(
+        target: conv(g.target),
+        entries: [
+          for (final e in g.entries)
+            GoalEntry(
+              id: e.id,
+              amount: conv(e.amount),
+              date: e.date,
+              note: e.note,
+              walletId: e.walletId,
+            ),
+        ],
+      );
+    }
+    for (var i = 0; i < _debts.length; i++) {
+      final d = _debts[i];
+      _debts[i] = d.copyWith(
+        amount: conv(d.amount),
+        payments: [
+          for (final p in d.payments)
+            DebtPayment(
+              id: p.id,
+              amount: conv(p.amount),
+              date: p.date,
+              note: p.note,
+              walletId: p.walletId,
+            ),
+        ],
+      );
+    }
+    for (var i = 0; i < _recurrings.length; i++) {
+      final r = _recurrings[i];
+      _recurrings[i] = r.copyWith(amount: conv(r.amount));
+    }
+    _currency = to;
+    AppCurrency.current = to;
+    _prefs.setString(_currencyKey, to.code);
+    notifyListeners();
+    await _save();
+  }
+
   BackupData createBackup() {
     return BackupData(
       categories: List.of(_categories),

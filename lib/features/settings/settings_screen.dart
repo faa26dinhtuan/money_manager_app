@@ -4,7 +4,10 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/features/settings/backup_screen.dart';
+import 'package:money_manager_app/features/settings/currency_converter_screen.dart';
+import 'package:money_manager_app/features/settings/currency_switch_dialog.dart';
 import 'package:money_manager_app/features/settings/export_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -64,9 +67,25 @@ class SettingsScreen extends StatelessWidget {
               trailing: store.currency.code == currency.code
                   ? const Icon(Icons.check, color: AppTheme.primary)
                   : null,
-              onTap: () {
-                store.setCurrency(currency);
+              onTap: () async {
                 Navigator.of(ctx).pop();
+                final from = store.currency;
+                if (currency.code == from.code) return;
+                final choice = await showCurrencySwitchDialog(
+                  context,
+                  from,
+                  currency,
+                );
+                if (choice == null) return;
+                if (choice == CurrencySwitchChoice.convert) {
+                  await ExchangeRates.instance.ensureLoaded();
+                  await store.convertCurrency(
+                    currency,
+                    ExchangeRates.instance.rate(from, currency),
+                  );
+                } else {
+                  store.setCurrency(currency);
+                }
               },
             ),
         ],
@@ -85,6 +104,16 @@ class SettingsScreen extends StatelessWidget {
             'Tiền tệ mặc định',
             AppStore.instance.currency.label,
             () => _pickCurrency(context),
+          ),
+          (
+            Icons.currency_exchange,
+            'Đổi tiền tệ',
+            'Quy đổi theo tỷ giá',
+            () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const CurrencyConverterScreen(),
+              ),
+            ),
           ),
           (
             Icons.palette_outlined,

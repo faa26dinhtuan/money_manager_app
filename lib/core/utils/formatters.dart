@@ -1,7 +1,7 @@
 import 'package:money_manager_app/core/utils/currency.dart';
 
-String groupDigits(String digits) {
-  final sep = AppCurrency.current.thousandsSep;
+String groupDigits(String digits, [AppCurrency? currency]) {
+  final sep = (currency ?? AppCurrency.current).thousandsSep;
   final buffer = StringBuffer();
   for (var i = 0; i < digits.length; i++) {
     if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(sep);
@@ -10,28 +10,34 @@ String groupDigits(String digits) {
   return buffer.toString();
 }
 
-String formatNumber(String minorDigits) {
-  final currency = AppCurrency.current;
+String formatNumber(String minorDigits, [AppCurrency? override]) {
+  final currency = override ?? AppCurrency.current;
   final padded = minorDigits.padLeft(currency.decimals + 1, '0');
   final split = padded.length - currency.decimals;
-  final grouped = groupDigits(padded.substring(0, split));
+  final grouped = groupDigits(padded.substring(0, split), currency);
   if (currency.decimals == 0) return grouped;
   return '$grouped${currency.decimalSep}${padded.substring(split)}';
 }
 
-String withCurrencySymbol(String number, {bool negative = false}) {
-  final currency = AppCurrency.current;
+String withCurrencySymbol(
+  String number, {
+  bool negative = false,
+  AppCurrency? currency,
+}) {
+  currency ??= AppCurrency.current;
   final sign = negative ? '-' : '';
   if (currency.symbolAfter) return '$sign$number ${currency.symbol}';
   final spaced = RegExp(r'[A-Za-z]$').hasMatch(currency.symbol);
   return '$sign${currency.symbol}${spaced ? ' ' : ''}$number';
 }
 
-String formatMoney(double value) {
-  final minor = (value.abs() * AppCurrency.current.scale).round();
+String formatMoney(double value, [AppCurrency? currency]) {
+  final target = currency ?? AppCurrency.current;
+  final minor = (value.abs() * target.scale).round();
   return withCurrencySymbol(
-    formatNumber(minor.toString()),
+    formatNumber(minor.toString(), target),
     negative: value < 0 && minor > 0,
+    currency: target,
   );
 }
 
