@@ -19,4 +19,24 @@ extension AppColors on BuildContext {
   Color get textDisabled => isDark ? Colors.white30 : Colors.black26;
 
   Color get outlineColor => isDark ? Colors.white12 : Colors.black12;
+
+  LinearGradient get headerGradient =>
+      isDark ? AppTheme.headerGradientDark : AppTheme.headerGradient;
+
+  List<BoxShadow> get softShadow => isDark
+      ? const []
+      : [
+          BoxShadow(
+            color: AppTheme.primaryDark.withValues(alpha: 0.10),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ];
+
+  BoxDecoration cardDecoration({double radius = 20}) => BoxDecoration(
+    color: surfaceColor,
+    borderRadius: BorderRadius.circular(radius),
+    boxShadow: softShadow,
+    border: isDark ? Border.all(color: outlineColor, width: 0.5) : null,
+  );
 }

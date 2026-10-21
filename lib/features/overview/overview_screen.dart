@@ -4,11 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
-import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/app_card.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/donut_chart.dart';
+import 'package:money_manager_app/core/widgets/gradient_header.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
@@ -71,15 +72,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                   children: [
-                    Card(
-                      color: context.surfaceColor,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
-                        child: Column(
+                    AppCard(
+                      padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
+                      radius: 24,
+                      child: Column(
                           children: [
                             PeriodBar(
                               period: _period,
@@ -123,9 +119,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             ),
                           ],
                         ),
-                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     if (entries.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -181,12 +176,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppTheme.primary,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
+    return GradientHeader(
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -230,6 +220,7 @@ class _Header extends StatelessWidget {
                 onPrimary: true,
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -252,38 +243,54 @@ class _CategoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = category?.color ?? Colors.grey;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: context.cardDecoration(radius: 16),
+        child: Column(
           children: [
-            CategoryIcon(
-              icon: category?.icon ?? AppIcons.help,
-              color: category?.color ?? Colors.grey,
-              size: 36,
+            Row(
+              children: [
+                CategoryIcon(
+                  icon: category?.icon ?? AppIcons.help,
+                  color: color,
+                  size: 38,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    category?.localizedName(context) ?? context.l10n.other,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Text(
+                  formatPercent(percent),
+                  style: TextStyle(color: context.textTertiary),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  formatMoney(amount),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                category?.localizedName(context) ?? context.l10n.other,
-                style: const TextStyle(fontWeight: FontWeight.w500),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                width: double.infinity,
+                height: 5,
+                alignment: Alignment.centerLeft,
+                color: color.withValues(alpha: 0.14),
+                child: FractionallySizedBox(
+                  widthFactor: (percent / 100).clamp(0.0, 1.0),
+                  child: Container(color: color),
+                ),
               ),
-            ),
-            Text(
-              formatPercent(percent),
-              style: TextStyle(color: context.textTertiary),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              formatMoney(amount),
-              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ],
         ),

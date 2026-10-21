@@ -27,9 +27,19 @@ class CustomBottomNav extends StatelessWidget {
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        border: Border(
-          top: BorderSide(color: context.outlineColor, width: 0.5),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+        boxShadow: context.isDark
+            ? const []
+            : [
+                BoxShadow(
+                  color: AppTheme.primaryDark.withValues(alpha: 0.12),
+                  blurRadius: 24,
+                  offset: const Offset(0, -6),
+                ),
+              ],
+        border: context.isDark
+            ? Border.all(color: context.outlineColor, width: 0.5)
+            : null,
       ),
       child: Row(
         children: [
@@ -62,7 +72,18 @@ class CustomBottomNav extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AppIcon(selected ? selectedIcon : icon, color: color),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOut,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppTheme.primary.withValues(alpha: 0.14)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: AppIcon(selected ? selectedIcon : icon, color: color),
+            ),
             const SizedBox(height: 2),
             Text(
               label,
@@ -97,19 +118,27 @@ class AddNavButton extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: AppTheme.accent.withValues(alpha: 0.45),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Material(
-        color: AppTheme.accent,
+        color: Colors.transparent,
         shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: const AppIcon(AppIcons.add, color: Colors.white, size: 36),
+        child: Ink(
+          decoration: const ShapeDecoration(
+            shape: CircleBorder(),
+            gradient: AppTheme.accentGradient,
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onPressed,
+            child: const Center(
+              child: AppIcon(AppIcons.add, color: Colors.white, size: 36),
+            ),
+          ),
         ),
       ),
     );

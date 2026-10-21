@@ -12,6 +12,24 @@ class AppTheme {
   static const Color darkBackground = Color(0xFF111513);
   static const Color darkSurface = Color(0xFF1B221F);
 
+  static const LinearGradient headerGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF1A6A4C), Color(0xFF2A8C66), Color(0xFF45BE92)],
+  );
+
+  static const LinearGradient headerGradientDark = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF123A2B), Color(0xFF1B5A43), Color(0xFF2A8C66)],
+  );
+
+  static const LinearGradient accentGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFFFD04D), Color(0xFFFFAE1A)],
+  );
+
   static const PageTransitionsTheme _pageTransitions = PageTransitionsTheme(
     builders: {
       TargetPlatform.android: CupertinoPageTransitionsBuilder(),
