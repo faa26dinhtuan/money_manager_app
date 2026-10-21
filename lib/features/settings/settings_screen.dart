@@ -4,6 +4,7 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_info.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/data/services/exchange_rates.dart';
@@ -191,7 +192,7 @@ class SettingsScreen extends StatelessWidget {
           (
             AppIcons.info,
             l.about,
-            l.appVersion('1.0.0'),
+            l.appVersion(AppInfo.version),
             () {},
           ),
         ];
