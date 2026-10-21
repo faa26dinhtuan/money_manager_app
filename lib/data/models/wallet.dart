@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/utils/category_icons.dart';
 
 class Wallet {
@@ -12,7 +13,7 @@ class Wallet {
 
   final String id;
   final String name;
-  final IconData icon;
+  final AppIconData icon;
   final Color color;
   final double initialBalance;
 

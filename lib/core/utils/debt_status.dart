@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 
@@ -12,12 +13,12 @@ extension DebtTypeStyle on DebtType {
     }
   }
 
-  IconData get icon {
+  AppIconData get icon {
     switch (this) {
       case DebtType.lend:
-        return Icons.call_made;
+        return AppIcons.sent;
       case DebtType.borrow:
-        return Icons.call_received;
+        return AppIcons.received;
     }
   }
 }

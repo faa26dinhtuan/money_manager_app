@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -193,7 +194,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
                 ),
                 if (value != null && onClear != null)
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const AppIcon(AppIcons.close),
                     onPressed: onClear,
                   ),
               ],

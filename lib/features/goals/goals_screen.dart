@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -93,7 +94,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   padding: EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      Icon(Icons.flag_outlined, size: 56, color: context.textDisabled),
+                      AppIcon(AppIcons.flag, size: 56, color: context.textDisabled),
                       SizedBox(height: 12),
                       Text(
                         'Chưa có mục tiêu nào',
@@ -120,7 +121,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add),
             label: const Text('Thêm mục tiêu'),
             onPressed: _openForm,
           ),

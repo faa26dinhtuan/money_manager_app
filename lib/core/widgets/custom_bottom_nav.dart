@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
@@ -31,15 +32,15 @@ class CustomBottomNav extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _item(context, 0, Icons.donut_large_outlined, Icons.donut_large,
+          _item(context, 0, AppIcons.overview, AppIcons.overview,
               AppConstants.tabOverview),
-          _item(context, 1, Icons.receipt_long_outlined, Icons.receipt_long,
+          _item(context, 1, AppIcons.transactions, AppIcons.transactions,
               AppConstants.tabTransactions),
           const Expanded(child: SizedBox.shrink()),
-          _item(context, 2, Icons.category_outlined, Icons.category,
+          _item(context, 2, AppIcons.categories, AppIcons.categories,
               AppConstants.tabCategories),
-          _item(context, 3, Icons.account_balance_wallet_outlined,
-              Icons.account_balance_wallet, AppConstants.tabWallet),
+          _item(context, 3, AppIcons.wallet,
+              AppIcons.wallet, AppConstants.tabWallet),
         ],
       ),
     );
@@ -48,8 +49,8 @@ class CustomBottomNav extends StatelessWidget {
   Widget _item(
     BuildContext context,
     int index,
-    IconData icon,
-    IconData selectedIcon,
+    AppIconData icon,
+    AppIconData selectedIcon,
     String label,
   ) {
     final selected = index == currentIndex;
@@ -60,7 +61,7 @@ class CustomBottomNav extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(selected ? selectedIcon : icon, color: color),
+            AppIcon(selected ? selectedIcon : icon, color: color),
             const SizedBox(height: 2),
             Text(
               label,
@@ -107,7 +108,7 @@ class AddNavButton extends StatelessWidget {
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onPressed,
-          child: const Icon(Icons.add, color: Colors.white, size: 36),
+          child: const AppIcon(AppIcons.add, color: Colors.white, size: 36),
         ),
       ),
     );

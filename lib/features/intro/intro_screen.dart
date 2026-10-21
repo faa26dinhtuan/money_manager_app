@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -13,25 +14,25 @@ class IntroScreen extends StatefulWidget {
 class _IntroScreenState extends State<IntroScreen> {
   static const _pages = <_IntroPage>[
     _IntroPage(
-      icon: Icons.pie_chart_rounded,
+      icon: AppIcons.overview,
       title: 'Theo dõi thu chi',
       description:
           'Ghi lại mọi khoản thu và chi, xem biểu đồ theo danh mục để biết tiền của bạn đang đi đâu.',
     ),
     _IntroPage(
-      icon: Icons.account_balance_wallet_rounded,
+      icon: AppIcons.wallet,
       title: 'Quản lý nhiều ví',
       description:
           'Tách riêng tiền mặt, ngân hàng, ví điện tử và xem số dư của từng ví một cách rõ ràng.',
     ),
     _IntroPage(
-      icon: Icons.flag_rounded,
+      icon: AppIcons.flag,
       title: 'Ngân sách & mục tiêu',
       description:
           'Đặt hạn mức chi tiêu mỗi tháng, nhận cảnh báo khi sắp vượt và tiết kiệm cho kế hoạch của bạn.',
     ),
     _IntroPage(
-      icon: Icons.autorenew_rounded,
+      icon: AppIcons.repeat,
       title: 'Sổ nợ & giao dịch định kỳ',
       description:
           'Theo dõi các khoản cho vay, đi vay và để các khoản lặp lại như tiền nhà, lương tự động được ghi.',
@@ -138,7 +139,7 @@ class _IntroPage {
     required this.description,
   });
 
-  final IconData icon;
+  final AppIconData icon;
   final String title;
   final String description;
 }
@@ -169,7 +170,7 @@ class _PageContent extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(page.icon, size: 84, color: AppTheme.primary),
+            child: AppIcon(page.icon, size: 84, color: AppTheme.primary),
           ),
           const SizedBox(height: 40),
           Text(

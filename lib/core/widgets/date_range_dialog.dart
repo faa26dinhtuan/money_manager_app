@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
@@ -158,7 +159,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const AppIcon(AppIcons.close),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -175,8 +176,8 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  _navButton(Icons.keyboard_double_arrow_left, () => _shiftMonth(-12)),
-                  _navButton(Icons.chevron_left, () => _shiftMonth(-1)),
+                  _navButton(AppIcons.doubleLeft, () => _shiftMonth(-12)),
+                  _navButton(AppIcons.chevronLeft, () => _shiftMonth(-1)),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -185,8 +186,8 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
                       ),
                     ),
                   ),
-                  _navButton(Icons.chevron_right, () => _shiftMonth(1)),
-                  _navButton(Icons.keyboard_double_arrow_right, () => _shiftMonth(12)),
+                  _navButton(AppIcons.chevronRight, () => _shiftMonth(1)),
+                  _navButton(AppIcons.doubleRight, () => _shiftMonth(12)),
                 ],
               ),
               const SizedBox(height: 4),
@@ -231,9 +232,9 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
     );
   }
 
-  Widget _navButton(IconData icon, VoidCallback onPressed) {
+  Widget _navButton(AppIconData icon, VoidCallback onPressed) {
     return IconButton(
-      icon: Icon(icon),
+      icon: AppIcon(icon),
       onPressed: onPressed,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(minWidth: 36, minHeight: 36),

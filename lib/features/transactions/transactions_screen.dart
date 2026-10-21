@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -127,11 +128,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 onChanged: (value) => setState(() => _query = value),
                 decoration: InputDecoration(
                   hintText: 'Tìm theo danh mục hoặc ghi chú',
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: const AppIcon(AppIcons.search),
                   suffixIcon: _query.isEmpty
                       ? null
                       : IconButton(
-                          icon: const Icon(Icons.close),
+                          icon: const AppIcon(AppIcons.close),
                           onPressed: () {
                             _searchCtrl.clear();
                             setState(() => _query = '');
@@ -212,7 +213,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               color: Colors.red.shade400,
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child: const AppIcon(AppIcons.delete, color: Colors.white),
                             ),
                             confirmDismiss: (_) => confirmDelete(
                               context,
@@ -259,7 +260,7 @@ class _TransactionTile extends StatelessWidget {
       child: Row(
         children: [
           CategoryIcon(
-            icon: category?.icon ?? Icons.help_outline,
+            icon: category?.icon ?? AppIcons.help,
             color: category?.color ?? Colors.grey,
             size: 34,
           ),

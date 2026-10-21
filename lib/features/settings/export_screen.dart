@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/csv_export.dart';
@@ -167,7 +168,7 @@ class _ExportScreenState extends State<ExportScreen> {
                     ),
                   ),
                   onPressed: _selected.isEmpty ? null : _export,
-                  icon: const Icon(Icons.file_download_outlined),
+                  icon: const AppIcon(AppIcons.download),
                   label: const Text(
                     'Xuất file CSV',
                     style: TextStyle(fontSize: 16),

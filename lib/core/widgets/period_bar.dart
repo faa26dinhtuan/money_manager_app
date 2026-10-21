@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -83,7 +84,7 @@ class PeriodBar extends StatelessWidget {
               const SizedBox(width: 48)
             else
               IconButton(
-                icon: const Icon(Icons.chevron_left),
+                icon: const AppIcon(AppIcons.chevronLeft),
                 onPressed: () => onShift(-1),
               ),
             Expanded(
@@ -102,7 +103,7 @@ class PeriodBar extends StatelessWidget {
               const SizedBox(width: 48)
             else
               IconButton(
-                icon: const Icon(Icons.chevron_right),
+                icon: const AppIcon(AppIcons.chevronRight),
                 onPressed: () => onShift(1),
               ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -289,7 +290,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
               ),
               if (_end != null)
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const AppIcon(AppIcons.close, size: 18),
                   onPressed: () => setState(() => _end = null),
                 ),
             ],

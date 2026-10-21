@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -46,8 +47,8 @@ class WalletSelector extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        wallet?.icon ?? Icons.account_balance_wallet,
+                      AppIcon(
+                        wallet?.icon ?? AppIcons.wallet,
                         size: 18,
                         color: iconColor,
                       ),
@@ -64,8 +65,8 @@ class WalletSelector extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_drop_down,
+                      AppIcon(
+                        AppIcons.chevronDown,
                         size: 20,
                         color: iconColor,
                       ),
@@ -111,7 +112,7 @@ class _WalletSheet extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             children: [
               _WalletOption(
-                icon: Icons.account_balance_wallet,
+                icon: AppIcons.wallet,
                 color: AppTheme.primary,
                 name: 'Tất cả ví',
                 balance: store.balance,
@@ -145,7 +146,7 @@ class _WalletOption extends StatelessWidget {
     required this.onTap,
   });
 
-  final IconData icon;
+  final AppIconData icon;
   final Color color;
   final String name;
   final double balance;
@@ -163,7 +164,7 @@ class _WalletOption extends StatelessWidget {
         style: TextStyle(color: context.textSecondary),
       ),
       trailing: selected
-          ? const Icon(Icons.check_circle, color: AppTheme.primary)
+          ? const AppIcon(AppIcons.checkCircle, color: AppTheme.primary)
           : null,
     );
   }

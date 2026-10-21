@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
@@ -58,7 +59,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       CategoryIcon(
-                        icon: category?.icon ?? Icons.help_outline,
+                        icon: category?.icon ?? AppIcons.help,
                         color: category?.color ?? Colors.grey,
                         size: 48,
                       ),

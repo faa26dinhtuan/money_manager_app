@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -18,15 +19,15 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  static const _icons = <IconData>[
-    Icons.account_balance_wallet,
-    Icons.payments,
-    Icons.account_balance,
-    Icons.credit_card,
-    Icons.savings,
-    Icons.attach_money,
-    Icons.phone_android,
-    Icons.card_giftcard,
+  static const _icons = <AppIconData>[
+    AppIcons.wallet,
+    AppIcons.payments,
+    AppIcons.bank,
+    AppIcons.creditCard,
+    AppIcons.savings,
+    AppIcons.dollar,
+    AppIcons.phone,
+    AppIcons.gift,
   ];
 
   static const _colors = <Color>[
@@ -40,17 +41,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Color(0xFF8E9A93),
   ];
 
-  static const _suggestions = <(String, IconData)>[
-    ('Tiền mặt', Icons.payments),
-    ('Ngân hàng', Icons.account_balance),
-    ('Ví điện tử', Icons.phone_android),
+  static const _suggestions = <(String, AppIconData)>[
+    ('Tiền mặt', AppIcons.payments),
+    ('Ngân hàng', AppIcons.bank),
+    ('Ví điện tử', AppIcons.phone),
   ];
 
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
   final _balanceCtrl = MoneyController();
 
-  IconData _icon = _icons.first;
+  AppIconData _icon = _icons.first;
   Color _color = _colors.first;
 
   @override
@@ -60,7 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _applySuggestion((String, IconData) s) {
+  void _applySuggestion((String, AppIconData) s) {
     setState(() {
       _nameCtrl.text = s.$1;
       _icon = s.$2;
@@ -108,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Column(
                 children: [
-                  Icon(Icons.account_balance_wallet,
+                  AppIcon(AppIcons.wallet,
                       size: 56, color: Colors.white),
                   SizedBox(height: 12),
                   Text(
@@ -148,7 +149,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         for (final s in _suggestions)
                           ActionChip(
-                            avatar: Icon(s.$2, size: 18),
+                            avatar: AppIcon(s.$2, size: 18),
                             label: Text(s.$1),
                             onPressed: () => _applySuggestion(s),
                           ),
@@ -223,8 +224,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: c == _color
-                                  ? const Icon(
-                                      Icons.check,
+                                  ? const AppIcon(
+                                      AppIcons.check,
                                       color: Colors.white,
                                       size: 20,
                                     )

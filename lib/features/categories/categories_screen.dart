@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
@@ -113,7 +114,7 @@ class _AddTile extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: context.textDisabled, width: 1.5),
             ),
-            child: Icon(Icons.add, color: context.textTertiary),
+            child: AppIcon(AppIcons.add, color: context.textTertiary),
           ),
           const SizedBox(height: 6),
           const Text('Thêm', style: TextStyle(fontSize: 12)),

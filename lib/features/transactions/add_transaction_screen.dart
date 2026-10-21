@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -207,7 +208,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             children: [
               for (final w in _store.wallets)
                 ChoiceChip(
-                  avatar: Icon(
+                  avatar: AppIcon(
                     w.icon,
                     size: 18,
                     color: _walletId == w.id ? Colors.white : w.color,

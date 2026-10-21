@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -18,15 +19,15 @@ class WalletFormScreen extends StatefulWidget {
 }
 
 class _WalletFormScreenState extends State<WalletFormScreen> {
-  static const _icons = <IconData>[
-    Icons.account_balance_wallet,
-    Icons.payments,
-    Icons.account_balance,
-    Icons.credit_card,
-    Icons.savings,
-    Icons.attach_money,
-    Icons.phone_android,
-    Icons.card_giftcard,
+  static const _icons = <AppIconData>[
+    AppIcons.wallet,
+    AppIcons.payments,
+    AppIcons.bank,
+    AppIcons.creditCard,
+    AppIcons.savings,
+    AppIcons.dollar,
+    AppIcons.phone,
+    AppIcons.gift,
   ];
 
   static const _colors = <Color>[
@@ -44,10 +45,10 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
   final _nameCtrl = TextEditingController();
   final _balanceCtrl = MoneyController();
 
-  late IconData _icon = widget.wallet?.icon ?? _icons.first;
+  late AppIconData _icon = widget.wallet?.icon ?? _icons.first;
   late Color _color = widget.wallet?.color ?? _colors.first;
 
-  late final List<IconData> _iconChoices = [
+  late final List<AppIconData> _iconChoices = [
     if (!_icons.contains(_icon)) _icon,
     ..._icons,
   ];
@@ -205,7 +206,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
                     height: 36,
                     decoration: BoxDecoration(color: c, shape: BoxShape.circle),
                     child: c == _color
-                        ? const Icon(Icons.check, color: Colors.white, size: 20)
+                        ? const AppIcon(AppIcons.check, color: Colors.white, size: 20)
                         : null,
                   ),
                 ),

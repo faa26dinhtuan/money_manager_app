@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -29,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text(entry.value),
               trailing: store.themeMode == entry.key
-                  ? const Icon(Icons.check, color: AppTheme.primary)
+                  ? const AppIcon(AppIcons.check, color: AppTheme.primary)
                   : null,
               onTap: () {
                 store.setThemeMode(entry.key);
@@ -60,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
               title: Text(currency.name),
               subtitle: Text(currency.label),
               trailing: store.currency.code == currency.code
-                  ? const Icon(Icons.check, color: AppTheme.primary)
+                  ? const AppIcon(AppIcons.check, color: AppTheme.primary)
                   : null,
               onTap: () async {
                 Navigator.of(ctx).pop();
@@ -93,15 +94,15 @@ class SettingsScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: AppStore.instance,
       builder: (context, _) {
-        final items = <(IconData, String, String, VoidCallback)>[
+        final items = <(AppIconData, String, String, VoidCallback)>[
           (
-            Icons.attach_money,
+            AppIcons.dollar,
             'Tiền tệ mặc định',
             AppStore.instance.currency.label,
             () => _pickCurrency(context),
           ),
           (
-            Icons.currency_exchange,
+            AppIcons.exchange,
             'Đổi tiền tệ',
             'Quy đổi theo tỷ giá',
             () => Navigator.of(context).push(
@@ -111,13 +112,13 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           (
-            Icons.palette_outlined,
+            AppIcons.brush,
             'Giao diện',
             _modeLabels[AppStore.instance.themeMode]!,
             () => _pickTheme(context),
           ),
           (
-            Icons.cloud_upload_outlined,
+            AppIcons.upload,
             'Sao lưu & khôi phục',
             '',
             () => Navigator.of(context).push(
@@ -125,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           (
-            Icons.file_download_outlined,
+            AppIcons.download,
             'Xuất dữ liệu',
             'CSV',
             () => Navigator.of(context).push(
@@ -133,7 +134,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           (
-            Icons.info_outline,
+            AppIcons.info,
             'Giới thiệu',
             'Phiên bản 1.0.0',
             () {},
@@ -155,10 +156,10 @@ class SettingsScreen extends StatelessWidget {
                   children: [
                     for (var i = 0; i < items.length; i++) ...[
                       ListTile(
-                        leading: Icon(items[i].$1, color: AppTheme.primary),
+                        leading: AppIcon(items[i].$1, color: AppTheme.primary),
                         title: Text(items[i].$2),
                         subtitle: items[i].$3.isEmpty ? null : Text(items[i].$3),
-                        trailing: const Icon(Icons.chevron_right),
+                        trailing: const AppIcon(AppIcons.chevronRight),
                         onTap: items[i].$4,
                       ),
                       if (i < items.length - 1)

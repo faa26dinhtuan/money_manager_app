@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
@@ -58,7 +59,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
               title: Text(c.name),
               subtitle: Text(c.label),
               trailing: c.code == selected.code
-                  ? const Icon(Icons.check, color: AppTheme.primary)
+                  ? const AppIcon(AppIcons.check, color: AppTheme.primary)
                   : null,
               onTap: () => Navigator.of(ctx).pop(c),
             ),
@@ -119,7 +120,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.expand_more),
+            const AppIcon(AppIcons.chevronDown),
           ],
         ),
       ),
@@ -178,8 +179,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       Align(
                         child: IconButton(
                           onPressed: _swap,
-                          icon: const Icon(
-                            Icons.swap_vert,
+                          icon: const AppIcon(
+                            AppIcons.swap,
                             color: AppTheme.primary,
                           ),
                         ),
@@ -247,7 +248,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.refresh),
+                      : const AppIcon(AppIcons.refresh),
                   label: const Text('Cập nhật tỷ giá'),
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 
 class CategoryIcon extends StatelessWidget {
   const CategoryIcon({
@@ -9,7 +10,7 @@ class CategoryIcon extends StatelessWidget {
     this.selected = false,
   });
 
-  final IconData icon;
+  final AppIconData icon;
   final Color color;
   final double size;
   final bool selected;
@@ -27,7 +28,7 @@ class CategoryIcon extends StatelessWidget {
             ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10)]
             : null,
       ),
-      child: Icon(icon, color: Colors.white, size: size * 0.55),
+      child: AppIcon(icon, color: Colors.white, size: size * 0.55),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -127,7 +128,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   children: [
-                    Icon(Icons.event, size: 20, color: context.textSecondary),
+                    AppIcon(AppIcons.calendar, size: 20, color: context.textSecondary),
                     const SizedBox(width: 8),
                     Text(
                       formatDate(_date),

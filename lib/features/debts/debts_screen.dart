@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
@@ -125,7 +126,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Column(
                     children: [
-                      Icon(Icons.request_quote_outlined,
+                      AppIcon(AppIcons.exchange,
                           size: 56, color: context.textDisabled),
                       const SizedBox(height: 12),
                       Text(
@@ -145,7 +146,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add),
             label: const Text('Thêm khoản nợ'),
             onPressed: _openForm,
           ),
@@ -211,7 +212,7 @@ class _Summary extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.warning_amber_rounded,
+                const AppIcon(AppIcons.warning,
                     color: Colors.white, size: 18),
                 const SizedBox(width: 6),
                 Text(

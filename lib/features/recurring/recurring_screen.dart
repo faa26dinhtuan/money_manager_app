@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -74,7 +75,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                   padding: EdgeInsets.symmetric(vertical: 40),
                   child: Column(
                     children: [
-                      Icon(Icons.autorenew, size: 56, color: context.textDisabled),
+                      AppIcon(AppIcons.repeat, size: 56, color: context.textDisabled),
                       SizedBox(height: 12),
                       Text(
                         'Chưa có giao dịch định kỳ nào',
@@ -93,7 +94,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add),
             label: const Text('Thêm định kỳ'),
             onPressed: () => _openForm(),
           ),
@@ -192,7 +193,7 @@ class _RecurringTile extends StatelessWidget {
             child: Row(
               children: [
                 CategoryIcon(
-                  icon: category?.icon ?? Icons.help_outline,
+                  icon: category?.icon ?? AppIcons.help,
                   color: category?.color ?? Colors.grey,
                   size: 44,
                 ),

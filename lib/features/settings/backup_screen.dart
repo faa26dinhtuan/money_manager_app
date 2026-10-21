@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
@@ -159,7 +160,7 @@ class BackupScreen extends StatelessWidget {
                 child: FilledButton.icon(
                   style: _style(AppTheme.primary),
                   onPressed: () => _backup(context),
-                  icon: const Icon(Icons.cloud_upload_outlined),
+                  icon: const AppIcon(AppIcons.upload),
                   label: const Text(
                     'Sao lưu dữ liệu',
                     style: TextStyle(fontSize: 16),
@@ -172,7 +173,7 @@ class BackupScreen extends StatelessWidget {
                 child: FilledButton.icon(
                   style: _style(AppTheme.accent),
                   onPressed: () => _restore(context),
-                  icon: const Icon(Icons.cloud_download_outlined),
+                  icon: const AppIcon(AppIcons.download),
                   label: const Text(
                     'Khôi phục từ bộ nhớ tạm',
                     style: TextStyle(fontSize: 16),

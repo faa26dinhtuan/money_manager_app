@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -115,7 +116,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
               children: [
                 for (final w in _store.wallets)
                   ChoiceChip(
-                    avatar: Icon(
+                    avatar: AppIcon(
                       w.icon,
                       size: 18,
                       color: _walletId == w.id ? Colors.white : w.color,
@@ -151,7 +152,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   children: [
-                    Icon(Icons.event, size: 20, color: context.textSecondary),
+                    AppIcon(AppIcons.calendar, size: 20, color: context.textSecondary),
                     const SizedBox(width: 8),
                     Text(
                       formatDate(_date),

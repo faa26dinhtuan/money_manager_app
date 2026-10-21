@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
@@ -97,7 +98,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left),
+                      icon: const AppIcon(AppIcons.chevronLeft),
                       onPressed: () => setState(() {
                         _anchor = DateRange.shift(Period.month, _anchor, -1);
                       }),
@@ -125,7 +126,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right),
+                      icon: const AppIcon(AppIcons.chevronRight),
                       onPressed: () => setState(() {
                         _anchor = DateRange.shift(Period.month, _anchor, 1);
                       }),
@@ -139,7 +140,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   padding: EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      Icon(Icons.pie_chart_outline,
+                      AppIcon(AppIcons.overview,
                           size: 56, color: context.textDisabled),
                       SizedBox(height: 12),
                       Text(
@@ -169,7 +170,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add),
             label: const Text('Thêm ngân sách'),
             onPressed: _openForm,
           ),
@@ -300,7 +301,7 @@ class _BudgetTile extends StatelessWidget {
           child: Row(
             children: [
               CategoryIcon(
-                icon: category?.icon ?? Icons.help_outline,
+                icon: category?.icon ?? AppIcons.help,
                 color: category?.color ?? Colors.grey,
                 size: 40,
               ),
@@ -354,7 +355,7 @@ class _BudgetTile extends StatelessWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.receipt_long_outlined),
+                icon: const AppIcon(AppIcons.transactions),
                 color: context.textTertiary,
                 tooltip: 'Xem giao dịch',
                 onPressed: onViewTransactions,

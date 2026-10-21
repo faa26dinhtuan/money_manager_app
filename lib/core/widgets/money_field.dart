@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -157,7 +158,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
             onLongPress: _clear,
             child: const SizedBox(
               height: 56,
-              child: Center(child: Icon(Icons.backspace_outlined)),
+              child: Center(child: AppIcon(AppIcons.backspace)),
             ),
           ),
         ),

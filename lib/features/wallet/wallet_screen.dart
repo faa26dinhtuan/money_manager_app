@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
@@ -64,7 +65,7 @@ class WalletScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _SectionTile(
-                icon: Icons.account_balance_wallet,
+                icon: AppIcons.wallet,
                 color: AppTheme.primary,
                 title: 'Ví tiền',
                 subtitle: 'Tạo và quản lý các ví của bạn',
@@ -73,7 +74,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: Icons.pie_chart,
+                icon: AppIcons.overview,
                 color: const Color(0xFFF5B82E),
                 title: 'Ngân sách theo danh mục',
                 subtitle: 'Đặt hạn mức chi tiêu mỗi tháng',
@@ -82,7 +83,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: Icons.flag,
+                icon: AppIcons.flag,
                 color: const Color(0xFF9B5DE5),
                 title: 'Mục tiêu kiếm tiền',
                 subtitle: 'Tiết kiệm cho kế hoạch của bạn',
@@ -91,7 +92,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: Icons.request_quote,
+                icon: AppIcons.exchange,
                 color: const Color(0xFFE8506E),
                 title: 'Sổ nợ',
                 subtitle: 'Theo dõi các khoản cho vay và đi vay',
@@ -100,7 +101,7 @@ class WalletScreen extends StatelessWidget {
                 ),
               ),
               _SectionTile(
-                icon: Icons.autorenew,
+                icon: AppIcons.repeat,
                 color: const Color(0xFF3CC6B0),
                 title: 'Giao dịch định kỳ',
                 subtitle: 'Tự động lặp lại theo chu kỳ',
@@ -125,7 +126,7 @@ class _SectionTile extends StatelessWidget {
     required this.onTap,
   });
 
-  final IconData icon;
+  final AppIconData icon;
   final Color color;
   final String title;
   final String subtitle;
@@ -144,7 +145,7 @@ class _SectionTile extends StatelessWidget {
         leading: CategoryIcon(icon: icon, color: color, size: 44),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const AppIcon(AppIcons.chevronRight),
         onTap: onTap,
       ),
     );

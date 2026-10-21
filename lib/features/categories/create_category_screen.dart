@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -21,12 +22,12 @@ class CreateCategoryScreen extends StatefulWidget {
 }
 
 class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
-  static const _icons = <IconData>[
-    Icons.shopping_basket, Icons.shopping_cart, Icons.restaurant, Icons.home,
-    Icons.account_balance, Icons.favorite, Icons.help_outline, Icons.directions_bus,
-    Icons.family_restroom, Icons.card_giftcard, Icons.flight, Icons.pets,
-    Icons.bolt, Icons.directions_car, Icons.brush, Icons.fitness_center,
-    Icons.school, Icons.movie, Icons.coffee, Icons.phone_android,
+  static const _icons = <AppIconData>[
+    AppIcons.shoppingBasket, AppIcons.shoppingCart, AppIcons.restaurant, AppIcons.home,
+    AppIcons.bank, AppIcons.favorite, AppIcons.help, AppIcons.bus,
+    AppIcons.family, AppIcons.gift, AppIcons.flight, AppIcons.pets,
+    AppIcons.bolt, AppIcons.car, AppIcons.brush, AppIcons.fitness,
+    AppIcons.school, AppIcons.movie, AppIcons.coffee, AppIcons.phone,
   ];
 
   static const _colors = <Color>[
@@ -37,10 +38,10 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
   late TxType _type = widget.category?.type ?? widget.initialType;
-  late IconData _icon = widget.category?.icon ?? _icons.first;
+  late AppIconData _icon = widget.category?.icon ?? _icons.first;
   late Color _color = widget.category?.color ?? _colors[1];
 
-  late final List<IconData> _iconChoices = [
+  late final List<AppIconData> _iconChoices = [
     if (!_icons.contains(_icon)) _icon,
     ..._icons,
   ];
@@ -122,7 +123,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
         actions: [
           if (_isEditing)
             IconButton(
-              icon: const Icon(Icons.delete_outline),
+              icon: const AppIcon(AppIcons.delete),
               onPressed: _confirmDelete,
             ),
         ],
@@ -185,7 +186,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
                     height: 36,
                     decoration: BoxDecoration(color: c, shape: BoxShape.circle),
                     child: c == _color
-                        ? const Icon(Icons.check, color: Colors.white, size: 20)
+                        ? const AppIcon(AppIcons.check, color: Colors.white, size: 20)
                         : null,
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/data/models/backup_data.dart';
@@ -32,7 +33,7 @@ class AppStore extends ChangeNotifier {
   static const _cashWallet = Wallet(
     id: 'cash',
     name: 'Tiền mặt',
-    icon: Icons.payments,
+    icon: AppIcons.payments,
     color: Color(0xFF2A8C66),
   );
 
@@ -765,84 +766,84 @@ class AppStore extends ChangeNotifier {
       Category(
         id: 'food',
         name: 'Ăn uống',
-        icon: Icons.restaurant,
+        icon: AppIcons.restaurant,
         color: Color(0xFFF5B82E),
         type: e,
       ),
       Category(
         id: 'grocery',
         name: 'Đi chợ',
-        icon: Icons.shopping_basket,
+        icon: AppIcons.shoppingBasket,
         color: Color(0xFF4C9BE8),
         type: e,
       ),
       Category(
         id: 'shop',
         name: 'Mua sắm',
-        icon: Icons.shopping_cart,
+        icon: AppIcons.shoppingCart,
         color: Color(0xFF9B5DE5),
         type: e,
       ),
       Category(
         id: 'home',
         name: 'Nhà cửa',
-        icon: Icons.home,
+        icon: AppIcons.home,
         color: Color(0xFFE8506E),
         type: e,
       ),
       Category(
         id: 'transport',
         name: 'Di chuyển',
-        icon: Icons.directions_bus,
+        icon: AppIcons.bus,
         color: Color(0xFF3CC6B0),
         type: e,
       ),
       Category(
         id: 'health',
         name: 'Sức khỏe',
-        icon: Icons.favorite,
+        icon: AppIcons.favorite,
         color: Color(0xFFEF6C57),
         type: e,
       ),
       Category(
         id: 'bill',
         name: 'Hóa đơn',
-        icon: Icons.bolt,
+        icon: AppIcons.bolt,
         color: Color(0xFF6BB94A),
         type: e,
       ),
       Category(
         id: 'other_e',
         name: 'Khác',
-        icon: Icons.help_outline,
+        icon: AppIcons.help,
         color: Color(0xFF8E9A93),
         type: e,
       ),
       Category(
         id: 'salary',
         name: 'Lương',
-        icon: Icons.account_balance_wallet,
+        icon: AppIcons.wallet,
         color: Color(0xFF2A8C66),
         type: i,
       ),
       Category(
         id: 'bonus',
         name: 'Thưởng',
-        icon: Icons.card_giftcard,
+        icon: AppIcons.gift,
         color: Color(0xFFF5B82E),
         type: i,
       ),
       Category(
         id: 'invest',
         name: 'Đầu tư',
-        icon: Icons.trending_up,
+        icon: AppIcons.trendingUp,
         color: Color(0xFF4C9BE8),
         type: i,
       ),
       Category(
         id: 'other_i',
         name: 'Khác',
-        icon: Icons.help_outline,
+        icon: AppIcons.help,
         color: Color(0xFF8E9A93),
         type: i,
       ),
@@ -853,7 +854,7 @@ class AppStore extends ChangeNotifier {
       Wallet(
         id: 'bank',
         name: 'Ngân hàng',
-        icon: Icons.account_balance,
+        icon: AppIcons.bank,
         color: Color(0xFF4C9BE8),
       ),
     ]);
@@ -904,7 +905,7 @@ class AppStore extends ChangeNotifier {
       Goal(
         id: 'g_trip',
         name: 'Du lịch Đà Lạt',
-        icon: Icons.flight,
+        icon: AppIcons.flight,
         color: const Color(0xFF4C9BE8),
         target: 10000000,
         deadline: today.add(const Duration(days: 90)),

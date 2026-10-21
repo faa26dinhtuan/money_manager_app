@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -19,23 +20,23 @@ class GoalFormScreen extends StatefulWidget {
 }
 
 class _GoalFormScreenState extends State<GoalFormScreen> {
-  static const _icons = <IconData>[
-    Icons.flag,
-    Icons.flight,
-    Icons.beach_access,
-    Icons.home,
-    Icons.directions_car,
-    Icons.two_wheeler,
-    Icons.laptop_mac,
-    Icons.phone_android,
-    Icons.camera_alt,
-    Icons.school,
-    Icons.savings,
-    Icons.diamond,
-    Icons.celebration,
-    Icons.favorite,
-    Icons.health_and_safety,
-    Icons.card_giftcard,
+  static const _icons = <AppIconData>[
+    AppIcons.flag,
+    AppIcons.flight,
+    AppIcons.beach,
+    AppIcons.home,
+    AppIcons.car,
+    AppIcons.motorcycle,
+    AppIcons.laptop,
+    AppIcons.phone,
+    AppIcons.camera,
+    AppIcons.school,
+    AppIcons.savings,
+    AppIcons.diamond,
+    AppIcons.celebration,
+    AppIcons.favorite,
+    AppIcons.health,
+    AppIcons.gift,
   ];
 
   static const _colors = <Color>[
@@ -54,11 +55,11 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   final _targetCtrl = MoneyController();
   final _initialCtrl = MoneyController();
 
-  late IconData _icon = widget.goal?.icon ?? _icons.first;
+  late AppIconData _icon = widget.goal?.icon ?? _icons.first;
   late Color _color = widget.goal?.color ?? _colors[1];
   late DateTime? _deadline = widget.goal?.deadline;
 
-  late final List<IconData> _iconChoices = [
+  late final List<AppIconData> _iconChoices = [
     if (!_icons.contains(_icon)) _icon,
     ..._icons,
   ];
@@ -250,7 +251,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                   ),
                   if (_deadline != null)
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const AppIcon(AppIcons.close),
                       onPressed: () => setState(() => _deadline = null),
                     ),
                 ],
@@ -290,7 +291,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                     height: 36,
                     decoration: BoxDecoration(color: c, shape: BoxShape.circle),
                     child: c == _color
-                        ? const Icon(Icons.check, color: Colors.white, size: 20)
+                        ? const AppIcon(AppIcons.check, color: Colors.white, size: 20)
                         : null,
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -31,7 +32,7 @@ class WalletListScreen extends StatelessWidget {
           ),
           floatingActionButton: FloatingActionButton.extended(
             shape: const StadiumBorder(),
-            icon: const Icon(Icons.add),
+            icon: const AppIcon(AppIcons.add),
             label: const Text('Thêm ví'),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const WalletFormScreen()),

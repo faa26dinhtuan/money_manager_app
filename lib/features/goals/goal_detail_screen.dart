@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -77,7 +78,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
             title: Text(goal.name),
             actions: [
               IconButton(
-                icon: const Icon(Icons.edit_outlined),
+                icon: const AppIcon(AppIcons.edit),
                 tooltip: 'Sửa mục tiêu',
                 onPressed: () => _edit(goal),
               ),
@@ -144,10 +145,10 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                       const Divider(height: 28),
                       Row(
                         children: [
-                          Icon(
+                          AppIcon(
                             state == GoalState.completed
-                                ? Icons.check_circle
-                                : Icons.event,
+                                ? AppIcons.checkCircle
+                                : AppIcons.calendar,
                             size: 20,
                             color: state.color,
                           ),
@@ -197,7 +198,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        icon: const Icon(Icons.add),
+                        icon: const AppIcon(AppIcons.add),
                         label: const Text('Nạp tiền'),
                         onPressed: () => _openEntry(goal, true),
                       ),
@@ -213,7 +214,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        icon: const Icon(Icons.remove),
+                        icon: const AppIcon(AppIcons.remove),
                         label: const Text('Rút tiền'),
                         onPressed:
                             goal.saved > 0 ? () => _openEntry(goal, false) : null,
@@ -262,7 +263,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             color: Colors.red.shade400,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 20),
-                            child: const Icon(Icons.delete, color: Colors.white),
+                            child: const AppIcon(AppIcons.delete, color: Colors.white),
                           ),
                           confirmDismiss: (_) => confirmDelete(
                             context,
@@ -334,7 +335,7 @@ class _EntryTile extends StatelessWidget {
       child: Row(
         children: [
           CategoryIcon(
-            icon: deposit ? Icons.arrow_upward : Icons.arrow_downward,
+            icon: deposit ? AppIcons.arrowUp : AppIcons.arrowDown,
             color: color,
             size: 34,
           ),

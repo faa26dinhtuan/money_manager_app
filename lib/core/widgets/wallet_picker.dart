@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -33,7 +34,7 @@ class WalletPicker extends StatelessWidget {
           ),
         for (final w in AppStore.instance.wallets)
           ChoiceChip(
-            avatar: Icon(
+            avatar: AppIcon(
               w.icon,
               size: 18,
               color: selectedId == w.id ? Colors.white : w.color,

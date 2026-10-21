@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -77,7 +78,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             title: Text(debt.person),
             actions: [
               IconButton(
-                icon: const Icon(Icons.edit_outlined),
+                icon: const AppIcon(AppIcons.edit),
                 tooltip: 'Sửa khoản nợ',
                 onPressed: () => _edit(debt),
               ),
@@ -172,13 +173,13 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       ),
                       const Divider(height: 28),
                       _InfoRow(
-                        icon: Icons.event,
+                        icon: AppIcons.calendar,
                         text:
                             '${isLend ? 'Cho vay' : 'Vay'} ngày ${formatDate(debt.date)}',
                       ),
                       const SizedBox(height: 8),
                       _InfoRow(
-                        icon: Icons.schedule,
+                        icon: AppIcons.clock,
                         color: state.color,
                         text: debt.dueDate == null
                             ? 'Không có hạn trả'
@@ -189,13 +190,13 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       if (walletName != null) ...[
                         const SizedBox(height: 8),
                         _InfoRow(
-                          icon: Icons.account_balance_wallet_outlined,
+                          icon: AppIcons.wallet,
                           text: 'Ví: $walletName',
                         ),
                       ],
                       if (debt.note.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        _InfoRow(icon: Icons.notes, text: debt.note),
+                        _InfoRow(icon: AppIcons.notes, text: debt.note),
                       ],
                     ],
                   ),
@@ -212,7 +213,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  icon: const Icon(Icons.payments_outlined),
+                  icon: const AppIcon(AppIcons.payments),
                   label: Text(debt.type.paymentLabel),
                   onPressed: debt.isSettled ? null : () => _openPayment(debt),
                 ),
@@ -247,8 +248,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                             color: Colors.red.shade400,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 20),
-                            child: const Icon(
-                              Icons.delete,
+                            child: const AppIcon(
+                              AppIcons.delete,
                               color: Colors.white,
                             ),
                           ),
@@ -259,7 +260,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                           ),
                           onDismissed: (_) => _removePayment(debt, p),
                           child: _HistoryTile(
-                            icon: Icons.payments_outlined,
+                            icon: AppIcons.payments,
                             color: AppTheme.primary,
                             title: p.note.isEmpty
                                 ? debt.type.paymentLabel
@@ -322,7 +323,7 @@ class _Stat extends StatelessWidget {
 class _InfoRow extends StatelessWidget {
   const _InfoRow({required this.icon, required this.text, this.color});
 
-  final IconData icon;
+  final AppIconData icon;
   final String text;
   final Color? color;
 
@@ -332,7 +333,7 @@ class _InfoRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: c),
+        AppIcon(icon, size: 20, color: c),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -355,7 +356,7 @@ class _HistoryTile extends StatelessWidget {
     required this.amount,
   });
 
-  final IconData icon;
+  final AppIconData icon;
   final Color color;
   final String title;
   final DateTime date;

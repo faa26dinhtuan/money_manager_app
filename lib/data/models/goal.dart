@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/utils/category_icons.dart';
 
 class GoalEntry {
@@ -56,7 +57,7 @@ class Goal {
 
   final String id;
   final String name;
-  final IconData icon;
+  final AppIconData icon;
   final Color color;
   final double target;
   final DateTime? deadline;
@@ -86,7 +87,7 @@ class Goal {
 
   Goal copyWith({
     String? name,
-    IconData? icon,
+    AppIconData? icon,
     Color? color,
     double? target,
     DateTime? deadline,

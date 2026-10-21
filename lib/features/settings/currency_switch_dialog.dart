@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -113,7 +114,7 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
                             height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Icon(Icons.refresh),
+                        : const AppIcon(AppIcons.refresh),
                     label: const Text('Cập nhật tỷ giá'),
                   ),
                 ),
