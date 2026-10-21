@@ -116,7 +116,7 @@ class WalletScreen extends StatelessWidget {
                       ),
                       _SectionTile(
                         icon: AppIcons.budget,
-                        color: const Color(0xFFF5B82E),
+                        color: AppTheme.categoryPalette[2],
                         title: l.budgetByCategory,
                         subtitle: l.budgetDesc,
                         onTap: () => Navigator.of(context).push(
@@ -127,7 +127,7 @@ class WalletScreen extends StatelessWidget {
                       ),
                       _SectionTile(
                         icon: AppIcons.goal,
-                        color: const Color(0xFF9B5DE5),
+                        color: AppTheme.categoryPalette[4],
                         title: l.goals,
                         subtitle: l.goalsDesc,
                         onTap: () => Navigator.of(context).push(
@@ -136,7 +136,7 @@ class WalletScreen extends StatelessWidget {
                       ),
                       _SectionTile(
                         icon: AppIcons.debt,
-                        color: const Color(0xFFE8506E),
+                        color: AppTheme.categoryPalette[3],
                         title: l.debts,
                         subtitle: l.debtsDesc,
                         onTap: () => Navigator.of(context).push(
@@ -145,7 +145,7 @@ class WalletScreen extends StatelessWidget {
                       ),
                       _SectionTile(
                         icon: AppIcons.repeat,
-                        color: const Color(0xFF3CC6B0),
+                        color: AppTheme.categoryPalette[5],
                         title: l.recurring,
                         subtitle: l.recurringDesc,
                         onTap: () => Navigator.of(context).push(

@@ -204,7 +204,7 @@ class SettingsScreen extends StatelessWidget {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

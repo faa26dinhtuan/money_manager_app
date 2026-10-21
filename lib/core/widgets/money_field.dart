@@ -245,7 +245,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
               child: FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: AppTheme.accent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppTheme.primaryDeep,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
                   ),

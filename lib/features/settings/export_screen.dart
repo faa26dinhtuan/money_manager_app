@@ -90,7 +90,7 @@ class _ExportScreenState extends State<ExportScreen> {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -121,7 +121,7 @@ class _ExportScreenState extends State<ExportScreen> {
               const SizedBox(height: 12),
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 clipBehavior: Clip.antiAlias,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

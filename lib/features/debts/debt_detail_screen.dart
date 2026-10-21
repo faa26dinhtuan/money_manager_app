@@ -95,7 +95,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -216,7 +216,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.accent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppTheme.primaryDeep,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -229,7 +229,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               const SizedBox(height: 16),
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

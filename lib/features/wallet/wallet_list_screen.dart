@@ -62,7 +62,7 @@ class _WalletTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: context.surfaceColor,
-      elevation: 0,
+      elevation: 1.25,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,

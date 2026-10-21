@@ -73,8 +73,10 @@ class _IntroScreenState extends State<IntroScreen> {
     final isLast = _index == pages.length - 1;
 
     return Scaffold(
-      backgroundColor: AppTheme.primary,
-      body: SafeArea(
+      backgroundColor: AppTheme.primaryDeep,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
+        child: SafeArea(
         child: Column(
           children: [
             Expanded(
@@ -109,7 +111,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 child: FilledButton(
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.accent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppTheme.primaryDeep,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),
@@ -124,6 +126,7 @@ class _IntroScreenState extends State<IntroScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

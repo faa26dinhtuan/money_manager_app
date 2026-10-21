@@ -4,6 +4,7 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/widgets/gradient_card.dart';
 import 'package:money_manager_app/core/utils/budget_status.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -94,7 +95,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -201,12 +202,9 @@ class _Summary extends StatelessWidget {
     final l = context.l10n;
     final over = spent > limit;
     final remaining = limit - spent;
-    return Container(
+    return GradientCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: over ? Colors.red.shade400 : AppTheme.primary,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      gradient: over ? AppTheme.alertGradient : context.headerGradient,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -295,7 +293,7 @@ class _BudgetTile extends StatelessWidget {
 
     return Card(
       color: context.surfaceColor,
-      elevation: 0,
+      elevation: 1.25,
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,

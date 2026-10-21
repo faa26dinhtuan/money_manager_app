@@ -147,7 +147,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -198,7 +198,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
               const SizedBox(height: 12),
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

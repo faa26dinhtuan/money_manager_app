@@ -76,7 +76,7 @@ class BackupScreen extends StatelessWidget {
   ButtonStyle _style(Color color) {
     return FilledButton.styleFrom(
       backgroundColor: color,
-      foregroundColor: Colors.white,
+      foregroundColor: color == AppTheme.accent ? AppTheme.primaryDeep : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
     );
   }
@@ -96,7 +96,7 @@ class BackupScreen extends StatelessWidget {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -127,7 +127,7 @@ class BackupScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

@@ -227,7 +227,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
                 child: FilledButton(
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.accent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppTheme.primaryDeep,
                   ),
                   onPressed: _canConfirm
                       ? () => Navigator.of(context).pop(

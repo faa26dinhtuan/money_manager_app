@@ -55,7 +55,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
             children: [
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -103,7 +103,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

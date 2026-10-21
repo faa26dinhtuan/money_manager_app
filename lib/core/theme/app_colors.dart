@@ -4,39 +4,59 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 extension AppColors on BuildContext {
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
 
-  Color get surfaceColor => isDark ? AppTheme.darkSurface : Colors.white;
+  Color get surfaceColor => isDark ? AppTheme.darkSurface : AppTheme.lightSurface;
 
-  Color get backgroundColor =>
-      isDark ? AppTheme.darkBackground : AppTheme.background;
+  Color get backgroundColor => isDark ? AppTheme.darkBackground : AppTheme.background;
 
-  Color get textPrimary =>
-      isDark ? Colors.white.withValues(alpha: 0.87) : Colors.black87;
+  Color get textPrimary => isDark
+      ? const Color(0xFFF1F6F2)
+      : const Color(0xFF18251E);
 
-  Color get textSecondary => isDark ? Colors.white70 : Colors.black54;
+  Color get textSecondary => isDark
+      ? const Color(0xFFA2B5A9)
+      : const Color(0xFF66766C);
 
-  Color get textTertiary => isDark ? Colors.white54 : Colors.black45;
+  Color get textTertiary => isDark
+      ? const Color(0xFF82968A)
+      : const Color(0xFF819087);
 
-  Color get textDisabled => isDark ? Colors.white30 : Colors.black26;
+  Color get textDisabled => isDark
+      ? const Color(0xFF56685D)
+      : const Color(0xFFB2BDB5);
 
-  Color get outlineColor => isDark ? Colors.white12 : Colors.black12;
+  Color get outlineColor => isDark ? AppTheme.darkOutline : AppTheme.lightOutline;
+
+  Color get positiveColor => isDark ? AppTheme.primaryLight : AppTheme.success;
+
+  Color get negativeColor => AppTheme.danger;
 
   LinearGradient get headerGradient =>
       isDark ? AppTheme.headerGradientDark : AppTheme.headerGradient;
 
-  List<BoxShadow> get softShadow => isDark
-      ? const []
-      : [
-          BoxShadow(
-            color: AppTheme.primaryDark.withValues(alpha: 0.10),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ];
+  LinearGradient get surfaceGradient => isDark
+      ? const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.darkSurfaceRaised, AppTheme.darkSurface],
+        )
+      : const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.lightSurface, AppTheme.lightSurfaceTint],
+        );
+
+  List<BoxShadow> get softShadow => [
+    BoxShadow(
+      color: AppTheme.primaryDark.withValues(alpha: isDark ? 0.08 : 0.075),
+      blurRadius: isDark ? 18 : 24,
+      offset: const Offset(0, 8),
+    ),
+  ];
 
   BoxDecoration cardDecoration({double radius = 20}) => BoxDecoration(
-    color: surfaceColor,
+    gradient: surfaceGradient,
     borderRadius: BorderRadius.circular(radius),
     boxShadow: softShadow,
-    border: isDark ? Border.all(color: outlineColor, width: 0.5) : null,
+    border: Border.all(color: outlineColor.withValues(alpha: 0.72), width: 0.65),
   );
 }

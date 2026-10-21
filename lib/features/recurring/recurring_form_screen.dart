@@ -311,7 +311,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
             child: FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.accent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppTheme.primaryDeep,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
                 ),

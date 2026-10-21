@@ -158,7 +158,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               const SizedBox(height: 12),
               Card(
                 color: context.surfaceColor,
-                elevation: 0,
+                elevation: 1.25,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

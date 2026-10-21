@@ -3,7 +3,7 @@ import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 
 class GradientHeader extends StatelessWidget {
-  const GradientHeader({super.key, required this.child, this.bottomRadius = 32});
+  const GradientHeader({super.key, required this.child, this.bottomRadius = 30});
 
   final Widget child;
   final double bottomRadius;
@@ -17,9 +17,9 @@ class GradientHeader extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.30),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+            color: AppTheme.primaryDark.withValues(alpha: context.isDark ? 0.28 : 0.18),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -29,13 +29,9 @@ class GradientHeader extends StatelessWidget {
           decoration: BoxDecoration(gradient: context.headerGradient),
           child: Stack(
             children: [
-              const Positioned(top: -60, right: -40, child: _Bubble(180, 0.08)),
-              const Positioned(
-                bottom: -50,
-                left: -50,
-                child: _Bubble(150, 0.06),
-              ),
-              const Positioned(top: 70, left: -20, child: _Bubble(70, 0.05)),
+              const Positioned(top: -64, right: -40, child: _Bubble(188, 0.09)),
+              const Positioned(bottom: -56, left: -48, child: _Bubble(156, 0.07)),
+              const Positioned(top: 76, left: -20, child: _Bubble(72, 0.055)),
               child,
             ],
           ),

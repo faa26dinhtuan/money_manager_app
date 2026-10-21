@@ -25,16 +25,7 @@ class CreateCategoryScreen extends StatefulWidget {
 
 class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   static const _icons = availableCategoryIcons;
-  static const _colors = <Color>[
-    Color(0xFF2A8C66),
-    Color(0xFF4C9BE8),
-    Color(0xFFF5B82E),
-    Color(0xFFE8506E),
-    Color(0xFF9B5DE5),
-    Color(0xFF3CC6B0),
-    Color(0xFFEF6C57),
-    Color(0xFF8E9A93),
-  ];
+  static const _colors = AppTheme.categoryPalette;
 
   final _store = AppStore.instance;
   final _nameCtrl = TextEditingController();
@@ -204,7 +195,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
             child: FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.accent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppTheme.primaryDeep,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
               ),
               onPressed: _submit,

@@ -48,8 +48,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primary,
-      body: Center(
+      backgroundColor: AppTheme.primaryDeep,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
+        child: Center(
         child: TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: 1),
           duration: const Duration(milliseconds: 800),
@@ -95,6 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

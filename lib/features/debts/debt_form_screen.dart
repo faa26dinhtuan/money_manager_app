@@ -276,7 +276,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
             child: FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.accent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppTheme.primaryDeep,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
                 ),
