@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
-import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/widgets/gradient_card.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/goal_status.dart';
@@ -40,9 +39,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
   }
 
   void _openForm() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const GoalFormScreen()),
-    );
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const GoalFormScreen()));
   }
 
   @override
@@ -97,7 +95,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      AppIcon(AppIcons.goal, size: 56, color: context.textDisabled),
+                      AppIcon(
+                        AppIcons.goal,
+                        size: 56,
+                        color: context.textDisabled,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         l.noGoalsYet,
@@ -153,8 +155,7 @@ class _Summary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l.totalSaved,
-              style: const TextStyle(color: Colors.white70)),
+          Text(l.totalSaved, style: const TextStyle(color: Colors.white70)),
           const SizedBox(height: 6),
           FittedBox(
             fit: BoxFit.scaleDown,
