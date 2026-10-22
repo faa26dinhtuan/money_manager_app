@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Hủy'**
   String get cancel;
 
+  /// No description provided for @no.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không'**
+  String get no;
+
   /// No description provided for @done.
   ///
   /// In vi, this message translates to:
@@ -1663,6 +1669,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chuyển sang tiền tệ này'**
   String get changeDefaultCurrency;
+
+  /// No description provided for @askAddWalletForCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có muốn tạo ví mới cho {currency} không?'**
+  String askAddWalletForCurrency(String currency);
 
   /// No description provided for @currencyConvertLinkedNotice.
   ///

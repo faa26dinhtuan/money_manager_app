@@ -43,6 +43,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String get no => 'No';
+
+  @override
   String get done => 'Done';
 
   @override
@@ -879,6 +882,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changeDefaultCurrency => 'Use this currency';
+
+  @override
+  String askAddWalletForCurrency(String currency) {
+    return 'Do you want to add a new wallet for $currency?';
+  }
 
   @override
   String get currencyConvertLinkedNotice =>

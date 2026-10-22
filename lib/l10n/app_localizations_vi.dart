@@ -43,6 +43,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cancel => 'Hủy';
 
   @override
+  String get no => 'Không';
+
+  @override
   String get done => 'Xong';
 
   @override
@@ -880,6 +883,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get changeDefaultCurrency => 'Chuyển sang tiền tệ này';
+
+  @override
+  String askAddWalletForCurrency(String currency) {
+    return 'Bạn có muốn tạo ví mới cho $currency không?';
+  }
 
   @override
   String get currencyConvertLinkedNotice =>

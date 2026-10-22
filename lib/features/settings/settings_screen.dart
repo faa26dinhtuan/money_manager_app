@@ -96,16 +96,32 @@ class SettingsScreen extends StatelessWidget {
       builder: (_) => _DefaultCurrencyDialog(initialCurrency: store.currency),
     );
     if (action == null || !context.mounted) return;
-    if (action.addWallet) {
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => WalletFormScreen(initialCurrency: action.currency),
-        ),
-      );
-      return;
-    }
     store.setCurrency(action.currency);
     store.selectWallet(null);
+    final l = context.l10n;
+    final addWallet = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l.addWallet),
+        content: Text(l.askAddWalletForCurrency(action.currency.label)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l.no),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l.addWallet),
+          ),
+        ],
+      ),
+    );
+    if (addWallet != true || !context.mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WalletFormScreen(initialCurrency: action.currency),
+      ),
+    );
   }
 
   @override
@@ -203,10 +219,9 @@ class SettingsScreen extends StatelessWidget {
 }
 
 class _DefaultCurrencyAction {
-  const _DefaultCurrencyAction(this.currency, {this.addWallet = false});
+  const _DefaultCurrencyAction(this.currency);
 
   final AppCurrency currency;
-  final bool addWallet;
 }
 
 class _DefaultCurrencyDialog extends StatefulWidget {
@@ -258,14 +273,6 @@ class _DefaultCurrencyDialogState extends State<_DefaultCurrencyDialog> {
                 _DefaultCurrencyAction(_currency),
               ),
               child: Text(l.changeDefaultCurrency),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).pop(
-                _DefaultCurrencyAction(_currency, addWallet: true),
-              ),
-              icon: const AppIcon(AppIcons.add),
-              label: Text(l.addWallet),
             ),
           ],
         ),
