@@ -866,6 +866,19 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chọn loại tiền nguồn và đích ở trên, sau đó chọn ví muốn quy đổi.';
 
   @override
+  String get filterCurrencies => 'Lọc ví theo tiền tệ';
+
+  @override
+  String get showAllCurrencies => 'Hiện tất cả tiền tệ';
+
+  @override
+  String get walletsMustShareCurrency =>
+      'Có thể chọn nhiều ví, nhưng các ví phải cùng loại tiền tệ.';
+
+  @override
+  String get selectTargetCurrency => 'Chọn tiền tệ muốn quy đổi sang';
+
+  @override
   String get changeDefaultCurrency => 'Chuyển sang tiền tệ này';
 
   @override

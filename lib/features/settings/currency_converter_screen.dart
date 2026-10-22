@@ -81,14 +81,83 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     );
   }
 
+  Future<AppCurrency?> _pickTargetCurrency(AppCurrency from) {
+    final options = AppCurrency.all
+        .where((currency) => currency.code != from.code)
+        .toList();
+    var selected = options.firstWhere(
+      (currency) => currency.code == _to.code,
+      orElse: () => options.first,
+    );
+    final l = context.l10n;
+    return showDialog<AppCurrency>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(l.selectTargetCurrency),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${l.fromCurrency}: ${from.localizedName(context)} (${from.code})'),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<AppCurrency>(
+                initialValue: selected,
+                decoration: InputDecoration(labelText: l.toCurrency),
+                items: [
+                  for (final currency in options)
+                    DropdownMenuItem(
+                      value: currency,
+                      child: Text('${currency.localizedName(context)} (${currency.code})'),
+                    ),
+                ],
+                onChanged: (currency) {
+                  if (currency != null) setDialogState(() => selected = currency);
+                },
+              ),
+              const SizedBox(height: 12),
+              Text(formatRateLine(from, selected, _rates.rate(from, selected))),
+              const SizedBox(height: 4),
+              Text(
+                _rates.updatedAt == null
+                    ? l.defaultRatesWarning
+                    : l.lastUpdated(formatUpdatedAt(_rates.updatedAt!)),
+                style: TextStyle(color: context.textSecondary, fontSize: 12),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(selected),
+              child: Text(l.convertSelectedWallets),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _convertWallets() async {
-    final walletIds = await showWalletConversionDialog(context, _from, _to);
+    final walletIds = await showWalletConversionDialog(context);
     if (walletIds == null || walletIds.isEmpty || !mounted) return;
+    final source = AppStore.instance.walletById(walletIds.first);
+    if (source == null) return;
+    final from = AppCurrency.byCode(source.currencyCode);
+    if (walletIds.any(
+      (id) => AppStore.instance.walletById(id)?.currencyCode != from.code,
+    )) return;
     await _rates.ensureLoaded();
+    if (!mounted) return;
+    final to = await _pickTargetCurrency(from);
+    if (to == null || !mounted) return;
     await AppStore.instance.convertCurrency(
-      _from,
-      _to,
-      _rates.rate(_from, _to),
+      from,
+      to,
+      _rates.rate(from, to),
       walletIds: walletIds,
     );
   }
@@ -294,7 +363,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.tonalIcon(
-                          onPressed: _from.code == _to.code ? null : _convertWallets,
+                          onPressed: _convertWallets,
                           icon: const AppIcon(AppIcons.exchange),
                           label: Text(l.convertWallets),
                         ),

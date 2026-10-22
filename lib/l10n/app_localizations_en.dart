@@ -862,7 +862,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walletConversionSubtitle =>
-      'Choose the source and target currencies above, then select the wallets to convert.';
+      'Select wallets first, then choose the currency to convert them to.';
+
+  @override
+  String get filterCurrencies => 'Filter wallets by currency';
+
+  @override
+  String get showAllCurrencies => 'Show all currencies';
+
+  @override
+  String get walletsMustShareCurrency =>
+      'You can select multiple wallets, but they must use the same currency.';
+
+  @override
+  String get selectTargetCurrency => 'Choose the currency to convert to';
 
   @override
   String get changeDefaultCurrency => 'Use this currency';

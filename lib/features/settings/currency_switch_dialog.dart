@@ -3,23 +3,14 @@ import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
-import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
-import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
-Future<Set<String>?> showWalletConversionDialog(
-  BuildContext context,
-  AppCurrency from,
-  AppCurrency to,
-) {
+Future<Set<String>?> showWalletConversionDialog(BuildContext context) {
   return showDialog<Set<String>>(
     context: context,
-    builder: (_) => _CurrencySwitchDialog(
-      from: from,
-      to: to,
-    ),
+    builder: (_) => const _WalletSelectionDialog(),
   );
 }
 
@@ -46,131 +37,131 @@ String formatUpdatedAt(DateTime d) {
   return '${formatDate(d)} ${two(d.hour)}:${two(d.minute)}';
 }
 
-class _CurrencySwitchDialog extends StatefulWidget {
-  const _CurrencySwitchDialog({
-    required this.from,
-    required this.to,
-  });
-
-  final AppCurrency from;
-  final AppCurrency to;
+class _WalletSelectionDialog extends StatefulWidget {
+  const _WalletSelectionDialog();
 
   @override
-  State<_CurrencySwitchDialog> createState() => _CurrencySwitchDialogState();
+  State<_WalletSelectionDialog> createState() => _WalletSelectionDialogState();
 }
 
-class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
-  final _rates = ExchangeRates.instance;
+class _WalletSelectionDialogState extends State<_WalletSelectionDialog> {
   final _store = AppStore.instance;
   final _selectedWalletIds = <String>{};
+  late final _visibleCurrencies =
+      _store.wallets.map((wallet) => wallet.currencyCode).toSet();
 
-  @override
-  void initState() {
-    super.initState();
-    _rates.ensureLoaded();
-  }
-
-  Future<void> _refresh() async {
-    final ok = await _rates.refresh();
-    if (!mounted || ok) return;
-    ScaffoldMessenger.of(context).showApp(context.l10n.ratesOffline);
-  }
+  String? get _selectedCurrencyCode => _selectedWalletIds.isEmpty
+      ? null
+      : _store.walletById(_selectedWalletIds.first)?.currencyCode;
 
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    return ListenableBuilder(
-      listenable: _rates,
-      builder: (context, _) {
-        final updated = _rates.updatedAt;
-        return AlertDialog(
-          title: Text(l.convertWallets),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l.selectWalletsToConvert),
-                const SizedBox(height: 8),
-                Text(
-                  l.currencyConvertLinkedNotice,
-                  style: TextStyle(color: context.textSecondary, fontSize: 12),
-                ),
-                const SizedBox(height: 12),
-                for (final wallet in _store.wallets.where(
-                  (wallet) => wallet.currencyCode == widget.from.code,
-                ))
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    value: _selectedWalletIds.contains(wallet.id),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    secondary: AppIcon(wallet.icon, color: wallet.color),
-                    title: Text(wallet.localizedName(context)),
-                    subtitle: Text(
-                      formatMoney(_store.walletBalance(wallet.id), widget.from),
+    final currencies = AppCurrency.all
+        .where((currency) => _store.wallets.any(
+              (wallet) => wallet.currencyCode == currency.code,
+            ))
+        .toList()
+      ..sort((a, b) => a.code.compareTo(b.code));
+    final wallets = _store.wallets
+        .where((wallet) => _visibleCurrencies.contains(wallet.currencyCode))
+        .toList()
+      ..sort((a, b) {
+        final currencyOrder = a.currencyCode.compareTo(b.currencyCode);
+        return currencyOrder != 0 ? currencyOrder : a.name.compareTo(b.name);
+      });
+    return AlertDialog(
+      title: Text(l.convertWallets),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l.selectWalletsToConvert),
+              const SizedBox(height: 12),
+              Text(l.filterCurrencies, style: TextStyle(color: context.textSecondary)),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: [
+                  for (final currency in currencies)
+                    FilterChip(
+                      label: Text(currency.code),
+                      selected: _visibleCurrencies.contains(currency.code),
+                      onSelected: (visible) => setState(() {
+                        if (visible) {
+                          _visibleCurrencies.add(currency.code);
+                        } else {
+                          _visibleCurrencies.remove(currency.code);
+                          _selectedWalletIds.removeWhere(
+                            (id) => _store.walletById(id)?.currencyCode == currency.code,
+                          );
+                        }
+                      }),
                     ),
-                    onChanged: (selected) => setState(() {
-                      if (selected == true) {
-                        _selectedWalletIds.add(wallet.id);
-                      } else {
-                        _selectedWalletIds.remove(wallet.id);
-                      }
-                    }),
-                  ),
-                const SizedBox(height: 12),
-                Text(
-                  formatRateLine(
-                    widget.from,
-                    widget.to,
-                    _rates.rate(widget.from, widget.to),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                ],
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => setState(() {
+                    _visibleCurrencies
+                      ..clear()
+                      ..addAll(_store.wallets.map((wallet) => wallet.currencyCode));
+                  }),
+                  child: Text(l.showAllCurrencies),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  updated == null
-                      ? l.defaultRatesWarning
-                      : l.lastUpdated(formatUpdatedAt(updated)),
-                  style: TextStyle(color: context.textSecondary),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: _rates.refreshing ? null : _refresh,
-                    icon: _rates.refreshing
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const AppIcon(AppIcons.refresh),
-                    label: Text(l.refreshRates),
+              ),
+              Text(
+                l.walletsMustShareCurrency,
+                style: TextStyle(color: context.textSecondary, fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              for (final wallet in wallets)
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: _selectedWalletIds.contains(wallet.id),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  secondary: AppIcon(wallet.icon, color: wallet.color),
+                  title: Text(wallet.localizedName(context)),
+                  subtitle: Text(
+                    '${wallet.currencyCode} · ${formatMoney(_store.walletBalance(wallet.id), AppCurrency.byCode(wallet.currencyCode))}',
                   ),
+                  onChanged: _selectedCurrencyCode != null &&
+                          _selectedCurrencyCode != wallet.currencyCode &&
+                          !_selectedWalletIds.contains(wallet.id)
+                      ? null
+                      : (selected) => setState(() {
+                            if (selected == true) {
+                              _selectedWalletIds.add(wallet.id);
+                            } else {
+                              _selectedWalletIds.remove(wallet.id);
+                            }
+                          }),
                 ),
-                Text(
-                  l.currencyConvertWarning,
-                  style: TextStyle(color: context.textSecondary, fontSize: 12),
-                ),
-              ],
-            ),
+              const SizedBox(height: 8),
+              Text(
+                l.currencyConvertLinkedNotice,
+                style: TextStyle(color: context.textSecondary, fontSize: 12),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l.cancel),
-            ),
-            FilledButton(
-              onPressed: _selectedWalletIds.isEmpty
-                  ? null
-                  : () => Navigator.of(context).pop(Set.of(_selectedWalletIds)),
-              child: Text(l.convertSelectedWallets),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.cancel),
+        ),
+        FilledButton(
+          onPressed: _selectedWalletIds.isEmpty
+              ? null
+              : () => Navigator.of(context).pop(Set.of(_selectedWalletIds)),
+          child: Text(l.convertSelectedWallets),
+        ),
+      ],
     );
   }
 }

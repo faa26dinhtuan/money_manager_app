@@ -1634,6 +1634,30 @@ abstract class AppLocalizations {
   /// **'Chọn loại tiền nguồn và đích ở trên, sau đó chọn ví muốn quy đổi.'**
   String get walletConversionSubtitle;
 
+  /// No description provided for @filterCurrencies.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lọc ví theo tiền tệ'**
+  String get filterCurrencies;
+
+  /// No description provided for @showAllCurrencies.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện tất cả tiền tệ'**
+  String get showAllCurrencies;
+
+  /// No description provided for @walletsMustShareCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có thể chọn nhiều ví, nhưng các ví phải cùng loại tiền tệ.'**
+  String get walletsMustShareCurrency;
+
+  /// No description provided for @selectTargetCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn tiền tệ muốn quy đổi sang'**
+  String get selectTargetCurrency;
+
   /// No description provided for @changeDefaultCurrency.
   ///
   /// In vi, this message translates to:
