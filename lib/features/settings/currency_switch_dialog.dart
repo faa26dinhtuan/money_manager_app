@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
@@ -9,20 +9,16 @@ import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
-enum CurrencySwitchChoice { existingWallets, newWallet, convert }
-
-Future<CurrencySwitchChoice?> showCurrencySwitchDialog(
+Future<Set<String>?> showWalletConversionDialog(
   BuildContext context,
   AppCurrency from,
-  AppCurrency to, {
-  required bool hasExistingWallets,
-}) {
-  return showDialog<CurrencySwitchChoice>(
+  AppCurrency to,
+) {
+  return showDialog<Set<String>>(
     context: context,
     builder: (_) => _CurrencySwitchDialog(
       from: from,
       to: to,
-      hasExistingWallets: hasExistingWallets,
     ),
   );
 }
@@ -54,12 +50,10 @@ class _CurrencySwitchDialog extends StatefulWidget {
   const _CurrencySwitchDialog({
     required this.from,
     required this.to,
-    required this.hasExistingWallets,
   });
 
   final AppCurrency from;
   final AppCurrency to;
-  final bool hasExistingWallets;
 
   @override
   State<_CurrencySwitchDialog> createState() => _CurrencySwitchDialogState();
@@ -67,6 +61,8 @@ class _CurrencySwitchDialog extends StatefulWidget {
 
 class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
   final _rates = ExchangeRates.instance;
+  final _store = AppStore.instance;
+  final _selectedWalletIds = <String>{};
 
   @override
   void initState() {
@@ -80,13 +76,6 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
     ScaffoldMessenger.of(context).showApp(context.l10n.ratesOffline);
   }
 
-  Future<void> _copyBackup() async {
-    final data = AppStore.instance.createBackup().encode();
-    await Clipboard.setData(ClipboardData(text: data));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showApp(context.l10n.backupCopied);
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -95,13 +84,39 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
       builder: (context, _) {
         final updated = _rates.updatedAt;
         return AlertDialog(
-          title: Text(l.convertCurrencyTitle(widget.to.code)),
+          title: Text(l.convertWallets),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l.convertCurrencyPrompt(widget.to.label)),
+                Text(l.selectWalletsToConvert),
+                const SizedBox(height: 8),
+                Text(
+                  l.currencyConvertLinkedNotice,
+                  style: TextStyle(color: context.textSecondary, fontSize: 12),
+                ),
+                const SizedBox(height: 12),
+                for (final wallet in _store.wallets.where(
+                  (wallet) => wallet.currencyCode == widget.from.code,
+                ))
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: _selectedWalletIds.contains(wallet.id),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    secondary: AppIcon(wallet.icon, color: wallet.color),
+                    title: Text(wallet.localizedName(context)),
+                    subtitle: Text(
+                      formatMoney(_store.walletBalance(wallet.id), widget.from),
+                    ),
+                    onChanged: (selected) => setState(() {
+                      if (selected == true) {
+                        _selectedWalletIds.add(wallet.id);
+                      } else {
+                        _selectedWalletIds.remove(wallet.id);
+                      }
+                    }),
+                  ),
                 const SizedBox(height: 12),
                 Text(
                   formatRateLine(
@@ -139,12 +154,6 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
                   l.currencyConvertWarning,
                   style: TextStyle(color: context.textSecondary, fontSize: 12),
                 ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _copyBackup,
-                  icon: const AppIcon(AppIcons.backup),
-                  label: Text(l.backupData),
-                ),
               ],
             ),
           ),
@@ -153,20 +162,11 @@ class _CurrencySwitchDialogState extends State<_CurrencySwitchDialog> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(l.cancel),
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(
-                widget.hasExistingWallets
-                    ? CurrencySwitchChoice.existingWallets
-                    : CurrencySwitchChoice.newWallet,
-              ),
-              child: Text(
-                widget.hasExistingWallets ? l.useExistingWallets : l.addWallet,
-              ),
-            ),
             FilledButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(CurrencySwitchChoice.convert),
-              child: Text(l.convertAll),
+              onPressed: _selectedWalletIds.isEmpty
+                  ? null
+                  : () => Navigator.of(context).pop(Set.of(_selectedWalletIds)),
+              child: Text(l.convertSelectedWallets),
             ),
           ],
         );

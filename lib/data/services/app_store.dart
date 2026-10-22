@@ -679,12 +679,50 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> convertCurrency(AppCurrency to, double factor) async {
-    final fromCode = _currency.code;
-    final sourceWalletIds = _wallets
-        .where((w) => w.currencyCode == fromCode)
-        .map((w) => w.id)
+  Future<void> convertCurrency(
+    AppCurrency from,
+    AppCurrency to,
+    double factor, {
+    required Set<String> walletIds,
+  }) async {
+    final fromCode = from.code;
+    final sourceWalletIds = walletIds
+        .where((id) => walletById(id)?.currencyCode == fromCode)
         .toSet();
+    var expanded = true;
+    while (expanded) {
+      expanded = false;
+      for (final goal in _goals) {
+        if (goal.currencyCode != fromCode ||
+            !goal.entries.any((entry) => sourceWalletIds.contains(entry.walletId))) {
+          continue;
+        }
+        for (final entry in goal.entries) {
+          final id = entry.walletId;
+          if (id != null &&
+              walletById(id)?.currencyCode == fromCode &&
+              sourceWalletIds.add(id)) {
+            expanded = true;
+          }
+        }
+      }
+      for (final debt in _debts) {
+        final linked = sourceWalletIds.contains(debt.walletId) ||
+            debt.payments.any((payment) => sourceWalletIds.contains(payment.walletId));
+        if (debt.currencyCode != fromCode || !linked) continue;
+        final linkedIds = <String?>[
+          debt.walletId,
+          ...debt.payments.map((payment) => payment.walletId),
+        ];
+        for (final id in linkedIds) {
+          if (id != null &&
+              walletById(id)?.currencyCode == fromCode &&
+              sourceWalletIds.add(id)) {
+            expanded = true;
+          }
+        }
+      }
+    }
     final scale = to.scale;
     double conv(double value) {
       final minor = (value * factor * scale).round();
@@ -694,7 +732,7 @@ class AppStore extends ChangeNotifier {
 
     for (var i = 0; i < _transactions.length; i++) {
       final t = _transactions[i];
-      if (walletById(t.walletId)?.currencyCode != fromCode) continue;
+      if (!sourceWalletIds.contains(t.walletId)) continue;
       _transactions[i] = Transaction(
         id: t.id,
         type: t.type,
@@ -707,7 +745,7 @@ class AppStore extends ChangeNotifier {
     }
     for (var i = 0; i < _wallets.length; i++) {
       final w = _wallets[i];
-      if (w.currencyCode != fromCode) continue;
+      if (!sourceWalletIds.contains(w.id)) continue;
       _wallets[i] = Wallet(
         id: w.id,
         name: w.name,
@@ -717,19 +755,10 @@ class AppStore extends ChangeNotifier {
         currencyCode: to.code,
       );
     }
-    for (var i = 0; i < _budgets.length; i++) {
-      final b = _budgets[i];
-      if (b.currencyCode != fromCode) continue;
-      _budgets[i] = Budget(
-        id: b.id,
-        categoryId: b.categoryId,
-        limit: conv(b.limit),
-        currencyCode: to.code,
-      );
-    }
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
-      if (g.currencyCode != fromCode) continue;
+      if (g.currencyCode != fromCode ||
+          !g.entries.any((entry) => sourceWalletIds.contains(entry.walletId))) continue;
       _goals[i] = g.copyWith(
         target: conv(g.target),
         currencyCode: to.code,
@@ -747,7 +776,9 @@ class AppStore extends ChangeNotifier {
     }
     for (var i = 0; i < _debts.length; i++) {
       final d = _debts[i];
-      if (d.currencyCode != fromCode) continue;
+      if (d.currencyCode != fromCode ||
+          (!sourceWalletIds.contains(d.walletId) &&
+              !d.payments.any((payment) => sourceWalletIds.contains(payment.walletId)))) continue;
       _debts[i] = d.copyWith(
         amount: conv(d.amount),
         currencyCode: to.code,

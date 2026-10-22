@@ -1451,7 +1451,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencyDefaultNotice.
   ///
   /// In vi, this message translates to:
-  /// **'Mỗi ví và khoản mục giữ tiền tệ riêng. Thêm ví mới để dùng tiền tệ khác, hoặc sao lưu rồi quy đổi dữ liệu hiện tại.'**
+  /// **'Chọn tiền tệ mặc định để hiển thị và nhập số tiền. Việc này không quy đổi số dư trong ví.'**
   String get currencyDefaultNotice;
 
   /// No description provided for @currencyConverter.
@@ -1609,6 +1609,42 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Quy đổi tất cả'**
   String get convertAll;
+
+  /// No description provided for @selectWalletsToConvert.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ví muốn quy đổi sang loại tiền mới'**
+  String get selectWalletsToConvert;
+
+  /// No description provided for @convertSelectedWallets.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quy đổi ví đã chọn'**
+  String get convertSelectedWallets;
+
+  /// No description provided for @convertWallets.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quy đổi ví'**
+  String get convertWallets;
+
+  /// No description provided for @walletConversionSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn loại tiền nguồn và đích ở trên, sau đó chọn ví muốn quy đổi.'**
+  String get walletConversionSubtitle;
+
+  /// No description provided for @changeDefaultCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển sang tiền tệ này'**
+  String get changeDefaultCurrency;
+
+  /// No description provided for @currencyConvertLinkedNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nếu mục tiêu hoặc khoản nợ liên kết nhiều ví, các ví đó cũng sẽ được quy đổi cùng để giữ dữ liệu nhất quán.'**
+  String get currencyConvertLinkedNotice;
 
   /// No description provided for @backupSavedConfirmation.
   ///
@@ -1997,7 +2033,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencyConvertWarning.
   ///
   /// In vi, this message translates to:
-  /// **'Nên sao lưu dữ liệu trước khi quy đổi. Số tiền sẽ được làm tròn theo đơn vị tiền mới.'**
+  /// **'Giao dịch, mục tiêu, khoản nợ và định kỳ gắn với ví được chọn sẽ được quy đổi. Ngân sách không gắn với ví sẽ giữ nguyên tiền tệ.'**
   String get currencyConvertWarning;
 
   /// No description provided for @manageWallets.

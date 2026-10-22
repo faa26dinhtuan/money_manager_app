@@ -8,6 +8,7 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/features/settings/currency_switch_dialog.dart';
 
@@ -77,6 +78,18 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showApp(
       ok ? l.ratesUpdated : l.ratesOffline,
+    );
+  }
+
+  Future<void> _convertWallets() async {
+    final walletIds = await showWalletConversionDialog(context, _from, _to);
+    if (walletIds == null || walletIds.isEmpty || !mounted) return;
+    await _rates.ensureLoaded();
+    await AppStore.instance.convertCurrency(
+      _from,
+      _to,
+      _rates.rate(_from, _to),
+      walletIds: walletIds,
     );
   }
 
@@ -255,6 +268,39 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         )
                       : const AppIcon(AppIcons.refresh),
                   label: Text(l.refreshRates),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                color: context.surfaceColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.convertWallets,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l.walletConversionSubtitle,
+                        style: TextStyle(color: context.textSecondary),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.tonalIcon(
+                          onPressed: _from.code == _to.code ? null : _convertWallets,
+                          icon: const AppIcon(AppIcons.exchange),
+                          label: Text(l.convertWallets),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

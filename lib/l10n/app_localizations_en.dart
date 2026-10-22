@@ -762,14 +762,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyDefaultNotice =>
-      'Each wallet and item keeps its own currency. Add a wallet for another currency, or back up before converting existing data.';
+      'Choose the default currency for display and entering amounts. This does not convert wallet balances.';
 
   @override
   String get currencyConverter => 'Currency converter';
 
   @override
   String get currencyConverterSubtitle =>
-      'Convert rates and convert existing data';
+      'Convert amounts and wallets using exchange rates';
 
   @override
   String get theme => 'Theme';
@@ -849,6 +849,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get convertAll => 'Convert all';
+
+  @override
+  String get selectWalletsToConvert =>
+      'Select wallets to convert to the new currency';
+
+  @override
+  String get convertSelectedWallets => 'Convert selected wallets';
+
+  @override
+  String get convertWallets => 'Convert wallets';
+
+  @override
+  String get walletConversionSubtitle =>
+      'Choose the source and target currencies above, then select the wallets to convert.';
+
+  @override
+  String get changeDefaultCurrency => 'Use this currency';
+
+  @override
+  String get currencyConvertLinkedNotice =>
+      'If a goal or debt is linked to multiple wallets, those wallets will be converted together to keep the data consistent.';
 
   @override
   String get backupSavedConfirmation => 'I saved the backup somewhere safe';
@@ -1067,7 +1088,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyConvertWarning =>
-      'Back up your data before converting. Amounts will be rounded to the new currency\'s minor unit.';
+      'Transactions, goals, debts, and recurring items linked to selected wallets will be converted. Budgets are not linked to wallets and will keep their currency.';
 
   @override
   String get manageWallets => 'Wallets';
