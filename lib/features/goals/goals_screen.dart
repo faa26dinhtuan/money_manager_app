@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/goal_status.dart';
 import 'package:money_manager_app/core/widgets/budget_progress_bar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/goals/goal_detail_screen.dart';
@@ -21,6 +22,8 @@ class GoalsScreen extends StatefulWidget {
 
 class _GoalsScreenState extends State<GoalsScreen> {
   final _store = AppStore.instance;
+  final Set<String> _selected = {};
+  bool _selecting = false;
   bool _showDone = false;
 
   int _byDeadline(Goal a, Goal b) {
@@ -43,6 +46,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
         .push(MaterialPageRoute(builder: (_) => const GoalFormScreen()));
   }
 
+  Future<void> _deleteSelected() async {
+    if (!await confirmBulkDelete(context, _selected.length) || !mounted) return;
+    for (final id in _selected.toList()) { _store.removeGoal(id); }
+    setState(() { _selected.clear(); _selecting = false; });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -58,7 +67,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         final totalTarget = all.fold<double>(0, (s, g) => s + g.target);
 
         return Scaffold(
-          appBar: AppBar(title: Text(l.goals)),
+          appBar: AppBar(title: Text(l.goals), actions: [
+            IconButton(tooltip: l.selectAll, icon: Icon(_selecting ? Icons.close : Icons.checklist), onPressed: () => setState(() { _selecting = !_selecting; _selected.clear(); })),
+          ]),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -84,8 +95,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       ),
                     ],
                     selected: {_showDone},
-                    onSelectionChanged: (s) =>
-                        setState(() => _showDone = s.first),
+                    onSelectionChanged: (s) => setState(() {
+                      _showDone = s.first;
+                      _selected.clear();
+                    }),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -118,11 +131,18 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     ),
                   ),
                 ),
+              if (_selecting && items.isNotEmpty)
+                BulkSelectionControls(count: items.length, selectedCount: _selected.length, onSelectAll: () => setState(() { if (_selected.length == items.length) { _selected.clear(); } else { _selected.addAll(items.map((g) => g.id)); } }), onDelete: _deleteSelected),
               for (final g in items)
-                _GoalTile(goal: g, onTap: () => _openDetail(g)),
+                BulkSelectableItem(
+                  selecting: _selecting,
+                  selected: _selected.contains(g.id),
+                  onChanged: (_) => setState(() { _selected.contains(g.id) ? _selected.remove(g.id) : _selected.add(g.id); }),
+                  child: _GoalTile(goal: g, onTap: () => _openDetail(g)),
+                ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _selecting ? null : FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
             label: Text(l.addGoal),

@@ -1844,6 +1844,18 @@ abstract class AppLocalizations {
   /// **'Chọn tất cả'**
   String get selectAll;
 
+  /// No description provided for @deleteSelectedTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa các mục đã chọn?'**
+  String get deleteSelectedTitle;
+
+  /// No description provided for @deleteSelectedMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có chắc muốn xóa {count} mục đã chọn không? Thao tác này không thể hoàn tác.'**
+  String deleteSelectedMessage(int count);
+
   /// No description provided for @exportCsvTitle.
   ///
   /// In vi, this message translates to:

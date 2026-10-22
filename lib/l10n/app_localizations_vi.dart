@@ -980,6 +980,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get selectAll => 'Chọn tất cả';
 
   @override
+  String get deleteSelectedTitle => 'Xóa các mục đã chọn?';
+
+  @override
+  String deleteSelectedMessage(int count) {
+    return 'Bạn có chắc muốn xóa $count mục đã chọn không? Thao tác này không thể hoàn tác.';
+  }
+
+  @override
   String get exportCsvTitle => 'Xuất ra file CSV';
 
   @override

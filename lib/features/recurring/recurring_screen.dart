@@ -8,6 +8,7 @@ import 'package:money_manager_app/core/widgets/gradient_card.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -22,6 +23,8 @@ class RecurringScreen extends StatefulWidget {
 
 class _RecurringScreenState extends State<RecurringScreen> {
   final _store = AppStore.instance;
+  final Set<String> _selected = {};
+  bool _selecting = false;
 
   int _rank(RecurringTransaction r) {
     if (r.isFinished) return 2;
@@ -49,6 +52,12 @@ class _RecurringScreenState extends State<RecurringScreen> {
     }
   }
 
+  Future<void> _deleteSelected() async {
+    if (!await confirmBulkDelete(context, _selected.length) || !mounted) return;
+    for (final id in _selected.toList()) { _store.removeRecurring(id); }
+    setState(() { _selected.clear(); _selecting = false; });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -68,7 +77,9 @@ class _RecurringScreenState extends State<RecurringScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(title: Text(l.recurring)),
+          appBar: AppBar(title: Text(l.recurring), actions: [
+            IconButton(tooltip: l.selectAll, icon: Icon(_selecting ? Icons.close : Icons.checklist), onPressed: () => setState(() { _selecting = !_selecting; _selected.clear(); })),
+          ]),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -88,15 +99,22 @@ class _RecurringScreenState extends State<RecurringScreen> {
                     ],
                   ),
                 ),
+              if (_selecting && items.isNotEmpty)
+                BulkSelectionControls(count: items.length, selectedCount: _selected.length, onSelectAll: () => setState(() { if (_selected.length == items.length) { _selected.clear(); } else { _selected.addAll(items.map((r) => r.id)); } }), onDelete: _deleteSelected),
               for (final r in items)
-                _RecurringTile(
-                  item: r,
-                  onTap: () => _openForm(r),
-                  onToggle: () => _toggle(r),
+                BulkSelectableItem(
+                  selecting: _selecting,
+                  selected: _selected.contains(r.id),
+                  onChanged: (_) => setState(() { _selected.contains(r.id) ? _selected.remove(r.id) : _selected.add(r.id); }),
+                  child: _RecurringTile(
+                    item: r,
+                    onTap: () => _openForm(r),
+                    onToggle: () => _toggle(r),
+                  ),
                 ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _selecting ? null : FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
             label: Text(l.addRecurring),

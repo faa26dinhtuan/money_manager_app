@@ -979,6 +979,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAll => 'Select all';
 
   @override
+  String get deleteSelectedTitle => 'Delete selected items?';
+
+  @override
+  String deleteSelectedMessage(int count) {
+    return 'Delete $count selected items? This action cannot be undone.';
+  }
+
+  @override
   String get exportCsvTitle => 'Export to CSV file';
 
   @override

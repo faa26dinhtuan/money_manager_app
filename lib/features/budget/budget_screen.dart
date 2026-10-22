@@ -10,6 +10,7 @@ import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/budget_progress_bar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -35,6 +36,8 @@ class _BudgetRow {
 
 class _BudgetScreenState extends State<BudgetScreen> {
   final _store = AppStore.instance;
+  final Set<String> _selected = {};
+  bool _selecting = false;
   DateTime _anchor = DateTime(DateTime.now().year, DateTime.now().month);
 
   bool get _isCurrentMonth {
@@ -59,6 +62,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _deleteSelected() async {
+    if (!await confirmBulkDelete(context, _selected.length) || !mounted) return;
+    for (final id in _selected.toList()) { _store.removeBudget(id); }
+    setState(() { _selected.clear(); _selecting = false; });
   }
 
   @override
@@ -89,7 +98,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(title: Text(l.budget)),
+          appBar: AppBar(title: Text(l.budget), actions: [
+            IconButton(tooltip: l.selectAll, icon: Icon(_selecting ? Icons.close : Icons.checklist), onPressed: () => setState(() { _selecting = !_selecting; _selected.clear(); })),
+          ]),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -155,6 +166,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   ),
                 )
               else ...[
+                if (_selecting) BulkSelectionControls(count: rows.length, selectedCount: _selected.length, onSelectAll: () => setState(() { if (_selected.length == rows.length) { _selected.clear(); } else { _selected.addAll(rows.map((r) => r.budget.id)); } }), onDelete: _deleteSelected),
                 _Summary(
                   limit: totalLimit,
                   spent: totalSpent,
@@ -163,16 +175,20 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
                 const SizedBox(height: 16),
                 for (final r in rows)
-                  _BudgetTile(
-                    row: r,
-                    onTap: () => _openForm(r.budget),
-                    onViewTransactions: () =>
-                        _openTransactions(r.budget.categoryId, range),
+                  BulkSelectableItem(
+                    selecting: _selecting,
+                    selected: _selected.contains(r.budget.id),
+                    onChanged: (_) => setState(() { _selected.contains(r.budget.id) ? _selected.remove(r.budget.id) : _selected.add(r.budget.id); }),
+                    child: _BudgetTile(
+                      row: r,
+                      onTap: () => _openForm(r.budget),
+                      onViewTransactions: () => _openTransactions(r.budget.categoryId, range),
+                    ),
                   ),
               ],
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _selecting ? null : FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
             label: Text(l.addBudget),
