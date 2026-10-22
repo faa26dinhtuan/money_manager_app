@@ -91,6 +91,10 @@ class AppStore extends ChangeNotifier {
     final rawDebts = _prefs.getString(_debtsKey);
     if (rawCategories != null && rawTransactions != null) {
       try {
+        bool missingCurrencyCode(String? raw) => raw != null &&
+            (jsonDecode(raw) as List).any(
+              (item) => item is Map && !item.containsKey('currencyCode'),
+            );
         final categories = (jsonDecode(rawCategories) as List)
             .map((e) => Category.fromJson(e as Map<String, dynamic>))
             .toList();
@@ -139,7 +143,11 @@ class AppStore extends ChangeNotifier {
         if (rawWallets == null ||
             rawBudgets == null ||
             rawGoals == null ||
-            rawDebts == null) {
+            rawDebts == null ||
+            missingCurrencyCode(rawWallets) ||
+            missingCurrencyCode(rawBudgets) ||
+            missingCurrencyCode(rawGoals) ||
+            missingCurrencyCode(rawDebts)) {
           await _save();
         }
         return;
@@ -204,7 +212,9 @@ class AppStore extends ChangeNotifier {
               (t) =>
                   t.type == type &&
                   range.contains(t.date) &&
-                  (walletId == null || t.walletId == walletId),
+                  (walletId == null
+                      ? walletById(t.walletId)?.currencyCode == _currency.code
+                      : t.walletId == walletId),
             )
             .toList()
           ..sort((a, b) => b.date.compareTo(a.date));
@@ -262,8 +272,9 @@ class AppStore extends ChangeNotifier {
     return sum;
   }
 
-  double get balance =>
-      _wallets.fold<double>(0, (sum, w) => sum + walletBalance(w.id));
+  double get balance => _wallets
+      .where((w) => w.currencyCode == _currency.code)
+      .fold<double>(0, (sum, w) => sum + walletBalance(w.id));
 
   String? get selectedWalletId {
     final id = _selectedWalletId;
@@ -282,6 +293,7 @@ class AppStore extends ChangeNotifier {
 
   void selectWallet(String? id) {
     _selectedWalletId = id;
+    if (id != null) setCurrency(AppCurrency.byCode(walletById(id)?.currencyCode));
     if (id == null) {
       _prefs.remove(_selectedWalletKey);
     } else {
@@ -306,6 +318,11 @@ class AppStore extends ChangeNotifier {
 
   void removeWallet(String id) {
     if (_wallets.length <= 1) return;
+    final wallet = walletById(id);
+    if (wallet == null ||
+        _wallets.where((w) => w.currencyCode == wallet.currencyCode).length <= 1) {
+      return;
+    }
     _wallets.removeWhere((w) => w.id == id);
     _transactions.removeWhere((t) => t.walletId == id);
     _recurrings.removeWhere((r) => r.walletId == id);
@@ -381,28 +398,40 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
-  List<Budget> get budgets => List.unmodifiable(_budgets);
+  List<Budget> get budgets => List.unmodifiable(
+    _budgets.where((b) => b.currencyCode == _currency.code),
+  );
+
+  List<Budget> get allBudgets => List.unmodifiable(_budgets);
 
   Budget? budgetOfCategory(String categoryId) {
     for (final b in _budgets) {
-      if (b.categoryId == categoryId) return b;
+      if (b.categoryId == categoryId && b.currencyCode == _currency.code) return b;
     }
     return null;
   }
 
-  double spentOfCategory(String categoryId, DateRange range) {
+  double spentOfCategory(
+    String categoryId,
+    DateRange range, {
+    String? currencyCode,
+  }) {
+    final code = currencyCode ?? _currency.code;
     var sum = 0.0;
     for (final t in _transactions) {
-      if (t.type != TxType.expense || t.categoryId != categoryId) continue;
+      if (t.type != TxType.expense || t.categoryId != categoryId ||
+          walletById(t.walletId)?.currencyCode != code) continue;
       if (range.contains(t.date)) sum += t.amount;
     }
     return sum;
   }
 
-  double expenseTotal(DateRange range) {
+  double expenseTotal(DateRange range, {String? currencyCode}) {
+    final code = currencyCode ?? _currency.code;
     var sum = 0.0;
     for (final t in _transactions) {
-      if (t.type == TxType.expense && range.contains(t.date)) sum += t.amount;
+      if (t.type == TxType.expense && range.contains(t.date) &&
+          walletById(t.walletId)?.currencyCode == code) sum += t.amount;
     }
     return sum;
   }
@@ -427,7 +456,11 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
-  List<Goal> get goals => List.unmodifiable(_goals);
+  List<Goal> get goals => List.unmodifiable(
+    _goals.where((g) => g.currencyCode == _currency.code),
+  );
+
+  List<Goal> get allGoals => List.unmodifiable(_goals);
 
   Goal? goalById(String id) {
     for (final g in _goals) {
@@ -476,7 +509,11 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
-  List<Debt> get debts => List.unmodifiable(_debts);
+  List<Debt> get debts => List.unmodifiable(
+    _debts.where((d) => d.currencyCode == _currency.code),
+  );
+
+  List<Debt> get allDebts => List.unmodifiable(_debts);
 
   Debt? debtById(String id) {
     for (final d in _debts) {
@@ -525,7 +562,11 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
-  List<RecurringTransaction> get recurrings => List.unmodifiable(_recurrings);
+  List<RecurringTransaction> get recurrings => List.unmodifiable(
+    _recurrings.where((r) => walletById(r.walletId)?.currencyCode == _currency.code),
+  );
+
+  List<RecurringTransaction> get allRecurrings => List.unmodifiable(_recurrings);
 
   RecurringTransaction? recurringById(String id) {
     for (final r in _recurrings) {
@@ -639,6 +680,11 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> convertCurrency(AppCurrency to, double factor) async {
+    final fromCode = _currency.code;
+    final sourceWalletIds = _wallets
+        .where((w) => w.currencyCode == fromCode)
+        .map((w) => w.id)
+        .toSet();
     final scale = to.scale;
     double conv(double value) {
       final minor = (value * factor * scale).round();
@@ -648,6 +694,7 @@ class AppStore extends ChangeNotifier {
 
     for (var i = 0; i < _transactions.length; i++) {
       final t = _transactions[i];
+      if (walletById(t.walletId)?.currencyCode != fromCode) continue;
       _transactions[i] = Transaction(
         id: t.id,
         type: t.type,
@@ -660,26 +707,32 @@ class AppStore extends ChangeNotifier {
     }
     for (var i = 0; i < _wallets.length; i++) {
       final w = _wallets[i];
+      if (w.currencyCode != fromCode) continue;
       _wallets[i] = Wallet(
         id: w.id,
         name: w.name,
         icon: w.icon,
         color: w.color,
         initialBalance: conv(w.initialBalance),
+        currencyCode: to.code,
       );
     }
     for (var i = 0; i < _budgets.length; i++) {
       final b = _budgets[i];
+      if (b.currencyCode != fromCode) continue;
       _budgets[i] = Budget(
         id: b.id,
         categoryId: b.categoryId,
         limit: conv(b.limit),
+        currencyCode: to.code,
       );
     }
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
+      if (g.currencyCode != fromCode) continue;
       _goals[i] = g.copyWith(
         target: conv(g.target),
+        currencyCode: to.code,
         entries: [
           for (final e in g.entries)
             GoalEntry(
@@ -694,8 +747,10 @@ class AppStore extends ChangeNotifier {
     }
     for (var i = 0; i < _debts.length; i++) {
       final d = _debts[i];
+      if (d.currencyCode != fromCode) continue;
       _debts[i] = d.copyWith(
         amount: conv(d.amount),
+        currencyCode: to.code,
         payments: [
           for (final p in d.payments)
             DebtPayment(
@@ -710,6 +765,7 @@ class AppStore extends ChangeNotifier {
     }
     for (var i = 0; i < _recurrings.length; i++) {
       final r = _recurrings[i];
+      if (!sourceWalletIds.contains(r.walletId)) continue;
       _recurrings[i] = r.copyWith(amount: conv(r.amount));
     }
     _currency = to;
@@ -788,6 +844,7 @@ class AppStore extends ChangeNotifier {
     name: l.cashWallet,
     icon: AppIcons.payments,
     color: const Color(0xFF2A8C66),
+    currencyCode: _currency.code,
   );
 
   void _seed() {
@@ -888,13 +945,14 @@ class AppStore extends ChangeNotifier {
         name: l.bankWallet,
         icon: AppIcons.bank,
         color: const Color(0xFF4C9BE8),
+        currencyCode: _currency.code,
       ),
     ]);
 
-    _budgets.addAll(const [
-      Budget(id: 'b_food', categoryId: 'food', limit: 2000000),
-      Budget(id: 'b_shop', categoryId: 'shop', limit: 1000000),
-      Budget(id: 'b_transport', categoryId: 'transport', limit: 500000),
+    _budgets.addAll([
+      Budget(id: 'b_food', categoryId: 'food', limit: 2000000, currencyCode: _currency.code),
+      Budget(id: 'b_shop', categoryId: 'shop', limit: 1000000, currencyCode: _currency.code),
+      Budget(id: 'b_transport', categoryId: 'transport', limit: 500000, currencyCode: _currency.code),
     ]);
 
     final now = DateTime.now();
@@ -940,6 +998,7 @@ class AppStore extends ChangeNotifier {
         icon: AppIcons.flight,
         color: const Color(0xFF4C9BE8),
         target: 10000000,
+        currencyCode: _currency.code,
         deadline: today.add(const Duration(days: 90)),
         entries: [
           GoalEntry(
@@ -967,6 +1026,7 @@ class AppStore extends ChangeNotifier {
         date: today.subtract(const Duration(days: 12)),
         dueDate: today.add(const Duration(days: 18)),
         note: l.seedDebtLendNote,
+        currencyCode: _currency.code,
         payments: [
           DebtPayment(
             id: 'dp_1',
@@ -984,6 +1044,7 @@ class AppStore extends ChangeNotifier {
         date: today.subtract(const Duration(days: 40)),
         dueDate: today.subtract(const Duration(days: 3)),
         note: l.seedDebtBorrowNote,
+        currencyCode: _currency.code,
       ),
     ]);
   }

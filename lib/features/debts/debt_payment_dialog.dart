@@ -30,6 +30,12 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
   bool get _isLend => widget.debt.type == DebtType.lend;
 
   @override
+  void initState() {
+    super.initState();
+    _amountCtrl.useCurrency(AppCurrency.byCode(widget.debt.currencyCode));
+  }
+
+  @override
   void dispose() {
     _amountCtrl.dispose();
     _noteCtrl.dispose();
@@ -95,7 +101,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
               },
               decoration: InputDecoration(
                 labelText: l.amount,
-                suffixText: currencySymbol,
+              suffixText: AppCurrency.byCode(debt.currencyCode).symbol,
                 errorText: _error,
               ),
             ),
@@ -120,6 +126,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
             WalletPicker(
               selectedId: _walletId,
               allowNone: true,
+              currencyCode: debt.currencyCode,
               onChanged: (id) => setState(() => _walletId = id),
             ),
             const SizedBox(height: 8),

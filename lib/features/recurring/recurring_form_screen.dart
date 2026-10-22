@@ -42,7 +42,10 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
   void initState() {
     super.initState();
     final r = widget.recurring;
-    _walletId = r?.walletId ?? _store.wallets.first.id;
+    _amountCtrl.useCurrency(_store.currency);
+    _walletId = r?.walletId ?? _store.wallets
+        .firstWhere((w) => w.currencyCode == _store.currency.code)
+        .id;
     if (r != null) {
       _amountCtrl.amount = r.amount;
       _noteCtrl.text = r.note;
@@ -204,6 +207,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
           const SizedBox(height: 8),
           WalletPicker(
             selectedId: _walletId,
+            currencyCode: _store.currency.code,
             onChanged: (id) => setState(() => _walletId = id),
           ),
           const SizedBox(height: 20),

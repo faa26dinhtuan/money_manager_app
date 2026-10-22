@@ -7,8 +7,16 @@ import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 
 class MoneyController extends TextEditingController {
-  MoneyController([double amount = 0]) {
-    this.amount = amount;
+  MoneyController({AppCurrency? currency}) : currency = currency ?? AppCurrency.current {
+    amount = 0;
+  }
+
+  AppCurrency currency;
+
+  void useCurrency(AppCurrency value) {
+    final current = amount;
+    currency = value;
+    amount = current;
   }
 
   double _amount = 0;
@@ -16,10 +24,10 @@ class MoneyController extends TextEditingController {
   double get amount => _amount;
 
   set amount(double value) {
-    final scale = AppCurrency.current.scale;
+    final scale = currency.scale;
     final minor = value <= 0 ? 0 : (value * scale).round();
     _amount = minor / scale;
-    text = minor == 0 ? '' : formatNumber(minor.toString());
+    text = minor == 0 ? '' : formatNumber(minor.toString(), currency);
   }
 }
 
@@ -45,6 +53,7 @@ class MoneyField extends StatelessWidget {
       context,
       initial: controller.amount,
       title: title ?? context.l10n.enterAmount,
+      currency: controller.currency,
     );
     if (result == null) return;
     controller.amount = result;
@@ -69,6 +78,7 @@ Future<double?> showMoneyKeypad(
   BuildContext context, {
   double initial = 0,
   String? title,
+  AppCurrency? currency,
 }) {
   return showModalBottomSheet<double>(
     context: context,
@@ -81,15 +91,17 @@ Future<double?> showMoneyKeypad(
     builder: (_) => _MoneyKeypad(
       initial: initial,
       title: title ?? context.l10n.enterAmount,
+      currency: currency ?? AppCurrency.current,
     ),
   );
 }
 
 class _MoneyKeypad extends StatefulWidget {
-  const _MoneyKeypad({required this.initial, required this.title});
+  const _MoneyKeypad({required this.initial, required this.title, required this.currency});
 
   final double initial;
   final String title;
+  final AppCurrency currency;
 
   @override
   State<_MoneyKeypad> createState() => _MoneyKeypadState();
@@ -98,7 +110,7 @@ class _MoneyKeypad extends StatefulWidget {
 class _MoneyKeypadState extends State<_MoneyKeypad> {
   static const int _maxDigits = 12;
 
-  final AppCurrency _currency = AppCurrency.current;
+  late final AppCurrency _currency = widget.currency;
 
   late String _digits = widget.initial > 0
       ? (widget.initial * _currency.scale).round().toString()
@@ -205,7 +217,10 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
-                withCurrencySymbol(formatNumber(_digits.isEmpty ? '0' : _digits)),
+                withCurrencySymbol(
+                  formatNumber(_digits.isEmpty ? '0' : _digits, _currency),
+                  currency: _currency,
+                ),
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
@@ -221,7 +236,7 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
               children: [
                 for (final a in _currency.quickAmounts)
                   ActionChip(
-                    label: Text(groupDigits(a.toString())),
+                    label: Text(groupDigits(a.toString(), _currency)),
                     onPressed: () =>
                         _append(a.toString() + '0' * _currency.decimals),
                   ),

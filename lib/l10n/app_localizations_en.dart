@@ -752,8 +752,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyDefault => 'Default currency';
 
   @override
+  String get walletCurrency => 'Wallet currency';
+
+  @override
+  String get useExistingWallets => 'Use existing wallets';
+
+  @override
+  String get currencyCodeLabel => 'Currency';
+
+  @override
   String get currencyDefaultNotice =>
-      'Only changes display, existing amounts will not be converted.';
+      'Each wallet and item keeps its own currency. Add a wallet for another currency, or back up before converting existing data.';
 
   @override
   String get currencyConverter => 'Currency converter';
@@ -831,14 +840,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get convertCurrencyPrompt =>
-      'Convert all existing amounts according to exchange rates, or change display only?';
+  String convertCurrencyPrompt(String currency) {
+    return 'Use or create wallets in $currency without conversion, or convert the current data?';
+  }
 
   @override
   String get displayOnly => 'Display only';
 
   @override
   String get convertAll => 'Convert all';
+
+  @override
+  String get backupSavedConfirmation => 'I saved the backup somewhere safe';
 
   @override
   String get ratesUpdated => 'Exchange rates updated';
@@ -1054,7 +1067,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyConvertWarning =>
-      'Amounts are rounded according to the new currency and cannot be precisely reversed. It is recommended to backup first.';
+      'Back up your data before converting. Amounts will be rounded to the new currency\'s minor unit.';
 
   @override
   String get manageWallets => 'Wallets';

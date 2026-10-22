@@ -752,8 +752,17 @@ class AppLocalizationsVi extends AppLocalizations {
   String get currencyDefault => 'Tiền tệ mặc định';
 
   @override
+  String get walletCurrency => 'Tiền tệ của ví';
+
+  @override
+  String get useExistingWallets => 'Dùng ví hiện có';
+
+  @override
+  String get currencyCodeLabel => 'Tiền tệ';
+
+  @override
   String get currencyDefaultNotice =>
-      'Chỉ đổi cách hiển thị, số tiền đã nhập không được quy đổi.';
+      'Mỗi ví và khoản mục giữ tiền tệ riêng. Thêm ví mới để dùng tiền tệ khác, hoặc sao lưu rồi quy đổi dữ liệu hiện tại.';
 
   @override
   String get currencyConverter => 'Đổi tiền tệ';
@@ -832,14 +841,18 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get convertCurrencyPrompt =>
-      'Quy đổi toàn bộ số tiền hiện có (giao dịch, ví, ngân sách, mục tiêu, sổ nợ, định kỳ) theo tỷ giá, hay chỉ đổi cách hiển thị?';
+  String convertCurrencyPrompt(String currency) {
+    return 'Dùng hoặc tạo ví bằng $currency mà không quy đổi, hay quy đổi dữ liệu hiện tại?';
+  }
 
   @override
   String get displayOnly => 'Chỉ đổi hiển thị';
 
   @override
   String get convertAll => 'Quy đổi tất cả';
+
+  @override
+  String get backupSavedConfirmation => 'Tôi đã lưu bản sao lưu ở nơi an toàn';
 
   @override
   String get ratesUpdated => 'Đã cập nhật tỷ giá';
@@ -1055,7 +1068,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get currencyConvertWarning =>
-      'Số tiền được làm tròn theo loại tiền mới nên không thể khôi phục chính xác. Nên sao lưu trước khi quy đổi.';
+      'Nên sao lưu dữ liệu trước khi quy đổi. Số tiền sẽ được làm tròn theo đơn vị tiền mới.';
 
   @override
   String get manageWallets => 'Ví tiền';

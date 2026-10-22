@@ -29,13 +29,13 @@ class _ExportScreenState extends State<ExportScreen> {
       case ExportSection.wallets:
         return _store.wallets.length;
       case ExportSection.budgets:
-        return _store.budgets.length;
+        return _store.allBudgets.length;
       case ExportSection.goals:
-        return _store.goals.length;
+        return _store.allGoals.length;
       case ExportSection.debts:
-        return _store.debts.length;
+        return _store.allDebts.length;
       case ExportSection.recurrings:
-        return _store.recurrings.length;
+        return _store.allRecurrings.length;
     }
   }
 

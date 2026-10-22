@@ -41,6 +41,9 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   void initState() {
     super.initState();
     final d = widget.debt;
+    _amountCtrl.useCurrency(
+      AppCurrency.byCode(d?.currencyCode ?? _store.currency.code),
+    );
     if (d != null) {
       _personCtrl.text = d.person;
       _amountCtrl.amount = d.amount;
@@ -110,6 +113,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           clearDueDate: _dueDate == null,
           note: note,
           walletId: _walletId,
+          currencyCode: current.currencyCode,
           clearWallet: _walletId == null,
         ),
       );
@@ -124,6 +128,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           dueDate: _dueDate,
           note: note,
           walletId: _walletId,
+          currencyCode: _store.currency.code,
         ),
       );
     }
@@ -237,7 +242,9 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
             decoration: InputDecoration(
               labelText: l.amount,
               hintText: '0',
-              suffixText: currencySymbol,
+              suffixText: AppCurrency.byCode(
+                widget.debt?.currencyCode ?? _store.currency.code,
+              ).symbol,
             ),
           ),
           const SizedBox(height: 20),
@@ -249,6 +256,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
           WalletPicker(
             selectedId: _walletId,
             allowNone: true,
+            currencyCode: widget.debt?.currencyCode ?? _store.currency.code,
             onChanged: (id) => setState(() => _walletId = id),
           ),
           const SizedBox(height: 20),

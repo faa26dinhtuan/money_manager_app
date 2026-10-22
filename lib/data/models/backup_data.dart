@@ -67,6 +67,12 @@ class BackupData {
       if ((map['version'] as int) > _version) {
         throw const FormatException('newer version');
       }
+      final currencyCode = map['currency'] as String?;
+      Map<String, dynamic> withCurrency(Map<String, dynamic> item) => {
+        ...item,
+        if (!item.containsKey('currencyCode'))
+          'currencyCode': currencyCode ?? 'VND',
+      };
 
       List<T> read<T>(String key, T Function(Map<String, dynamic>) from) {
         return ((map[key] as List?) ?? const [])
@@ -74,7 +80,7 @@ class BackupData {
             .toList();
       }
 
-      final wallets = read('wallets', Wallet.fromJson);
+      final wallets = read('wallets', (item) => Wallet.fromJson(withCurrency(item)));
       if (wallets.isEmpty) throw const FormatException('no wallets');
       final exported = map['exportedAt'] as String?;
 
@@ -82,12 +88,12 @@ class BackupData {
         categories: read('categories', Category.fromJson),
         transactions: read('transactions', Transaction.fromJson),
         wallets: wallets,
-        budgets: read('budgets', Budget.fromJson),
-        goals: read('goals', Goal.fromJson),
-        debts: read('debts', Debt.fromJson),
+        budgets: read('budgets', (item) => Budget.fromJson(withCurrency(item))),
+        goals: read('goals', (item) => Goal.fromJson(withCurrency(item))),
+        debts: read('debts', (item) => Debt.fromJson(withCurrency(item))),
         recurrings: read('recurrings', RecurringTransaction.fromJson),
         exportedAt: exported == null ? null : DateTime.tryParse(exported),
-        currency: map['currency'] as String?,
+        currency: currencyCode,
       );
     } on FormatException {
       rethrow;

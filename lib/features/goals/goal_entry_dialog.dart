@@ -24,9 +24,19 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
   final _store = AppStore.instance;
   final _amountCtrl = MoneyController();
   final _noteCtrl = TextEditingController();
-  late String _walletId = _store.wallets.first.id;
+  late String _walletId = '';
   DateTime _date = DateTime.now();
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountCtrl.useCurrency(AppCurrency.byCode(widget.goal.currencyCode));
+    final wallets = _store.wallets
+        .where((w) => w.currencyCode == widget.goal.currencyCode)
+        .toList();
+    _walletId = wallets.isEmpty ? '' : wallets.first.id;
+  }
 
   @override
   void dispose() {
@@ -78,7 +88,7 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
   Widget build(BuildContext context) {
     final l = context.l10n;
     final remaining = widget.goal.remaining;
-    final walletBalance = _store.walletBalance(_walletId);
+    final walletBalance = _walletId.isEmpty ? 0.0 : _store.walletBalance(_walletId);
     return AlertDialog(
       title: Text(widget.deposit ? l.deposit : l.withdraw),
       content: SingleChildScrollView(
@@ -118,7 +128,9 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final w in _store.wallets)
+                for (final w in _store.wallets.where(
+                  (w) => w.currencyCode == widget.goal.currencyCode,
+                ))
                   ChoiceChip(
                     avatar: AppIcon(
                       w.icon,
@@ -138,7 +150,10 @@ class _GoalEntryDialogState extends State<GoalEntryDialog> {
             ),
             const SizedBox(height: 6),
             Text(
-              l.walletBalanceLabel(formatMoney(walletBalance)),
+              l.walletBalanceLabel(formatMoney(
+                walletBalance,
+                AppCurrency.byCode(widget.goal.currencyCode),
+              )),
               style: TextStyle(
                 fontSize: 12,
                 color: walletBalance < 0 ? Colors.red.shade400 : context.textTertiary,

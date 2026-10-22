@@ -11,11 +11,13 @@ class WalletPicker extends StatelessWidget {
     required this.selectedId,
     required this.onChanged,
     this.allowNone = false,
+    this.currencyCode,
   });
 
   final String? selectedId;
   final ValueChanged<String?> onChanged;
   final bool allowNone;
+  final String? currencyCode;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +36,16 @@ class WalletPicker extends StatelessWidget {
             ),
             onSelected: (_) => onChanged(null),
           ),
-        for (final w in AppStore.instance.wallets)
+        for (final w in AppStore.instance.wallets.where(
+          (w) => currencyCode == null || w.currencyCode == currencyCode,
+        ))
           ChoiceChip(
             avatar: AppIcon(
               w.icon,
               size: 18,
               color: selectedId == w.id ? Colors.white : w.color,
             ),
-            label: Text(w.localizedName(context)),
+            label: Text('${w.localizedName(context)} · ${w.currencyCode}'),
             selected: selectedId == w.id,
             selectedColor: w.color,
             showCheckmark: false,

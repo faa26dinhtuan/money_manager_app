@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -38,8 +39,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _nameCtrl = TextEditingController();
   final _balanceCtrl = MoneyController();
 
+  late AppCurrency _currency = _store.currency;
   AppIconData _icon = _icons.first;
   Color _color = _colors.first;
+
+  @override
+  void initState() {
+    super.initState();
+    _balanceCtrl.useCurrency(_currency);
+  }
 
   @override
   void dispose() {
@@ -68,11 +76,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _submit() {
+    final l = context.l10n;
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showApp(context.l10n.pleaseEnterWalletName);
+      ScaffoldMessenger.of(context).showApp(l.pleaseEnterWalletName);
       return;
     }
+    _store.setCurrency(_currency);
     _finish(
       Wallet(
         id: _store.newId(),
@@ -80,6 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         icon: _icon,
         color: _color,
         initialBalance: _balanceCtrl.amount,
+        currencyCode: _currency.code,
       ),
     );
   }
@@ -182,8 +193,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       decoration: InputDecoration(
                         labelText: l.initialBalance,
                         hintText: '0',
-                        suffixText: currencySymbol,
+                        suffixText: _currency.symbol,
                       ),
+                    ),
+                    const SizedBox(height: 24),
+                    DropdownButtonFormField<AppCurrency>(
+                      initialValue: _currency,
+                      decoration: InputDecoration(labelText: l.walletCurrency),
+                      items: [
+                        for (final currency in AppCurrency.all)
+                          DropdownMenuItem(
+                            value: currency,
+                            child: Text(
+                              '${currency.localizedName(context)} (${currency.code})',
+                            ),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() {
+                          _currency = value;
+                          _balanceCtrl.useCurrency(value);
+                        });
+                      },
                     ),
                     const SizedBox(height: 24),
                     Text(

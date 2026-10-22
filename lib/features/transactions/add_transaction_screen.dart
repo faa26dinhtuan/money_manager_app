@@ -46,8 +46,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void initState() {
     super.initState();
     final t = widget.transaction;
-    _walletId =
-        t?.walletId ?? _store.selectedWalletId ?? _store.wallets.first.id;
+    _amountCtrl.useCurrency(_store.currency);
+    final sameCurrencyWallets = _store.wallets
+        .where((w) => w.currencyCode == _store.currency.code)
+        .toList();
+    _walletId = t?.walletId ??
+        (_store.selectedWalletId == null ||
+                _store.walletById(_store.selectedWalletId!)?.currencyCode !=
+                    _store.currency.code
+            ? sameCurrencyWallets.first.id
+            : _store.selectedWalletId!);
     if (t != null) {
       _amountCtrl.amount = t.amount;
       _noteCtrl.text = t.note;
@@ -213,7 +221,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final w in _store.wallets)
+              for (final w in _store.wallets.where(
+                (w) => w.currencyCode == _store.currency.code,
+              ))
                 ChoiceChip(
                   avatar: AppIcon(
                     w.icon,

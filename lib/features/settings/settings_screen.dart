@@ -12,6 +12,7 @@ import 'package:money_manager_app/features/settings/backup_screen.dart';
 import 'package:money_manager_app/features/settings/currency_converter_screen.dart';
 import 'package:money_manager_app/features/settings/currency_switch_dialog.dart';
 import 'package:money_manager_app/features/settings/export_screen.dart';
+import 'package:money_manager_app/features/wallet/wallet_form_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -120,6 +121,9 @@ class SettingsScreen extends StatelessWidget {
                   context,
                   from,
                   currency,
+                  hasExistingWallets: store.wallets.any(
+                    (wallet) => wallet.currencyCode == currency.code,
+                  ),
                 );
                 if (choice == null) return;
                 if (choice == CurrencySwitchChoice.convert) {
@@ -128,8 +132,15 @@ class SettingsScreen extends StatelessWidget {
                     currency,
                     ExchangeRates.instance.rate(from, currency),
                   );
-                } else {
+                } else if (choice == CurrencySwitchChoice.existingWallets) {
                   store.setCurrency(currency);
+                  store.selectWallet(null);
+                } else if (choice == CurrencySwitchChoice.newWallet && context.mounted) {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => WalletFormScreen(initialCurrency: currency),
+                    ),
+                  );
                 }
               },
             ),

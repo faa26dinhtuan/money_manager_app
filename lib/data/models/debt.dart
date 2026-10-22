@@ -1,3 +1,5 @@
+import 'package:money_manager_app/core/utils/currency.dart';
+
 enum DebtType { lend, borrow }
 
 class DebtPayment {
@@ -51,6 +53,7 @@ class Debt {
     this.note = '',
     this.walletId,
     this.payments = const [],
+    this.currencyCode = 'VND',
   });
 
   final String id;
@@ -62,6 +65,7 @@ class Debt {
   final String note;
   final String? walletId;
   final List<DebtPayment> payments;
+  final String currencyCode;
 
   double get paid => payments.fold<double>(0, (sum, p) => sum + p.amount);
 
@@ -94,6 +98,7 @@ class Debt {
     String? walletId,
     bool clearWallet = false,
     List<DebtPayment>? payments,
+    String? currencyCode,
   }) {
     return Debt(
       id: id,
@@ -105,6 +110,7 @@ class Debt {
       note: note ?? this.note,
       walletId: clearWallet ? null : (walletId ?? this.walletId),
       payments: payments ?? this.payments,
+      currencyCode: currencyCode ?? this.currencyCode,
     );
   }
 
@@ -115,6 +121,7 @@ class Debt {
       type: DebtType.values.byName(json['type'] as String),
       person: json['person'] as String,
       amount: (json['amount'] as num).toDouble(),
+      currencyCode: json['currencyCode'] as String? ?? AppCurrency.current.code,
       date: DateTime.parse(json['date'] as String),
       dueDate: rawDue == null ? null : DateTime.parse(rawDue),
       note: json['note'] as String? ?? '',
@@ -131,6 +138,7 @@ class Debt {
       'type': type.name,
       'person': person,
       'amount': amount,
+      'currencyCode': currencyCode,
       'date': date.toIso8601String(),
       'dueDate': dueDate?.toIso8601String(),
       'note': note,

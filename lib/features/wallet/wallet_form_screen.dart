@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
+import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
@@ -11,9 +12,10 @@ import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class WalletFormScreen extends StatefulWidget {
-  const WalletFormScreen({super.key, this.wallet});
+  const WalletFormScreen({super.key, this.wallet, this.initialCurrency});
 
   final Wallet? wallet;
+  final AppCurrency? initialCurrency;
 
   @override
   State<WalletFormScreen> createState() => _WalletFormScreenState();
@@ -39,6 +41,9 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
 
   late AppIconData _icon = widget.wallet?.icon ?? _icons.first;
   late Color _color = widget.wallet?.color ?? _colors.first;
+  late AppCurrency _currency = AppCurrency.byCode(
+    widget.wallet?.currencyCode ?? widget.initialCurrency?.code ?? _store.currency.code,
+  );
 
   late final List<AppIconData> _iconChoices = [
     if (!_icons.contains(_icon)) _icon,
@@ -55,6 +60,7 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
   void initState() {
     super.initState();
     final wallet = widget.wallet;
+    _balanceCtrl.useCurrency(_currency);
     if (wallet != null) {
       _nameCtrl.text = wallet.name;
       _balanceCtrl.amount = wallet.initialBalance;
@@ -85,11 +91,14 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
       icon: _icon,
       color: _color,
       initialBalance: _balanceCtrl.amount,
+      currencyCode: _currency.code,
     );
     if (_isEditing) {
       _store.updateWallet(wallet);
     } else {
       _store.addWallet(wallet);
+      _store.setCurrency(_currency);
+      _store.selectWallet(wallet.id);
     }
     Navigator.of(context).pop();
   }
@@ -97,7 +106,10 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
   Future<void> _confirmDelete() async {
     final l = context.l10n;
     final wallet = widget.wallet!;
-    if (_store.wallets.length <= 1) {
+    if (_store.wallets
+            .where((w) => w.currencyCode == wallet.currencyCode)
+            .length <=
+        1) {
       _toast(l.keepAtLeastOneWallet);
       return;
     }
@@ -163,9 +175,34 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
             decoration: InputDecoration(
               labelText: l.initialBalance,
               hintText: '0',
-              suffixText: currencySymbol,
+              suffixText: _currency.symbol,
             ),
           ),
+          const SizedBox(height: 16),
+          if (_isEditing)
+            InputDecorator(
+              decoration: InputDecoration(labelText: l.walletCurrency),
+              child: Text(_currency.label),
+            )
+          else
+            DropdownButtonFormField<AppCurrency>(
+              initialValue: _currency,
+              decoration: InputDecoration(labelText: l.walletCurrency),
+              items: [
+                for (final currency in AppCurrency.all)
+                  DropdownMenuItem(
+                    value: currency,
+                    child: Text('${currency.localizedName(context)} (${currency.code})'),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _currency = value;
+                  _balanceCtrl.useCurrency(value);
+                });
+              },
+            ),
           const SizedBox(height: 24),
           Text(l.icon, style: TextStyle(color: context.textSecondary)),
           const SizedBox(height: 12),

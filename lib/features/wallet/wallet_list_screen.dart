@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -83,7 +84,7 @@ class _WalletTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      wallet.localizedName(context),
+                      '${wallet.localizedName(context)} · ${wallet.currencyCode}',
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 2),
@@ -99,7 +100,7 @@ class _WalletTile extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                formatMoney(balance),
+                formatMoney(balance, AppCurrency.byCode(wallet.currencyCode)),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,

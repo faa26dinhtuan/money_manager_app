@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -117,17 +118,21 @@ class _WalletSheet extends StatelessWidget {
               _WalletOption(
                 icon: AppIcons.wallet,
                 color: AppTheme.primary,
-                name: l.allWallets,
+                name: '${l.allWallets} · ${store.currency.code}',
                 balance: store.balance,
+                currencyCode: store.currency.code,
                 selected: selectedId == null,
                 onTap: () => choose(null),
               ),
-              for (final w in store.wallets)
+              for (final w in store.wallets.where(
+                (w) => w.currencyCode == store.currency.code,
+              ))
                 _WalletOption(
                   icon: w.icon,
                   color: w.color,
                   name: w.localizedName(context),
                   balance: store.walletBalance(w.id),
+                  currencyCode: w.currencyCode,
                   selected: selectedId == w.id,
                   onTap: () => choose(w.id),
                 ),
@@ -145,6 +150,7 @@ class _WalletOption extends StatelessWidget {
     required this.color,
     required this.name,
     required this.balance,
+    required this.currencyCode,
     required this.selected,
     required this.onTap,
   });
@@ -153,6 +159,7 @@ class _WalletOption extends StatelessWidget {
   final Color color;
   final String name;
   final double balance;
+  final String currencyCode;
   final bool selected;
   final VoidCallback onTap;
 
@@ -163,7 +170,7 @@ class _WalletOption extends StatelessWidget {
       leading: CategoryIcon(icon: icon, color: color, size: 40),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(
-        formatMoney(balance),
+        formatMoney(balance, AppCurrency.byCode(currencyCode)),
         style: TextStyle(color: context.textSecondary),
       ),
       trailing: selected

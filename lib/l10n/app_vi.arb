@@ -405,7 +405,10 @@
   "paused": "Tạm dừng",
   "finished": "Đã kết thúc",
   "currencyDefault": "Tiền tệ mặc định",
-  "currencyDefaultNotice": "Chỉ đổi cách hiển thị, số tiền đã nhập không được quy đổi.",
+  "walletCurrency": "Tiền tệ của ví",
+  "useExistingWallets": "Dùng ví hiện có",
+  "currencyCodeLabel": "Tiền tệ",
+  "currencyDefaultNotice": "Mỗi ví và khoản mục giữ tiền tệ riêng. Thêm ví mới để dùng tiền tệ khác, hoặc sao lưu rồi quy đổi dữ liệu hiện tại.",
   "currencyConverter": "Đổi tiền tệ",
   "currencyConverterSubtitle": "Quy đổi theo tỷ giá",
   "theme": "Giao diện",
@@ -439,9 +442,11 @@
       "code": {"type": "String"}
     }
   },
-  "convertCurrencyPrompt": "Quy đổi toàn bộ số tiền hiện có (giao dịch, ví, ngân sách, mục tiêu, sổ nợ, định kỳ) theo tỷ giá, hay chỉ đổi cách hiển thị?",
+  "convertCurrencyPrompt": "Dùng hoặc tạo ví bằng {currency} mà không quy đổi, hay quy đổi dữ liệu hiện tại?",
+  "@convertCurrencyPrompt": {"placeholders": {"currency": {"type": "String"}}},
   "displayOnly": "Chỉ đổi hiển thị",
   "convertAll": "Quy đổi tất cả",
+  "backupSavedConfirmation": "Tôi đã lưu bản sao lưu ở nơi an toàn",
   "ratesUpdated": "Đã cập nhật tỷ giá",
   "ratesOffline": "Không có kết nối, đang dùng tỷ giá đã lưu",
   "welcome": "Chào mừng bạn!",
@@ -535,7 +540,7 @@
     }
   },
   "currencyDisclaimer": "Tỷ giá cung cấp bởi ExchangeRate-API (exchangerate-api.com), cập nhật mỗi ngày, chỉ mang tính tham khảo.",
-  "currencyConvertWarning": "Số tiền được làm tròn theo loại tiền mới nên không thể khôi phục chính xác. Nên sao lưu trước khi quy đổi.",
+  "currencyConvertWarning": "Nên sao lưu dữ liệu trước khi quy đổi. Số tiền sẽ được làm tròn theo đơn vị tiền mới.",
   "manageWallets": "Ví tiền",
   "manageWalletsDesc": "Tạo và quản lý các ví của bạn",
   "budgetDesc": "Đặt hạn mức chi tiêu mỗi tháng",

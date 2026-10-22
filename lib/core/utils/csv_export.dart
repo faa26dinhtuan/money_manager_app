@@ -47,7 +47,7 @@ String exportToCsv(
     ExportSection.transactions: [
       _section(
         l.exportSectionTransactions.toUpperCase(),
-        [l.date, l.type, l.category, l.wallet, l.amount, l.note],
+        [l.date, l.type, l.category, l.wallet, l.amount, l.currencyCodeLabel, l.note],
         [
           for (final t in transactions)
             [
@@ -56,6 +56,7 @@ String exportToCsv(
               categoryName(t.categoryId),
               walletName(t.walletId),
               _amount(t.amount),
+              store.walletById(t.walletId)?.currencyCode ?? '',
               t.note,
             ],
         ],
@@ -64,11 +65,12 @@ String exportToCsv(
     ExportSection.wallets: [
       _section(
         l.exportSectionWallets.toUpperCase(),
-        [l.walletName, l.initialBalance, l.currentBalance],
+        [l.walletName, l.currencyCodeLabel, l.initialBalance, l.currentBalance],
         [
           for (final w in store.wallets)
             [
               w.nameOf(l),
+              w.currencyCode,
               _amount(w.initialBalance),
               _amount(store.walletBalance(w.id)),
             ],
@@ -78,13 +80,18 @@ String exportToCsv(
     ExportSection.budgets: [
       _section(
         l.csvBudgetTitle(now.month, now.year),
-        [l.category, l.limitLabel, l.spent, l.remaining],
+        [l.category, l.currencyCodeLabel, l.limitLabel, l.spent, l.remaining],
         [
-          for (final b in store.budgets)
+          for (final b in store.allBudgets)
             () {
-              final spent = store.spentOfCategory(b.categoryId, month);
+              final spent = store.spentOfCategory(
+                b.categoryId,
+                month,
+                currencyCode: b.currencyCode,
+              );
               return [
                 categoryName(b.categoryId),
+                b.currencyCode,
                 _amount(b.limit),
                 _amount(spent),
                 _amount(b.limit - spent),
@@ -98,6 +105,7 @@ String exportToCsv(
         l.exportSectionGoals.toUpperCase(),
         [
           l.goalName,
+          l.currencyCodeLabel,
           l.targetAmount,
           l.savedLabel,
           l.remaining,
@@ -106,9 +114,10 @@ String exportToCsv(
           l.status,
         ],
         [
-          for (final g in store.goals)
+          for (final g in store.allGoals)
             [
               g.name,
+              g.currencyCode,
               _amount(g.target),
               _amount(g.saved),
               _amount(g.remaining),
@@ -120,9 +129,9 @@ String exportToCsv(
       ),
       _section(
         l.csvGoalHistory.toUpperCase(),
-        [l.goalName, l.date, l.type, l.amount, l.wallet, l.note],
+        [l.goalName, l.date, l.type, l.amount, l.currencyCodeLabel, l.wallet, l.note],
         [
-          for (final g in store.goals)
+          for (final g in store.allGoals)
             for (final e
                 in [...g.entries]..sort((a, b) => b.date.compareTo(a.date)))
               [
@@ -130,6 +139,7 @@ String exportToCsv(
                 _date(e.date),
                 e.isDeposit ? l.deposit : l.withdraw,
                 _amount(e.amount.abs()),
+                g.currencyCode,
                 walletName(e.walletId),
                 e.note,
               ],
@@ -142,6 +152,7 @@ String exportToCsv(
         [
           l.type,
           l.person,
+          l.currencyCodeLabel,
           l.amount,
           l.paid,
           l.remaining,
@@ -152,10 +163,11 @@ String exportToCsv(
           l.note,
         ],
         [
-          for (final d in store.debts)
+          for (final d in store.allDebts)
             [
               d.type.labelOf(l),
               d.person,
+              d.currencyCode,
               _amount(d.amount),
               _amount(d.paid),
               _amount(d.remaining),
@@ -169,9 +181,9 @@ String exportToCsv(
       ),
       _section(
         l.csvDebtPayments.toUpperCase(),
-        [l.person, l.type, l.date, l.amount, l.wallet, l.note],
+        [l.person, l.type, l.date, l.amount, l.currencyCodeLabel, l.wallet, l.note],
         [
-          for (final d in store.debts)
+          for (final d in store.allDebts)
             for (final p
                 in [...d.payments]..sort((a, b) => b.date.compareTo(a.date)))
               [
@@ -179,6 +191,7 @@ String exportToCsv(
                 d.type.paymentLabelOf(l),
                 _date(p.date),
                 _amount(p.amount),
+                d.currencyCode,
                 walletName(p.walletId),
                 p.note,
               ],
@@ -193,6 +206,7 @@ String exportToCsv(
           l.category,
           l.wallet,
           l.amount,
+          l.currencyCodeLabel,
           l.frequency,
           l.startDate,
           l.nextDate,
@@ -201,12 +215,13 @@ String exportToCsv(
           l.note,
         ],
         [
-          for (final r in store.recurrings)
+          for (final r in store.allRecurrings)
             [
               r.type.labelOf(l),
               categoryName(r.categoryId),
               walletName(r.walletId),
               _amount(r.amount),
+              store.walletById(r.walletId)?.currencyCode ?? '',
               r.frequency.labelOf(l),
               _date(r.startDate),
               _date(r.nextDate),

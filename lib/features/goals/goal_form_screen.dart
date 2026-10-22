@@ -60,6 +60,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   void initState() {
     super.initState();
     final g = widget.goal;
+    final currency = AppCurrency.byCode(g?.currencyCode ?? _store.currency.code);
+    _targetCtrl.useCurrency(currency);
+    _initialCtrl.useCurrency(currency);
     if (g != null) {
       _nameCtrl.text = g.name;
       _targetCtrl.amount = g.target;
@@ -104,6 +107,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
           icon: _icon,
           color: _color,
           target: target,
+          currencyCode: current.currencyCode,
           deadline: _deadline,
           clearDeadline: _deadline == null,
         ),
@@ -118,6 +122,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
           icon: _icon,
           color: _color,
           target: target,
+          currencyCode: _store.currency.code,
           deadline: _deadline,
           entries: initial > 0
               ? [
@@ -191,7 +196,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
             decoration: InputDecoration(
               labelText: l.targetAmount,
               hintText: '0',
-              suffixText: currencySymbol,
+              suffixText: AppCurrency.byCode(
+                widget.goal?.currencyCode ?? _store.currency.code,
+              ).symbol,
             ),
           ),
           if (!_isEditing) ...[
@@ -202,7 +209,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
               decoration: InputDecoration(
                 labelText: l.initialAmountOptional,
                 hintText: '0',
-                suffixText: currencySymbol,
+              suffixText: AppCurrency.byCode(
+                widget.goal?.currencyCode ?? _store.currency.code,
+              ).symbol,
               ),
             ),
           ],

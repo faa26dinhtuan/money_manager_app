@@ -74,6 +74,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
       id: widget.budget?.id ?? _store.newId(),
       categoryId: _categoryId!,
       limit: limit,
+      currencyCode: widget.budget?.currencyCode ?? _store.currency.code,
     );
     if (_isEditing) {
       _store.updateBudget(budget);

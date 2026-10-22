@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/utils/category_icons.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 
 class GoalEntry {
   const GoalEntry({
@@ -53,6 +54,7 @@ class Goal {
     required this.target,
     this.deadline,
     this.entries = const [],
+    this.currencyCode = 'VND',
   });
 
   final String id;
@@ -62,6 +64,7 @@ class Goal {
   final double target;
   final DateTime? deadline;
   final List<GoalEntry> entries;
+  final String currencyCode;
 
   double get saved => entries.fold<double>(0, (sum, e) => sum + e.amount);
 
@@ -93,6 +96,7 @@ class Goal {
     DateTime? deadline,
     bool clearDeadline = false,
     List<GoalEntry>? entries,
+    String? currencyCode,
   }) {
     return Goal(
       id: id,
@@ -102,6 +106,7 @@ class Goal {
       target: target ?? this.target,
       deadline: clearDeadline ? null : (deadline ?? this.deadline),
       entries: entries ?? this.entries,
+      currencyCode: currencyCode ?? this.currencyCode,
     );
   }
 
@@ -113,6 +118,7 @@ class Goal {
       icon: iconFromKey(json['icon'] as String),
       color: Color(json['color'] as int),
       target: (json['target'] as num).toDouble(),
+      currencyCode: json['currencyCode'] as String? ?? AppCurrency.current.code,
       deadline: rawDeadline == null ? null : DateTime.parse(rawDeadline),
       entries: (json['entries'] as List? ?? [])
           .map((e) => GoalEntry.fromJson(e as Map<String, dynamic>))
@@ -127,6 +133,7 @@ class Goal {
       'icon': iconToKey(icon),
       'color': color.toARGB32(),
       'target': target,
+      'currencyCode': currencyCode,
       'deadline': deadline?.toIso8601String(),
       'entries': entries.map((e) => e.toJson()).toList(),
     };

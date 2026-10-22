@@ -1430,10 +1430,28 @@ abstract class AppLocalizations {
   /// **'Tiền tệ mặc định'**
   String get currencyDefault;
 
+  /// No description provided for @walletCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền tệ của ví'**
+  String get walletCurrency;
+
+  /// No description provided for @useExistingWallets.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dùng ví hiện có'**
+  String get useExistingWallets;
+
+  /// No description provided for @currencyCodeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền tệ'**
+  String get currencyCodeLabel;
+
   /// No description provided for @currencyDefaultNotice.
   ///
   /// In vi, this message translates to:
-  /// **'Chỉ đổi cách hiển thị, số tiền đã nhập không được quy đổi.'**
+  /// **'Mỗi ví và khoản mục giữ tiền tệ riêng. Thêm ví mới để dùng tiền tệ khác, hoặc sao lưu rồi quy đổi dữ liệu hiện tại.'**
   String get currencyDefaultNotice;
 
   /// No description provided for @currencyConverter.
@@ -1577,8 +1595,8 @@ abstract class AppLocalizations {
   /// No description provided for @convertCurrencyPrompt.
   ///
   /// In vi, this message translates to:
-  /// **'Quy đổi toàn bộ số tiền hiện có (giao dịch, ví, ngân sách, mục tiêu, sổ nợ, định kỳ) theo tỷ giá, hay chỉ đổi cách hiển thị?'**
-  String get convertCurrencyPrompt;
+  /// **'Dùng hoặc tạo ví bằng {currency} mà không quy đổi, hay quy đổi dữ liệu hiện tại?'**
+  String convertCurrencyPrompt(String currency);
 
   /// No description provided for @displayOnly.
   ///
@@ -1591,6 +1609,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Quy đổi tất cả'**
   String get convertAll;
+
+  /// No description provided for @backupSavedConfirmation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tôi đã lưu bản sao lưu ở nơi an toàn'**
+  String get backupSavedConfirmation;
 
   /// No description provided for @ratesUpdated.
   ///
@@ -1973,7 +1997,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencyConvertWarning.
   ///
   /// In vi, this message translates to:
-  /// **'Số tiền được làm tròn theo loại tiền mới nên không thể khôi phục chính xác. Nên sao lưu trước khi quy đổi.'**
+  /// **'Nên sao lưu dữ liệu trước khi quy đổi. Số tiền sẽ được làm tròn theo đơn vị tiền mới.'**
   String get currencyConvertWarning;
 
   /// No description provided for @manageWallets.
