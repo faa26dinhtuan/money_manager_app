@@ -229,18 +229,21 @@ class _MoneyKeypadState extends State<_MoneyKeypad> {
               ),
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              alignment: WrapAlignment.center,
-              children: [
-                for (final a in _currency.quickAmounts)
-                  ActionChip(
-                    label: Text(groupDigits(a.toString(), _currency)),
-                    onPressed: () =>
-                        _append(a.toString() + '0' * _currency.decimals),
-                  ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final a in _currency.quickAmounts)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ActionChip(
+                        label: Text(groupDigits(a.toString(), _currency)),
+                        onPressed: () =>
+                            _append(a.toString() + '0' * _currency.decimals),
+                      ),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             Row(children: [_key('1'), _key('2'), _key('3')]),
