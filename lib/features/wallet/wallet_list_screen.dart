@@ -4,9 +4,9 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -148,8 +148,9 @@ class _WalletTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                formatMoney(balance, AppCurrency.byCode(wallet.currencyCode)),
+              SensitiveBalance(
+                amount: balance,
+                currency: AppCurrency.byCode(wallet.currencyCode),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,

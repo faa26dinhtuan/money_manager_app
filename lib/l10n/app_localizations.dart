@@ -2749,6 +2749,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Vẫn ghi giao dịch'**
   String get recordAnyway;
+
+  /// No description provided for @hideBalanceByDefault.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn số dư mặc định'**
+  String get hideBalanceByDefault;
+
+  /// No description provided for @hideBalanceDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào số dư để hiện tạm thời.'**
+  String get hideBalanceDescription;
+
+  /// No description provided for @showBalance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện số dư'**
+  String get showBalance;
+
+  /// No description provided for @hideBalance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn số dư'**
+  String get hideBalance;
 }
 
 class _AppLocalizationsDelegate

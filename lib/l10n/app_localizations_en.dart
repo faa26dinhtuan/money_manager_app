@@ -1464,4 +1464,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordAnyway => 'Record anyway';
+
+  @override
+  String get hideBalanceByDefault => 'Hide balances by default';
+
+  @override
+  String get hideBalanceDescription =>
+      'Tap a balance to reveal it temporarily.';
+
+  @override
+  String get showBalance => 'Show balance';
+
+  @override
+  String get hideBalance => 'Hide balance';
 }

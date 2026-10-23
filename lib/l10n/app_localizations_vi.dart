@@ -1463,4 +1463,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get recordAnyway => 'Vẫn ghi giao dịch';
+
+  @override
+  String get hideBalanceByDefault => 'Ẩn số dư mặc định';
+
+  @override
+  String get hideBalanceDescription => 'Chạm vào số dư để hiện tạm thời.';
+
+  @override
+  String get showBalance => 'Hiện số dư';
+
+  @override
+  String get hideBalance => 'Ẩn số dư';
 }

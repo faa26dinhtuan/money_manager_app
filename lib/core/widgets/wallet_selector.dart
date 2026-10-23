@@ -4,9 +4,9 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class WalletSelector extends StatelessWidget {
@@ -169,8 +169,9 @@ class _WalletOption extends StatelessWidget {
       onTap: onTap,
       leading: CategoryIcon(icon: icon, color: color, size: 40),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(
-        formatMoney(balance, AppCurrency.byCode(currencyCode)),
+      subtitle: SensitiveBalance(
+        amount: balance,
+        currency: AppCurrency.byCode(currencyCode),
         style: TextStyle(color: context.textSecondary),
       ),
       trailing: selected

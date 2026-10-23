@@ -4,11 +4,11 @@ import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/app_card.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/gradient_header.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
+import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/budget/budget_screen.dart';
 import 'package:money_manager_app/features/debts/debts_screen.dart';
@@ -66,8 +66,8 @@ class WalletScreen extends StatelessWidget {
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             alignment: Alignment.centerLeft,
-                            child: Text(
-                              formatMoney(store.balance),
+                            child: SensitiveBalance(
+                              amount: store.balance,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 34,
@@ -131,7 +131,9 @@ class WalletScreen extends StatelessWidget {
                         title: l.goals,
                         subtitle: l.goalsDesc,
                         onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const GoalsScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const GoalsScreen(),
+                          ),
                         ),
                       ),
                       _SectionTile(
@@ -140,7 +142,9 @@ class WalletScreen extends StatelessWidget {
                         title: l.debts,
                         subtitle: l.debtsDesc,
                         onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const DebtsScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const DebtsScreen(),
+                          ),
                         ),
                       ),
                       _SectionTile(

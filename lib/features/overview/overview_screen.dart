@@ -15,6 +15,7 @@ import 'package:money_manager_app/core/widgets/gradient_header.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
+import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/core/widgets/wallet_picker.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
@@ -583,8 +584,8 @@ class _Header extends StatelessWidget {
               style: const TextStyle(color: Colors.white70, letterSpacing: 1.5),
             ),
             const SizedBox(height: 4),
-            Text(
-              formatMoney(balance),
+            SensitiveBalance(
+              amount: balance,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 30,

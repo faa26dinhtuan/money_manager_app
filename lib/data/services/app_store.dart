@@ -34,6 +34,7 @@ class AppStore extends ChangeNotifier {
   static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
   static const _localeKey = 'locale';
+  static const _hideBalancesKey = 'hideBalancesByDefault';
 
 
   late final SharedPreferences _prefs;
@@ -51,10 +52,14 @@ class AppStore extends ChangeNotifier {
   AppCurrency _currency = AppCurrency.vnd;
   Locale? _locale;
   String? _selectedWalletId;
+  bool _hideBalancesByDefault = true;
 
   bool get onboarded => _onboarded;
 
   ThemeMode get themeMode => _themeMode;
+
+  bool get hideBalancesByDefault => _hideBalancesByDefault;
+
 
   AppCurrency get currency => _currency;
 
@@ -63,6 +68,7 @@ class AppStore extends ChangeNotifier {
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
+    _hideBalancesByDefault = _prefs.getBool(_hideBalancesKey) ?? true;
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
         ThemeMode.system;
@@ -959,6 +965,12 @@ class AppStore extends ChangeNotifier {
       _save();
     }
     return created;
+  }
+
+  void setHideBalancesByDefault(bool value) {
+    _hideBalancesByDefault = value;
+    _prefs.setBool(_hideBalancesKey, value);
+    notifyListeners();
   }
 
   void setThemeMode(ThemeMode mode) {

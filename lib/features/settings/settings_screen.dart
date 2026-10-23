@@ -203,6 +203,21 @@ class SettingsScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                child: SwitchListTile(
+                  secondary: const Icon(Icons.visibility_off_outlined),
+                  title: Text(l.hideBalanceByDefault),
+                  subtitle: Text(l.hideBalanceDescription),
+                  value: AppStore.instance.hideBalancesByDefault,
+                  onChanged: AppStore.instance.setHideBalancesByDefault,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Card(
+                color: context.surfaceColor,
+                elevation: 1.25,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Column(
                   children: [
                     for (var i = 0; i < items.length; i++) ...[

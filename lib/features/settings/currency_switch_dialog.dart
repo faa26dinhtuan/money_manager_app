@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 Future<Set<String>?> showWalletConversionDialog(BuildContext context) {
@@ -126,8 +127,15 @@ class _WalletSelectionDialogState extends State<_WalletSelectionDialog> {
                   controlAffinity: ListTileControlAffinity.leading,
                   secondary: AppIcon(wallet.icon, color: wallet.color),
                   title: Text(wallet.localizedName(context)),
-                  subtitle: Text(
-                    '${wallet.currencyCode} · ${formatMoney(_store.walletBalance(wallet.id), AppCurrency.byCode(wallet.currencyCode))}',
+                  subtitle: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text('${wallet.currencyCode} · '),
+                      SensitiveBalance(
+                        amount: _store.walletBalance(wallet.id),
+                        currency: AppCurrency.byCode(wallet.currencyCode),
+                      ),
+                    ],
                   ),
                   onChanged: _selectedCurrencyCode != null &&
                           _selectedCurrencyCode != wallet.currencyCode &&

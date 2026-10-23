@@ -797,5 +797,9 @@
   "eventReminderChannelDescription": "Thông báo về các sự kiện đã lên lịch",
   "negativeWalletBalanceTitle": "Ví không đủ tiền",
   "negativeWalletBalanceMessage": "Số dư ví không đủ cho khoản chi này. Nếu tiếp tục, số dư ví sẽ thành số âm.",
-  "recordAnyway": "Vẫn ghi giao dịch"
+  "recordAnyway": "Vẫn ghi giao dịch",
+  "hideBalanceByDefault": "Ẩn số dư mặc định",
+  "hideBalanceDescription": "Chạm vào số dư để hiện tạm thời.",
+  "showBalance": "Hiện số dư",
+  "hideBalance": "Ẩn số dư"
 }

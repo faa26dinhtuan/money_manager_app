@@ -472,5 +472,9 @@
   "eventReminderChannelDescription": "Notifications for scheduled events",
   "negativeWalletBalanceTitle": "Insufficient wallet balance",
   "negativeWalletBalanceMessage": "This wallet does not have enough money for this expense. Continuing will make its balance negative.",
-  "recordAnyway": "Record anyway"
+  "recordAnyway": "Record anyway",
+  "hideBalanceByDefault": "Hide balances by default",
+  "hideBalanceDescription": "Tap a balance to reveal it temporarily.",
+  "showBalance": "Show balance",
+  "hideBalance": "Hide balance"
 }
