@@ -367,70 +367,80 @@ class _TodayEventReminder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasAmount = event.amount > 0;
-    final color = !hasAmount
-        ? context.textSecondary
-        : event.type == TxType.expense
+    final color = event.type == TxType.expense
         ? context.negativeColor
         : context.positiveColor;
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const AppIcon(AppIcons.calendar, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    !hasAmount
-                        ? context.l10n.plannedEvent
-                        : event.type == TxType.expense
-                        ? context.l10n.plannedExpense
-                        : context.l10n.plannedIncome,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    event.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            if (hasAmount) ...[
-              const SizedBox(width: 8),
-              Text(
-                formatMoney(event.amount, AppCurrency.byCode(event.currencyCode)),
-                style: TextStyle(color: color, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ],
+        const Padding(
+          padding: EdgeInsets.only(top: 2),
+          child: AppIcon(AppIcons.calendar, size: 20),
         ),
-        if (event.note.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(event.note, style: TextStyle(color: context.textSecondary)),
-        ],
-        if (hasAmount)
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: () => onRecord(event),
-              icon: const AppIcon(AppIcons.check, size: 18),
-              label: Text(context.l10n.recordEventTransaction),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                event.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              if (event.note.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  event.note,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: context.textSecondary),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (hasAmount) ...[
+          const SizedBox(width: 12),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 150),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  event.type == TxType.expense
+                      ? context.l10n.plannedExpense
+                      : context.l10n.plannedIncome,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: color, fontSize: 11),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  formatMoney(event.amount, AppCurrency.byCode(event.currencyCode)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: color, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                TextButton.icon(
+                  onPressed: () => onRecord(event),
+                  icon: const AppIcon(AppIcons.check, size: 18),
+                  label: Text(context.l10n.recordEventTransaction),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 36),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ],
             ),
           ),
+        ],
       ],
     );
   }
 }
-
 class _Header extends StatelessWidget {
   const _Header({
     required this.balance,
