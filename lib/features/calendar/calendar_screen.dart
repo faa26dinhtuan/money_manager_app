@@ -6,11 +6,11 @@ import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
-import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
@@ -28,7 +28,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
   final _store = AppStore.instance;
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
   DateTime _selectedDay = DateTime.now();
-  TxType _type = TxType.expense;
+  final Set<TxType> _visibleTypes = {TxType.expense, TxType.income};
+
+  void _toggleType(TxType type) {
+    setState(() {
+      if (_visibleTypes.contains(type)) {
+        if (_visibleTypes.length > 1) _visibleTypes.remove(type);
+      } else {
+        _visibleTypes.add(type);
+      }
+    });
+  }
 
   void _moveMonth(int amount) {
     HapticFeedback.selectionClick();
@@ -64,10 +74,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final selectedTransactions = [...expenses, ...incomes]
           ..removeWhere((t) => !isSameDay(t.date, _selectedDay))
           ..sort((a, b) => b.date.compareTo(a.date));
-        final daily = <DateTime, double>{};
-        for (final t in _type == TxType.expense ? expenses : incomes) {
+        final dailyExpenses = <DateTime, double>{};
+        final dailyIncomes = <DateTime, double>{};
+        for (final t in expenses) {
           final day = DateTime(t.date.year, t.date.month, t.date.day);
-          daily.update(day, (sum) => sum + t.amount, ifAbsent: () => t.amount);
+          dailyExpenses.update(day, (sum) => sum + t.amount, ifAbsent: () => t.amount);
+        }
+        for (final t in incomes) {
+          final day = DateTime(t.date.year, t.date.month, t.date.day);
+          dailyIncomes.update(day, (sum) => sum + t.amount, ifAbsent: () => t.amount);
         }
 
         return Scaffold(
@@ -109,16 +124,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ],
               ),
               const SizedBox(height: 14),
-              TypeTabs(
-                type: _type,
-                onChanged: (type) => setState(() => _type = type),
+              _CalendarFilters(
+                visibleTypes: _visibleTypes,
+                onToggle: _toggleType,
               ),
               const SizedBox(height: 8),
               _CalendarGrid(
                 month: _month,
                 selectedDay: _selectedDay,
-                amounts: daily,
-                type: _type,
+                expenses: dailyExpenses,
+                incomes: dailyIncomes,
+                visibleTypes: _visibleTypes,
                 onSelect: (day) {
                   HapticFeedback.selectionClick();
                   setState(() => _selectedDay = day);
@@ -237,15 +253,17 @@ class _CalendarGrid extends StatelessWidget {
   const _CalendarGrid({
     required this.month,
     required this.selectedDay,
-    required this.amounts,
-    required this.type,
+    required this.expenses,
+    required this.incomes,
+    required this.visibleTypes,
     required this.onSelect,
   });
 
   final DateTime month;
   final DateTime selectedDay;
-  final Map<DateTime, double> amounts;
-  final TxType type;
+  final Map<DateTime, double> expenses;
+  final Map<DateTime, double> incomes;
+  final Set<TxType> visibleTypes;
   final ValueChanged<DateTime> onSelect;
 
   @override
@@ -263,9 +281,6 @@ class _CalendarGrid extends StatelessWidget {
     final firstOffset = DateTime(month.year, month.month, 1).weekday - 1;
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     final count = ((firstOffset + daysInMonth + 6) ~/ 7) * 7;
-    final color = type == TxType.expense
-        ? context.negativeColor
-        : context.positiveColor;
     return Column(
       children: [
         Row(
@@ -302,7 +317,8 @@ class _CalendarGrid extends StatelessWidget {
               return const SizedBox.shrink();
             }
             final day = DateTime(month.year, month.month, dayNumber);
-            final amount = amounts[day];
+            final expense = expenses[day];
+            final income = incomes[day];
             final selected = isSameDay(day, selectedDay);
             final today = isSameDay(day, DateTime.now());
             return Padding(
@@ -337,19 +353,10 @@ class _CalendarGrid extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (amount != null && amount > 0) ...[
-                          const SizedBox(height: 2),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              NumberFormat.compact(
-                                locale: Localizations.localeOf(context).toLanguageTag(),
-                              ).format(amount),
-                              maxLines: 1,
-                              style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ],
+                        if (visibleTypes.contains(TxType.income) && income != null)
+                          _DayAmount(amount: income, color: context.positiveColor),
+                        if (visibleTypes.contains(TxType.expense) && expense != null)
+                          _DayAmount(amount: expense, color: context.negativeColor),
                       ],
                     ),
                   ),
@@ -357,6 +364,69 @@ class _CalendarGrid extends StatelessWidget {
               ),
             );
           },
+        ),
+      ],
+    );
+  }
+}
+
+class _DayAmount extends StatelessWidget {
+  const _DayAmount({required this.amount, required this.color});
+
+  final double amount;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final currency = AppCurrency.current;
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final compactNumber = NumberFormat.compact(locale: locale).format(amount);
+    final compactMoney = withCurrencySymbol(compactNumber, currency: currency);
+    return Padding(
+      padding: const EdgeInsets.only(top: 1),
+      child: SizedBox(
+        width: double.infinity,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            compactMoney,
+            maxLines: 1,
+            style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarFilters extends StatelessWidget {
+  const _CalendarFilters({required this.visibleTypes, required this.onToggle});
+
+  final Set<TxType> visibleTypes;
+  final ValueChanged<TxType> onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        FilterChip(
+          label: Text(l.incomeSummary),
+          selected: visibleTypes.contains(TxType.income),
+          onSelected: (_) => onToggle(TxType.income),
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          labelStyle: TextStyle(color: context.positiveColor, fontSize: 11),
+        ),
+        const SizedBox(width: 6),
+        FilterChip(
+          label: Text(l.expenseSummary),
+          selected: visibleTypes.contains(TxType.expense),
+          onSelected: (_) => onToggle(TxType.expense),
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          labelStyle: TextStyle(color: context.negativeColor, fontSize: 11),
         ),
       ],
     );

@@ -12,5 +12,7 @@ icon động loading
 
 có cài đặt tự động che số dư bằng \*\*\*, chỉ hiển thị khi người dùng nhấn vào, có thể tắt cài đặt để số dư luôn hiển thị
 
-luôn hiển thị cả chi tiêu và thu nhập trên lịch, có thêm tính năng chọn chỉ hiển thị 1 trong 2(quá chiếm diện tích màn hình)
+đồng hồ nhắc nhở
+
+thêm tính năng nhắc nhở trong lịch chọn 1 ngày nào đó tạo sự kiện rồi điền vào số tiền có thể sẽ thu/chi trong ngày đó
 
