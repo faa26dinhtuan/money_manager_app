@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
@@ -8,6 +7,7 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/features/settings/currency_switch_dialog.dart';
@@ -26,9 +26,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   late AppCurrency _to = AppCurrency.current.code == 'USD'
       ? AppCurrency.vnd
       : AppCurrency.usd;
-  late final _amountCtrl = TextEditingController(
-    text: _from.quickAmounts[1].toString(),
-  );
+  late final _amountCtrl = MoneyController(currency: _from)
+    ..amount = _from.quickAmounts[1].toDouble();
 
   @override
   void initState() {
@@ -42,13 +41,6 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   void dispose() {
     _amountCtrl.dispose();
     super.dispose();
-  }
-
-  double _parse(String text) {
-    var t = text.replaceAll(RegExp(r'\s'), '');
-    final separators = RegExp(r'[.,]').allMatches(t).length;
-    t = separators > 1 ? t.replaceAll(RegExp(r'[.,]'), '') : t.replaceAll(',', '.');
-    return double.tryParse(t) ?? 0;
   }
 
   Future<AppCurrency?> _pick(AppCurrency selected) {
@@ -167,6 +159,14 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       final tmp = _from;
       _from = _to;
       _to = tmp;
+      _amountCtrl.useCurrency(_from);
+    });
+  }
+
+  void _setFromCurrency(AppCurrency currency) {
+    setState(() {
+      _from = currency;
+      _amountCtrl.useCurrency(currency);
     });
   }
 
@@ -221,7 +221,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       body: ListenableBuilder(
         listenable: _rates,
         builder: (context, _) {
-          final amount = _parse(_amountCtrl.text);
+          final amount = _amountCtrl.amount;
           final rate = _rates.rate(_from, _to);
           final updated = _rates.updatedAt;
           return ListView(
@@ -237,14 +237,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      TextField(
+                      MoneyField(
                         controller: _amountCtrl,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-                        ],
+                        title: l.amount,
                         onChanged: (_) => setState(() {}),
                         style: const TextStyle(
                           fontSize: 24,
@@ -260,7 +255,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       _currencyTile(
                         l.fromCurrency,
                         _from,
-                        (c) => setState(() => _from = c),
+                        _setFromCurrency,
                       ),
                       const Divider(height: 1),
                       Align(
