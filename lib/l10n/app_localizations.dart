@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Danh mục'**
   String get categories;
 
+  /// No description provided for @manageCategories.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quản lý danh mục'**
+  String get manageCategories;
+
   /// No description provided for @wallet.
   ///
   /// In vi, this message translates to:

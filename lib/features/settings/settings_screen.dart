@@ -10,6 +10,7 @@ import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/settings/backup_screen.dart';
 import 'package:money_manager_app/features/settings/currency_converter_screen.dart';
 import 'package:money_manager_app/features/settings/export_screen.dart';
+import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_form_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -145,6 +146,14 @@ class SettingsScreen extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => const CurrencyConverterScreen(),
               ),
+            ),
+          ),
+          (
+            AppIcons.categories,
+            l.categories,
+            l.manageCategories,
+            () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CategoriesScreen()),
             ),
           ),
           (

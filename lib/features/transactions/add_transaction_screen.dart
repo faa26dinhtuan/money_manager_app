@@ -12,6 +12,7 @@ import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
+import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -79,6 +80,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null) setState(() => _date = picked);
+  }
+
+  Future<void> _manageCategories() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CategoriesScreen(initialType: _type),
+      ),
+    );
+    if (!mounted) return;
+    setState(() {
+      if (_categoryId != null && _store.categoryById(_categoryId!) == null) {
+        _categoryId = null;
+      }
+    });
   }
 
   void _submit() {
@@ -242,7 +257,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Text(l.category, style: TextStyle(color: context.textSecondary)),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l.category,
+                  style: TextStyle(color: context.textSecondary),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _manageCategories,
+                icon: const AppIcon(AppIcons.settings, size: 18),
+                label: Text(l.manageCategories),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 14,

@@ -22,6 +22,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get categories => 'Danh mục';
 
   @override
+  String get manageCategories => 'Quản lý danh mục';
+
+  @override
   String get wallet => 'Ví tiền';
 
   @override

@@ -22,6 +22,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categories => 'Categories';
 
   @override
+  String get manageCategories => 'Manage categories';
+
+  @override
   String get wallet => 'Wallet';
 
   @override
