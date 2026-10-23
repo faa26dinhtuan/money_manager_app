@@ -1364,4 +1364,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seedDebtBorrowNote => 'Borrowed to buy a bicycle';
+
+  @override
+  String get dayEvents => 'Events for this day';
+
+  @override
+  String get noTransactionsOnDate => 'No transactions on this day';
+
+  @override
+  String get noEventsOnDate => 'No events on this day';
+
+  @override
+  String get pastEvent => 'Past event';
+
+  @override
+  String get todayEvent => 'Event today';
 }

@@ -2563,6 +2563,36 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Mượn mua xe đạp'**
   String get seedDebtBorrowNote;
+
+  /// No description provided for @dayEvents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện trong ngày'**
+  String get dayEvents;
+
+  /// No description provided for @noTransactionsOnDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có giao dịch trong ngày này'**
+  String get noTransactionsOnDate;
+
+  /// No description provided for @noEventsOnDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có sự kiện trong ngày này'**
+  String get noEventsOnDate;
+
+  /// No description provided for @pastEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện đã qua'**
+  String get pastEvent;
+
+  /// No description provided for @todayEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện hôm nay'**
+  String get todayEvent;
 }
 
 class _AppLocalizationsDelegate

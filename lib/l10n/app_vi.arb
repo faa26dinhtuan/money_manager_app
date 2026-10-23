@@ -75,14 +75,20 @@
   "monthLabel": "Tháng {month}, {year}",
   "@monthLabel": {
     "placeholders": {
-      "month": {"type": "int"},
-      "year": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
     }
   },
   "yearLabel": "Năm {year}",
   "@yearLabel": {
     "placeholders": {
-      "year": {"type": "int"}
+      "year": {
+        "type": "int"
+      }
     }
   },
   "searchCategoryOrNote": "Tìm theo danh mục hoặc ghi chú",
@@ -98,7 +104,9 @@
   "transactionCount": "{count} giao dịch",
   "@transactionCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "pleaseEnterAmount": "Vui lòng nhập số tiền",
@@ -106,22 +114,34 @@
   "budgetExceeded": "Đã vượt ngân sách \"{name}\" {amount}",
   "@budgetExceeded": {
     "placeholders": {
-      "name": {"type": "String"},
-      "amount": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "budgetWarning": "Ngân sách \"{name}\" đã dùng {percent}, còn lại {remaining}",
   "@budgetWarning": {
     "placeholders": {
-      "name": {"type": "String"},
-      "percent": {"type": "String"},
-      "remaining": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
     }
   },
   "autoAddedRecurring": "Đã tự động thêm {count} giao dịch định kỳ",
   "@autoAddedRecurring": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "myWallets": "Ví của tôi",
@@ -132,7 +152,9 @@
   "walletCount": "{count} ví",
   "@walletCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "allWallets": "Tất cả ví",
@@ -144,20 +166,28 @@
   "deleteWalletMessageSimple": "Ví \"{name}\" sẽ bị xóa.",
   "@deleteWalletMessageSimple": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "deleteWalletMessageWithTx": "Ví \"{name}\" và {count} giao dịch trong ví này sẽ bị xóa.",
   "@deleteWalletMessageWithTx": {
     "placeholders": {
-      "name": {"type": "String"},
-      "count": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "deleteWalletLinkedNotice": " {count} khoản ở mục tiêu và sổ nợ liên quan sẽ được giữ lại nhưng không còn gắn với ví.",
   "@deleteWalletLinkedNotice": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "manageWalletsSubtitle": "Tạo và quản lý các ví của bạn",
@@ -172,14 +202,20 @@
   "deleteCategorySimple": "Danh mục \"{name}\" sẽ bị xóa.",
   "@deleteCategorySimple": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "deleteCategoryWithTx": "Danh mục \"{name}\" và {count} giao dịch thuộc danh mục này sẽ bị xóa.",
   "@deleteCategoryWithTx": {
     "placeholders": {
-      "name": {"type": "String"},
-      "count": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "catFood": "Ăn uống",
@@ -205,7 +241,9 @@
   "deleteBudgetMessage": "Ngân sách của danh mục \"{name}\" sẽ bị xóa.",
   "@deleteBudgetMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "noBudgetsYet": "Chưa có ngân sách nào",
@@ -214,38 +252,50 @@
   "canSpendPerDay": "Có thể chi {amount}/ngày",
   "@canSpendPerDay": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "outsideBudget": "Chi ngoài ngân sách: {amount}",
   "@outsideBudget": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "viewTransactions": "Xem giao dịch",
   "spentOfLimit": "Đã chi {amount}",
   "@spentOfLimit": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "limitAmount": "Hạn mức {amount}",
   "@limitAmount": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "statusOver": "Vượt {amount}",
   "@statusOver": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "statusRemaining": "Còn {amount}",
   "@statusRemaining": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "goals": "Mục tiêu kiếm tiền",
@@ -257,7 +307,9 @@
   "deleteGoalMessage": "Mục tiêu \"{name}\" và toàn bộ lịch sử sẽ bị xóa.",
   "@deleteGoalMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "goalName": "Tên mục tiêu",
@@ -267,13 +319,17 @@
   "targetLabel": "Mục tiêu {amount}",
   "@targetLabel": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "stillNeeded": "Còn thiếu {amount}",
   "@stillNeeded": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "deadline": "Hạn hoàn thành",
@@ -281,13 +337,17 @@
   "activeGoalsCount": "Đang thực hiện ({count})",
   "@activeGoalsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "doneGoalsCount": "Hoàn thành ({count})",
   "@doneGoalsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noGoalsYet": "Chưa có mục tiêu nào",
@@ -296,8 +356,12 @@
   "goalsCompletedCount": "{done}/{total} hoàn thành",
   "@goalsCompletedCount": {
     "placeholders": {
-      "done": {"type": "int"},
-      "total": {"type": "int"}
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "deposit": "Nạp tiền",
@@ -307,7 +371,9 @@
   "congratsGoalCompleted": "Chúc mừng! Bạn đã hoàn thành mục tiêu \"{name}\"",
   "@congratsGoalCompleted": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "pleaseEnterGoalName": "Vui lòng nhập tên mục tiêu",
@@ -318,14 +384,18 @@
   "daysRemaining": "Còn {days} ngày",
   "@daysRemaining": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "dueToday": "Hết hạn hôm nay",
   "daysOverdue": "Quá hạn {days} ngày",
   "@daysOverdue": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "completed": "Đã hoàn thành",
@@ -351,25 +421,33 @@
   "openDebtsCount": "Chưa xong ({count})",
   "@openDebtsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "settledDebtsCount": "Đã tất toán ({count})",
   "@settledDebtsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "lendCount": "Cho vay ({count})",
   "@lendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "borrowCount": "Đi vay ({count})",
   "@borrowCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "receivable": "Cần thu",
@@ -377,7 +455,9 @@
   "overdueCount": "{count} khoản quá hạn",
   "@overdueCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noSettledDebts": "Chưa có khoản nào đã tất toán",
@@ -386,7 +466,9 @@
   "debtSettledNotification": "Đã tất toán khoản của \"{person}\"",
   "@debtSettledNotification": {
     "placeholders": {
-      "person": {"type": "String"}
+      "person": {
+        "type": "String"
+      }
     }
   },
   "settled": "Đã tất toán",
@@ -395,8 +477,12 @@
   "debtCreatedDate": "{type} ngày {date}",
   "@debtCreatedDate": {
     "placeholders": {
-      "type": {"type": "String"},
-      "date": {"type": "String"}
+      "type": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "deletePaymentTitle": "Xóa lần thanh toán?",
@@ -447,7 +533,9 @@
   "appVersion": "Phiên bản {version}",
   "@appVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "backupData": "Sao lưu dữ liệu",
@@ -460,11 +548,19 @@
   "convertCurrencyTitle": "Đổi sang {code}",
   "@convertCurrencyTitle": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "convertCurrencyPrompt": "Dùng hoặc tạo ví bằng {currency} mà không quy đổi, hay quy đổi dữ liệu hiện tại?",
-  "@convertCurrencyPrompt": {"placeholders": {"currency": {"type": "String"}}},
+  "@convertCurrencyPrompt": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
   "displayOnly": "Chỉ đổi hiển thị",
   "convertAll": "Quy đổi tất cả",
   "selectWalletsToConvert": "Chọn ví muốn quy đổi sang loại tiền mới",
@@ -477,7 +573,13 @@
   "selectTargetCurrency": "Chọn tiền tệ muốn quy đổi sang",
   "changeDefaultCurrency": "Chuyển sang tiền tệ này",
   "askAddWalletForCurrency": "Bạn có muốn tạo ví mới cho {currency} không?",
-  "@askAddWalletForCurrency": {"placeholders": {"currency": {"type": "String"}}},
+  "@askAddWalletForCurrency": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
   "currencyConvertLinkedNotice": "Nếu mục tiêu hoặc khoản nợ liên kết nhiều ví, các ví đó cũng sẽ được quy đổi cùng để giữ dữ liệu nhất quán.",
   "backupSavedConfirmation": "Tôi đã lưu bản sao lưu ở nơi an toàn",
   "ratesUpdated": "Đã cập nhật tỷ giá",
@@ -508,7 +610,13 @@
   "selectAll": "Chọn tất cả",
   "deleteSelectedTitle": "Xóa các mục đã chọn?",
   "deleteSelectedMessage": "Bạn có chắc muốn xóa {count} mục đã chọn không? Thao tác này không thể hoàn tác.",
-  "@deleteSelectedMessage": {"placeholders": {"count": {"type": "int"}}},
+  "@deleteSelectedMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exportCsvTitle": "Xuất ra file CSV",
   "splashTagline": "Quản lý chi tiêu cá nhân",
   "amountCannotBeLessThanPaid": "Số tiền không được nhỏ hơn số đã thanh toán",
@@ -516,13 +624,17 @@
   "collectAll": "Thu hết: {amount}",
   "@collectAll": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "payAll": "Trả hết: {amount}",
   "@payAll": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "creditToWallet": "Cộng vào ví",
@@ -543,13 +655,17 @@
   "reachGoalAmount": "Đủ mục tiêu: {amount}",
   "@reachGoalAmount": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "walletBalanceLabel": "Số dư ví: {amount}",
   "@walletBalanceLabel": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "deletePaymentConfirmTitle": "Xóa lần thanh toán?",
@@ -559,7 +675,9 @@
   "duePrefix": "Hạn trả {date}",
   "@duePrefix": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "exportSectionTransactions": "Giao dịch",
@@ -572,7 +690,9 @@
   "lastUpdated": "Cập nhật lần cuối: {time}",
   "@lastUpdated": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "currencyDisclaimer": "Tỷ giá cung cấp bởi ExchangeRate-API (exchangerate-api.com), cập nhật mỗi ngày, chỉ mang tính tham khảo.",
@@ -617,8 +737,12 @@
   "csvBudgetTitle": "NGÂN SÁCH THÁNG {month}/{year}",
   "@csvBudgetTitle": {
     "placeholders": {
-      "month": {"type": "int"},
-      "year": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
     }
   },
   "csvGoalHistory": "Lịch sử mục tiêu",
@@ -642,5 +766,10 @@
   "seedDebtLendNote": "Cho mượn đóng tiền trọ",
   "seedDebtPayment": "Trả đợt 1",
   "seedPersonLan": "Chị Lan",
-  "seedDebtBorrowNote": "Mượn mua xe đạp"
+  "seedDebtBorrowNote": "Mượn mua xe đạp",
+  "dayEvents": "Sự kiện trong ngày",
+  "noTransactionsOnDate": "Chưa có giao dịch trong ngày này",
+  "noEventsOnDate": "Không có sự kiện trong ngày này",
+  "pastEvent": "Sự kiện đã qua",
+  "todayEvent": "Sự kiện hôm nay"
 }

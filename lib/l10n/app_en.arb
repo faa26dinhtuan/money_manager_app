@@ -271,7 +271,13 @@
   "restoreSuccess": "Data restored successfully",
   "convertCurrencyTitle": "Switch to {code}",
   "convertCurrencyPrompt": "Use or create wallets in {currency} without conversion, or convert the current data?",
-  "@convertCurrencyPrompt": {"placeholders": {"currency": {"type": "String"}}},
+  "@convertCurrencyPrompt": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
   "displayOnly": "Display only",
   "convertAll": "Convert all",
   "selectWalletsToConvert": "Select wallets to convert to the new currency",
@@ -284,7 +290,13 @@
   "selectTargetCurrency": "Choose the currency to convert to",
   "changeDefaultCurrency": "Use this currency",
   "askAddWalletForCurrency": "Do you want to add a new wallet for {currency}?",
-  "@askAddWalletForCurrency": {"placeholders": {"currency": {"type": "String"}}},
+  "@askAddWalletForCurrency": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
   "currencyConvertLinkedNotice": "If a goal or debt is linked to multiple wallets, those wallets will be converted together to keep the data consistent.",
   "backupSavedConfirmation": "I saved the backup somewhere safe",
   "ratesUpdated": "Exchange rates updated",
@@ -315,7 +327,13 @@
   "selectAll": "Select all",
   "deleteSelectedTitle": "Delete selected items?",
   "deleteSelectedMessage": "Delete {count} selected items? This action cannot be undone.",
-  "@deleteSelectedMessage": {"placeholders": {"count": {"type": "int"}}},
+  "@deleteSelectedMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exportCsvTitle": "Export to CSV file",
   "splashTagline": "Personal expense manager",
   "amountCannotBeLessThanPaid": "Amount cannot be less than paid amount",
@@ -394,8 +412,12 @@
   "csvBudgetTitle": "BUDGET FOR {month}/{year}",
   "@csvBudgetTitle": {
     "placeholders": {
-      "month": {"type": "int"},
-      "year": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
     }
   },
   "csvGoalHistory": "Goal history",
@@ -419,5 +441,10 @@
   "seedDebtLendNote": "Lent for rent",
   "seedDebtPayment": "First installment",
   "seedPersonLan": "Lan (older sister)",
-  "seedDebtBorrowNote": "Borrowed to buy a bicycle"
+  "seedDebtBorrowNote": "Borrowed to buy a bicycle",
+  "dayEvents": "Events for this day",
+  "noTransactionsOnDate": "No transactions on this day",
+  "noEventsOnDate": "No events on this day",
+  "pastEvent": "Past event",
+  "todayEvent": "Event today"
 }

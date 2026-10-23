@@ -273,37 +273,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              if (selectedEvents.isNotEmpty) ...[
-                Text(l.plannedEvents, style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
-                for (final event in selectedEvents)
-                  _PlannedEventRow(
-                    event: event,
-                    onEdit: () => _editPlannedEvent(event: event),
-                    onDelete: () => _deletePlannedEvent(event),
-                  ),
-                const SizedBox(height: 10),
-              ]
-              else if (selectedTransactions.isEmpty)
-                _EmptyDay(message: l.noTransactionsInRange)
-              else ...[
-                Text(l.transactions, style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
-                for (final transaction in selectedTransactions)
-                  _TransactionRow(
-                    transaction: transaction,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => AddTransactionScreen(
-                          transaction: transaction,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-              if (selectedEvents.isNotEmpty && selectedTransactions.isNotEmpty) ...[
-                Text(l.transactions, style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
+              Text(l.transactions, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              if (selectedTransactions.isEmpty)
+                _EmptyDay(message: l.noTransactionsOnDate)
+              else
                 for (final transaction in selectedTransactions)
                   _TransactionRow(
                     transaction: transaction,
@@ -313,7 +287,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                     ),
                   ),
-              ],
+              const SizedBox(height: 14),
+              Text(l.dayEvents, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              if (selectedEvents.isEmpty)
+                _EmptyDay(message: l.noEventsOnDate)
+              else
+                for (final event in selectedEvents)
+                  _PlannedEventRow(
+                    event: event,
+                    onEdit: () => _editPlannedEvent(event: event),
+                    onDelete: () => _deletePlannedEvent(event),
+                  ),
             ],
           ),
         );
@@ -379,19 +364,19 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      decoration: context.cardDecoration(radius: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: context.cardDecoration(radius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: TextStyle(color: context.textSecondary, fontSize: 12)),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
               formatMoney(amount),
-              style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 17),
+              style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 15),
             ),
           ),
         ],
@@ -462,7 +447,7 @@ class _CalendarGrid extends StatelessWidget {
           itemCount: count,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
-            mainAxisExtent: 66,
+            mainAxisExtent: 80,
           ),
           itemBuilder: (context, index) {
             final dayNumber = index - firstOffset + 1;
@@ -580,10 +565,16 @@ class _PlannedEventRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isExpense = event.type == TxType.expense;
     final color = isExpense ? context.negativeColor : context.positiveColor;
-    final details = [
-      if (event.note.isNotEmpty) event.note,
-      if (event.frequency != null) event.frequency!.localizedLabel(context),
-    ];
+    final eventDay = DateTime(event.date.year, event.date.month, event.date.day);
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final isPast = eventDay.isBefore(todayDate);
+    final isToday = eventDay.isAtSameMomentAs(todayDate);
+    final status = isPast
+        ? context.l10n.pastEvent
+        : isToday
+        ? context.l10n.todayEvent
+        : context.l10n.plannedEvent;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       color: context.surfaceColor,
@@ -604,10 +595,21 @@ class _PlannedEventRow extends StatelessWidget {
           child: const AppIcon(AppIcons.calendar, color: AppTheme.primary, size: 20),
         ),
         title: Text(event.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text(
-          details.isEmpty ? context.l10n.plannedEvent : details.join(' · '),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(status),
+            if (event.note.isNotEmpty || event.frequency != null)
+              Text(
+                [
+                  if (event.note.isNotEmpty) event.note,
+                  if (event.frequency != null) event.frequency!.localizedLabel(context),
+                ].join(' · '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

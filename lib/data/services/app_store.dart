@@ -417,8 +417,7 @@ class AppStore extends ChangeNotifier {
         if (range.contains(event.date)) result.add(event);
         continue;
       }
-      if (!recurring.active || recurring.isFinished) continue;
-      var date = recurring.nextDate;
+      var date = event.date;
       var guard = 0;
       while (date.isBefore(range.start) && guard < 100000) {
         date = recurring.advance(date);

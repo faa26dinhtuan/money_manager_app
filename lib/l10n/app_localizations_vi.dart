@@ -1364,4 +1364,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get seedDebtBorrowNote => 'Mượn mua xe đạp';
+
+  @override
+  String get dayEvents => 'Sự kiện trong ngày';
+
+  @override
+  String get noTransactionsOnDate => 'Chưa có giao dịch trong ngày này';
+
+  @override
+  String get noEventsOnDate => 'Không có sự kiện trong ngày này';
+
+  @override
+  String get pastEvent => 'Sự kiện đã qua';
+
+  @override
+  String get todayEvent => 'Sự kiện hôm nay';
 }
