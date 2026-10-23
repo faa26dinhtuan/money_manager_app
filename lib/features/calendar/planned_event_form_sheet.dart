@@ -8,22 +8,15 @@ import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
-import 'package:money_manager_app/core/widgets/wallet_picker.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class PlannedEventFormResult {
-  const PlannedEventFormResult({
-    required this.event,
-    required this.previousRecurringId,
-    this.recurring,
-  });
+  const PlannedEventFormResult({required this.event});
 
   final PlannedEvent event;
-  final String? previousRecurringId;
-  final RecurringTransaction? recurring;
 }
 
 class PlannedEventFormSheet extends StatefulWidget {
@@ -51,25 +44,17 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   late TxType _type;
   late Frequency _frequency;
   late bool _repeat;
-  String? _categoryId;
-  String? _walletId;
 
   @override
   void initState() {
     super.initState();
     final event = widget.event;
     final currency = AppCurrency.byCode(event?.currencyCode ?? _store.currency.code);
-    final recurring = event?.recurringId == null
-        ? null
-        : _store.recurringById(event!.recurringId!);
     _amountController = MoneyController(currency: currency);
     _date = event?.seriesStartDate ?? event?.date ?? widget.initialDate;
     _type = event?.type ?? TxType.expense;
     _frequency = event?.frequency ?? Frequency.monthly;
-    _repeat = event?.recurringId != null;
-    _categoryId = recurring?.categoryId ?? _store.categoriesOf(_type).firstOrNull?.id;
-    _walletId = recurring?.walletId ?? event?.walletId ??
-        _store.wallets.where((wallet) => wallet.currencyCode == currency.code).firstOrNull?.id;
+    _repeat = event?.frequency != null;
     _nameController.text = event?.title ?? '';
     _noteController.text = event?.note ?? '';
     if (event != null) _amountController.amount = event.amount;
@@ -93,27 +78,6 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
     if (picked != null) setState(() => _date = picked);
   }
 
-  DateTime _nextOccurrence(DateTime start, Frequency frequency) {
-    final schedule = RecurringTransaction(
-      id: '',
-      type: _type,
-      categoryId: _categoryId ?? '',
-      walletId: _walletId ?? '',
-      amount: 0,
-      frequency: frequency,
-      startDate: start,
-      nextDate: start,
-    );
-    var next = start;
-    final today = RecurringTransaction.dateOnly(DateTime.now());
-    var guard = 0;
-    while (next.isBefore(today) && guard < 100000) {
-      next = schedule.advance(next);
-      guard++;
-    }
-    return next;
-  }
-
   void _save() {
     final l = context.l10n;
     final currency = AppCurrency.byCode(
@@ -132,46 +96,10 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
       );
       return;
     }
-    if (_repeat && _categoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.pleaseSelectCategory)),
-      );
-      return;
-    }
-    if (_repeat && _walletId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.pleaseSelectWallet)),
-      );
-      return;
-    }
-    final previousRecurring = widget.event?.recurringId == null
-        ? null
-        : _store.recurringById(widget.event!.recurringId!);
-    final scheduleChanged = previousRecurring == null ||
-        previousRecurring.frequency != _frequency ||
-        !isSameDay(previousRecurring.startDate, _date);
-    final startDate = RecurringTransaction.dateOnly(_date);
-    final recurring = _repeat
-        ? RecurringTransaction(
-            id: previousRecurring?.id ?? _store.newId(),
-            type: _type,
-            categoryId: _categoryId!,
-            walletId: _walletId!,
-            amount: _amountController.amount,
-            frequency: _frequency,
-            startDate: startDate,
-            nextDate: previousRecurring == null
-                ? startDate
-                : scheduleChanged
-                ? _nextOccurrence(startDate, _frequency)
-                : previousRecurring.nextDate,
-            note: title,
-            active: previousRecurring?.active ?? true,
-            skippedDates: scheduleChanged
-                ? const []
-                : previousRecurring?.skippedDates ?? const [],
-          )
-        : null;
+    final oldStart = widget.event?.seriesStartDate ?? widget.event?.date;
+    final scheduleChanged = oldStart == null ||
+        widget.event?.frequency != (_repeat ? _frequency : null) ||
+        !isSameDay(oldStart, _date);
     final plannedEvent = PlannedEvent(
       id: widget.event?.id ?? _store.newId(),
       title: title,
@@ -180,16 +108,12 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
       date: DateTime(_date.year, _date.month, _date.day, 12),
       currencyCode: currency.code,
       note: _noteController.text.trim(),
-      walletId: _repeat ? _walletId : widget.event?.walletId ?? _store.selectedWalletId,
-      recurringId: recurring?.id,
-      frequency: recurring?.frequency,
+      walletId: widget.event?.walletId ?? _store.selectedWalletId,
+      frequency: _repeat ? _frequency : null,
+      skippedDates: scheduleChanged ? const [] : widget.event?.skippedDates ?? const [],
     );
     Navigator.of(context).pop(
-      PlannedEventFormResult(
-        event: plannedEvent,
-        previousRecurringId: widget.event?.recurringId,
-        recurring: recurring,
-      ),
+      PlannedEventFormResult(event: plannedEvent),
     );
   }
 
@@ -197,7 +121,6 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   Widget build(BuildContext context) {
     final l = context.l10n;
     final event = widget.event;
-    final currency = AppCurrency.byCode(event?.currencyCode ?? _store.currency.code);
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -242,7 +165,6 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                 type: _type,
                 onChanged: (type) => setState(() {
                   _type = type;
-                  _categoryId = _store.categoriesOf(type).firstOrNull?.id;
                 }),
               ),
               const SizedBox(height: 12),
@@ -297,26 +219,6 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                   },
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: _categoryId,
-                  decoration: InputDecoration(labelText: l.category),
-                  items: [
-                    for (final category in _store.categoriesOf(_type))
-                      DropdownMenuItem(
-                        value: category.id,
-                        child: Text(category.localizedName(context)),
-                      ),
-                  ],
-                  onChanged: (id) => setState(() => _categoryId = id),
-                ),
-                const SizedBox(height: 12),
-                Text(l.wallet, style: TextStyle(color: context.textSecondary)),
-                const SizedBox(height: 6),
-                WalletPicker(
-                  selectedId: _walletId,
-                  currencyCode: currency.code,
-                  onChanged: (id) => setState(() => _walletId = id),
-                ),
               ],
               const SizedBox(height: 12),
               TextField(

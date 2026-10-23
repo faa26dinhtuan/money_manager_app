@@ -14,5 +14,3 @@ có cài đặt tự động che số dư bằng \*\*\*, chỉ hiển thị khi 
 
 đồng hồ nhắc nhở
 
-hiển thị nhắc nhở ở overview...
-

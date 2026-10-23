@@ -76,25 +76,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
     if (result == null) return;
-    final previousRecurringId = result.previousRecurringId;
-    if (previousRecurringId != null && result.recurring == null) {
-      final confirmed = await confirmDelete(
-        context,
-        title: context.l10n.stopRecurringEventTitle,
-        message: context.l10n.stopRecurringEventMessage,
-      );
-      if (!confirmed) return;
-      _store.removeRecurring(previousRecurringId, preservePlannedEvent: true);
-    } else if (result.recurring != null) {
-      final existingRecurring = previousRecurringId == null
-          ? null
-          : _store.recurringById(previousRecurringId);
-      if (existingRecurring == null) {
-        _store.addRecurring(result.recurring!);
-      } else {
-        _store.updateRecurring(result.recurring!);
-      }
-    }
     if (event == null) {
       _store.addPlannedEvent(result.event);
     } else {
@@ -112,8 +93,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Future<void> _deletePlannedEvent(PlannedEvent event) async {
     final l = context.l10n;
-    final recurringId = event.recurringId;
-    if (recurringId != null) {
+    if (event.frequency != null) {
       final deleteSeries = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
@@ -138,10 +118,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       );
       if (deleteSeries == null) return;
       if (deleteSeries) {
-        _store.removeRecurring(recurringId);
         _store.removePlannedEvent(event.id);
       } else {
-        _store.skipRecurringOccurrence(recurringId, event.date);
+        _store.skipPlannedEventOccurrence(event.id, event.date);
       }
       return;
     }

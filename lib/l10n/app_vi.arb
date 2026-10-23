@@ -18,7 +18,7 @@
   "repeatFrequency": "Tần suất lặp lại",
   "deleteThisOccurrence": "Chỉ xóa ngày này",
   "deleteEventSeries": "Xóa toàn bộ lần lặp",
-  "deleteRecurringEventWarning": "Xóa ngày này sẽ bỏ qua giao dịch định kỳ tương ứng. Xóa toàn bộ lần lặp sẽ xóa cả giao dịch định kỳ.",
+  "deleteRecurringEventWarning": "Xóa sự kiện không xóa các giao dịch đã ghi trong sổ.",
   "pleaseSelectWallet": "Vui lòng chọn ví",
   "stopRecurringEventTitle": "Tắt lặp lại sự kiện?",
   "stopRecurringEventMessage": "Giao dịch định kỳ liên kết sẽ bị xóa. Các giao dịch đã được tạo trước đó vẫn được giữ lại.",

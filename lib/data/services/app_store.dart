@@ -100,6 +100,7 @@ class AppStore extends ChangeNotifier {
         _plannedEvents.clear();
       }
     }
+    final eventsMigrated = _detachEventsFromRecurringPayments();
     final rawCategories = _prefs.getString(_categoriesKey);
     final rawTransactions = _prefs.getString(_transactionsKey);
     final rawWallets = _prefs.getString(_walletsKey);
@@ -162,6 +163,7 @@ class AppStore extends ChangeNotifier {
             rawGoals == null ||
             rawDebts == null ||
             missingCurrencyCode(rawWallets) ||
+            eventsMigrated ||
             missingCurrencyCode(rawBudgets) ||
             missingCurrencyCode(rawGoals) ||
             missingCurrencyCode(rawDebts)) {
@@ -404,34 +406,91 @@ class AppStore extends ChangeNotifier {
 
   List<PlannedEvent> get allPlannedEvents => List.unmodifiable(_plannedEvents);
 
+  bool _detachEventsFromRecurringPayments() {
+    final linkedIds = <String>{};
+    var changed = false;
+    for (var i = 0; i < _plannedEvents.length; i++) {
+      final event = _plannedEvents[i];
+      final recurringId = event.recurringId;
+      if (recurringId == null) continue;
+      final recurring = recurringById(recurringId);
+      _plannedEvents[i] = event.copyWith(
+        clearRecurringId: true,
+        frequency: event.frequency ?? recurring?.frequency,
+        skippedDates: event.skippedDates.isEmpty
+            ? recurring?.skippedDates ?? const []
+            : event.skippedDates,
+      );
+      linkedIds.add(recurringId);
+      changed = true;
+    }
+    if (linkedIds.isNotEmpty) {
+      _recurrings.removeWhere((recurring) => linkedIds.contains(recurring.id));
+    }
+    return changed;
+  }
+
   List<PlannedEvent> plannedEventsInRange(DateRange range) {
     final result = <PlannedEvent>[];
     for (final event in plannedEvents) {
-      final recurringId = event.recurringId;
-      if (recurringId == null || event.frequency == null) {
-        if (range.contains(event.date)) result.add(event);
-        continue;
-      }
-      final recurring = recurringById(recurringId);
-      if (recurring == null) {
+      final frequency = event.frequency;
+      if (frequency == null) {
         if (range.contains(event.date)) result.add(event);
         continue;
       }
       var date = event.date;
       var guard = 0;
       while (date.isBefore(range.start) && guard < 100000) {
-        date = recurring.advance(date);
+        date = _advanceEventDate(date, event.date, frequency);
         guard++;
       }
       while (date.isBefore(range.end) && guard < 100000) {
-        if (!recurring.isSkipped(date)) {
+        if (!event.skippedDates.any((skipped) =>
+            skipped.year == date.year && skipped.month == date.month &&
+            skipped.day == date.day)) {
           result.add(event.copyWith(date: date, seriesStartDate: event.date));
         }
-        date = recurring.advance(date);
+        date = _advanceEventDate(date, event.date, frequency);
         guard++;
       }
     }
     return result;
+  }
+
+  DateTime _advanceEventDate(DateTime from, DateTime start, Frequency frequency) {
+    switch (frequency) {
+      case Frequency.daily:
+        return DateTime(from.year, from.month, from.day + 1);
+      case Frequency.weekly:
+        return DateTime(from.year, from.month, from.day + 7);
+      case Frequency.monthly:
+        return _advanceEventMonth(from, start, 1);
+      case Frequency.yearly:
+        return _advanceEventMonth(from, start, 12);
+    }
+  }
+
+  DateTime _advanceEventMonth(DateTime from, DateTime start, int months) {
+    final total = from.month - 1 + months;
+    final year = from.year + total ~/ 12;
+    final month = total % 12 + 1;
+    final lastDay = DateTime(year, month + 1, 0).day;
+    final day = start.day < lastDay ? start.day : lastDay;
+    return DateTime(year, month, day);
+  }
+
+  void skipPlannedEventOccurrence(String eventId, DateTime date) {
+    final index = _plannedEvents.indexWhere((event) => event.id == eventId);
+    if (index == -1) return;
+    final event = _plannedEvents[index];
+    final skipped = DateTime(date.year, date.month, date.day);
+    if (event.skippedDates.any((item) =>
+        item.year == skipped.year && item.month == skipped.month && item.day == skipped.day)) {
+      return;
+    }
+    _plannedEvents[index] = event.copyWith(skippedDates: [...event.skippedDates, skipped]);
+    notifyListeners();
+    _save();
   }
 
   void skipRecurringOccurrence(String recurringId, DateTime date) {

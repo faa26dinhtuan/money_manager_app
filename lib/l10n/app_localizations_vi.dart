@@ -65,7 +65,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get deleteRecurringEventWarning =>
-      'Xóa ngày này sẽ bỏ qua giao dịch định kỳ tương ứng. Xóa toàn bộ lần lặp sẽ xóa cả giao dịch định kỳ.';
+      'Xóa sự kiện không xóa các giao dịch đã ghi trong sổ.';
 
   @override
   String get pleaseSelectWallet => 'Vui lòng chọn ví';

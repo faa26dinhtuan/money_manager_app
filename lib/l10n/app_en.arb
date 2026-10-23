@@ -18,7 +18,7 @@
   "repeatFrequency": "Repeat frequency",
   "deleteThisOccurrence": "Delete this day only",
   "deleteEventSeries": "Delete all repetitions",
-  "deleteRecurringEventWarning": "Deleting this day skips its matching recurring transaction. Deleting all repetitions also removes the recurring transaction.",
+  "deleteRecurringEventWarning": "Deleting an event does not remove transactions already recorded in the ledger.",
   "pleaseSelectWallet": "Select a wallet",
   "stopRecurringEventTitle": "Stop repeating this event?",
   "stopRecurringEventMessage": "The linked recurring transaction will be deleted. Transactions already created will be kept.",

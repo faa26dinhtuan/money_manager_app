@@ -209,7 +209,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteRecurringEventWarning.
   ///
   /// In vi, this message translates to:
-  /// **'Xóa ngày này sẽ bỏ qua giao dịch định kỳ tương ứng. Xóa toàn bộ lần lặp sẽ xóa cả giao dịch định kỳ.'**
+  /// **'Xóa sự kiện không xóa các giao dịch đã ghi trong sổ.'**
   String get deleteRecurringEventWarning;
 
   /// No description provided for @pleaseSelectWallet.

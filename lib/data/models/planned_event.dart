@@ -14,6 +14,7 @@ class PlannedEvent {
     this.recurringId,
     this.frequency,
     this.seriesStartDate,
+    this.skippedDates = const [],
   });
 
   final String id;
@@ -27,6 +28,7 @@ class PlannedEvent {
   final String? recurringId;
   final Frequency? frequency;
   final DateTime? seriesStartDate;
+  final List<DateTime> skippedDates;
 
   PlannedEvent copyWith({
     String? title,
@@ -38,6 +40,8 @@ class PlannedEvent {
     String? recurringId,
     Frequency? frequency,
     DateTime? seriesStartDate,
+    List<DateTime>? skippedDates,
+    bool clearRecurringId = false,
   }) => PlannedEvent(
     id: id,
     title: title ?? this.title,
@@ -47,9 +51,10 @@ class PlannedEvent {
     currencyCode: currencyCode ?? this.currencyCode,
     note: note ?? this.note,
     walletId: walletId,
-    recurringId: recurringId ?? this.recurringId,
+    recurringId: clearRecurringId ? null : recurringId ?? this.recurringId,
     frequency: frequency ?? this.frequency,
     seriesStartDate: seriesStartDate ?? this.seriesStartDate,
+    skippedDates: skippedDates ?? this.skippedDates,
   );
 
   factory PlannedEvent.fromJson(Map<String, dynamic> json) => PlannedEvent(
@@ -68,6 +73,9 @@ class PlannedEvent {
     seriesStartDate: json['seriesStartDate'] == null
         ? null
         : DateTime.parse(json['seriesStartDate'] as String),
+    skippedDates: (json['skippedDates'] as List? ?? const [])
+        .map((value) => DateTime.parse(value as String))
+        .toList(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -82,5 +90,6 @@ class PlannedEvent {
     'recurringId': recurringId,
     'frequency': frequency?.name,
     'seriesStartDate': seriesStartDate?.toIso8601String(),
+    'skippedDates': skippedDates.map((date) => date.toIso8601String()).toList(),
   };
 }

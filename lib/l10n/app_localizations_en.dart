@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteRecurringEventWarning =>
-      'Deleting this day skips its matching recurring transaction. Deleting all repetitions also removes the recurring transaction.';
+      'Deleting an event does not remove transactions already recorded in the ledger.';
 
   @override
   String get pleaseSelectWallet => 'Select a wallet';
