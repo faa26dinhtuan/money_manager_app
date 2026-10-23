@@ -43,7 +43,7 @@ class _WalletListScreenState extends State<WalletListScreen> {
             title: Text(l.myWallets),
             actions: [
               IconButton(
-                tooltip: l.selectAll,
+                tooltip: _selecting ? l.cancel : l.selectItemsToDelete,
                 icon: Icon(_selecting ? Icons.close : Icons.checklist),
                 onPressed: () => setState(() {
                   _selecting = !_selecting;

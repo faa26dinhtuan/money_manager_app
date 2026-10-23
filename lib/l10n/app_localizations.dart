@@ -2629,6 +2629,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Sự kiện này đã có giao dịch trong sổ.'**
   String get eventTransactionAlreadyRecorded;
+
+  /// No description provided for @plannedExpense.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản chi dự kiến'**
+  String get plannedExpense;
+
+  /// No description provided for @plannedIncome.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản thu dự kiến'**
+  String get plannedIncome;
+
+  /// No description provided for @selectItemsToDelete.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn mục cần xóa'**
+  String get selectItemsToDelete;
 }
 
 class _AppLocalizationsDelegate

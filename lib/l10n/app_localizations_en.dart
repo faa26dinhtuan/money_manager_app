@@ -1381,7 +1381,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todayEvent => 'Event today';
 
   @override
-  String get todayEvents => 'Events due today';
+  String get todayEvents => 'Today\'s events';
 
   @override
   String get recordEventTransaction => 'Record transaction';
@@ -1400,4 +1400,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventTransactionAlreadyRecorded =>
       'A transaction for this event is already in your ledger.';
+
+  @override
+  String get plannedExpense => 'Planned expense';
+
+  @override
+  String get plannedIncome => 'Planned income';
+
+  @override
+  String get selectItemsToDelete => 'Select items to delete';
 }

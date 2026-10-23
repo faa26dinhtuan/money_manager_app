@@ -447,10 +447,13 @@
   "noEventsOnDate": "No events on this day",
   "pastEvent": "Past event",
   "todayEvent": "Event today",
-  "todayEvents": "Events due today",
+  "todayEvents": "Today's events",
   "recordEventTransaction": "Record transaction",
   "confirmEventTransactionTitle": "Record this transaction?",
   "confirmEventTransactionMessage": "This planned amount will be added to your ledger and wallet balance.",
   "eventTransactionNeedsSetup": "Set up a matching category and a wallet in this currency before recording.",
-  "eventTransactionAlreadyRecorded": "A transaction for this event is already in your ledger."
+  "eventTransactionAlreadyRecorded": "A transaction for this event is already in your ledger.",
+  "plannedExpense": "Planned expense",
+  "plannedIncome": "Planned income",
+  "selectItemsToDelete": "Select items to delete"
 }

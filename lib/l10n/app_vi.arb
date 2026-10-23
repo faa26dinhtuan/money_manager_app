@@ -777,5 +777,8 @@
   "confirmEventTransactionTitle": "Xác nhận tạo giao dịch?",
   "confirmEventTransactionMessage": "Khoản dự kiến dưới đây sẽ được ghi vào sổ và cập nhật số dư ví.",
   "eventTransactionNeedsSetup": "Cần có danh mục phù hợp và ví cùng loại tiền tệ để ghi giao dịch.",
-  "eventTransactionAlreadyRecorded": "Sự kiện này đã có giao dịch trong sổ."
+  "eventTransactionAlreadyRecorded": "Sự kiện này đã có giao dịch trong sổ.",
+  "plannedExpense": "Khoản chi dự kiến",
+  "plannedIncome": "Khoản thu dự kiến",
+  "selectItemsToDelete": "Chọn mục cần xóa"
 }

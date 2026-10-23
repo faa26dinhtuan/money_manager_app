@@ -1400,4 +1400,13 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get eventTransactionAlreadyRecorded =>
       'Sự kiện này đã có giao dịch trong sổ.';
+
+  @override
+  String get plannedExpense => 'Khoản chi dự kiến';
+
+  @override
+  String get plannedIncome => 'Khoản thu dự kiến';
+
+  @override
+  String get selectItemsToDelete => 'Chọn mục cần xóa';
 }

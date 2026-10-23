@@ -363,11 +363,26 @@ class _TodayEventReminder extends StatelessWidget {
             const AppIcon(AppIcons.calendar, size: 20),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                event.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.type == TxType.expense
+                        ? context.l10n.plannedExpense
+                        : context.l10n.plannedIncome,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    event.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 8),
