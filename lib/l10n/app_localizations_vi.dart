@@ -866,7 +866,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get walletConversionSubtitle =>
-      'Chọn loại tiền nguồn và đích ở trên, sau đó chọn ví muốn quy đổi.';
+      'Chọn một hoặc nhiều ví cùng loại tiền tệ để quy đổi.';
 
   @override
   String get filterCurrencies => 'Lọc ví theo tiền tệ';

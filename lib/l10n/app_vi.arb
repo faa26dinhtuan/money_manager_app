@@ -450,7 +450,7 @@
   "selectWalletsToConvert": "Chọn ví muốn quy đổi sang loại tiền mới",
   "convertSelectedWallets": "Quy đổi ví đã chọn",
   "convertWallets": "Quy đổi ví",
-  "walletConversionSubtitle": "Chọn loại tiền nguồn và đích ở trên, sau đó chọn ví muốn quy đổi.",
+  "walletConversionSubtitle": "Chọn một hoặc nhiều ví cùng loại tiền tệ để quy đổi.",
   "filterCurrencies": "Lọc ví theo tiền tệ",
   "showAllCurrencies": "Hiện tất cả tiền tệ",
   "walletsMustShareCurrency": "Có thể chọn nhiều ví, nhưng các ví phải cùng loại tiền tệ.",

@@ -865,7 +865,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walletConversionSubtitle =>
-      'Select wallets first, then choose the currency to convert them to.';
+      'Select one or more wallets with the same currency to convert.';
 
   @override
   String get filterCurrencies => 'Filter wallets by currency';

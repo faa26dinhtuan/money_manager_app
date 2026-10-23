@@ -1637,7 +1637,7 @@ abstract class AppLocalizations {
   /// No description provided for @walletConversionSubtitle.
   ///
   /// In vi, this message translates to:
-  /// **'Chọn loại tiền nguồn và đích ở trên, sau đó chọn ví muốn quy đổi.'**
+  /// **'Chọn một hoặc nhiều ví cùng loại tiền tệ để quy đổi.'**
   String get walletConversionSubtitle;
 
   /// No description provided for @filterCurrencies.
