@@ -203,13 +203,13 @@ abstract class AppLocalizations {
   /// No description provided for @deleteEventSeries.
   ///
   /// In vi, this message translates to:
-  /// **'Xóa toàn bộ lần lặp'**
+  /// **'Xóa tất cả các lần lặp'**
   String get deleteEventSeries;
 
   /// No description provided for @deleteRecurringEventWarning.
   ///
   /// In vi, this message translates to:
-  /// **'Xóa sự kiện không xóa các giao dịch đã ghi trong sổ.'**
+  /// **'Chọn phạm vi sự kiện muốn xóa.'**
   String get deleteRecurringEventWarning;
 
   /// No description provided for @pleaseSelectWallet.
@@ -2647,6 +2647,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chọn mục cần xóa'**
   String get selectItemsToDelete;
+
+  /// No description provided for @deleteEventTransactionsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa giao dịch liên quan?'**
+  String get deleteEventTransactionsTitle;
+
+  /// No description provided for @deleteEventTransactionsMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có muốn xóa các giao dịch đã ghi từ sự kiện này không?'**
+  String get deleteEventTransactionsMessage;
+
+  /// No description provided for @keepEventTransactions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giữ lại giao dịch'**
+  String get keepEventTransactions;
+
+  /// No description provided for @deleteEventTransactions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa giao dịch'**
+  String get deleteEventTransactions;
 }
 
 class _AppLocalizationsDelegate

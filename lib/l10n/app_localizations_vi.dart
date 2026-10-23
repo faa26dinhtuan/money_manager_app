@@ -61,11 +61,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get deleteThisOccurrence => 'Chỉ xóa ngày này';
 
   @override
-  String get deleteEventSeries => 'Xóa toàn bộ lần lặp';
+  String get deleteEventSeries => 'Xóa tất cả các lần lặp';
 
   @override
-  String get deleteRecurringEventWarning =>
-      'Xóa sự kiện không xóa các giao dịch đã ghi trong sổ.';
+  String get deleteRecurringEventWarning => 'Chọn phạm vi sự kiện muốn xóa.';
 
   @override
   String get pleaseSelectWallet => 'Vui lòng chọn ví';
@@ -1409,4 +1408,17 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get selectItemsToDelete => 'Chọn mục cần xóa';
+
+  @override
+  String get deleteEventTransactionsTitle => 'Xóa giao dịch liên quan?';
+
+  @override
+  String get deleteEventTransactionsMessage =>
+      'Bạn có muốn xóa các giao dịch đã ghi từ sự kiện này không?';
+
+  @override
+  String get keepEventTransactions => 'Giữ lại giao dịch';
+
+  @override
+  String get deleteEventTransactions => 'Xóa giao dịch';
 }

@@ -18,7 +18,7 @@
   "repeatFrequency": "Repeat frequency",
   "deleteThisOccurrence": "Delete this day only",
   "deleteEventSeries": "Delete all repetitions",
-  "deleteRecurringEventWarning": "Deleting an event does not remove transactions already recorded in the ledger.",
+  "deleteRecurringEventWarning": "Choose which event occurrences to delete.",
   "pleaseSelectWallet": "Select a wallet",
   "stopRecurringEventTitle": "Stop repeating this event?",
   "stopRecurringEventMessage": "The linked recurring transaction will be deleted. Transactions already created will be kept.",
@@ -455,5 +455,9 @@
   "eventTransactionAlreadyRecorded": "A transaction for this event is already in your ledger.",
   "plannedExpense": "Planned expense",
   "plannedIncome": "Planned income",
-  "selectItemsToDelete": "Select items to delete"
+  "selectItemsToDelete": "Select items to delete",
+  "deleteEventTransactionsTitle": "Delete related transactions?",
+  "deleteEventTransactionsMessage": "Do you want to delete transactions recorded from this event?",
+  "keepEventTransactions": "Keep transactions",
+  "deleteEventTransactions": "Delete transactions"
 }

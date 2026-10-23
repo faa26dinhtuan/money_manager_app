@@ -17,8 +17,8 @@
   "repeatEvent": "Lặp lại sự kiện",
   "repeatFrequency": "Tần suất lặp lại",
   "deleteThisOccurrence": "Chỉ xóa ngày này",
-  "deleteEventSeries": "Xóa toàn bộ lần lặp",
-  "deleteRecurringEventWarning": "Xóa sự kiện không xóa các giao dịch đã ghi trong sổ.",
+  "deleteEventSeries": "Xóa tất cả các lần lặp",
+  "deleteRecurringEventWarning": "Chọn phạm vi sự kiện muốn xóa.",
   "pleaseSelectWallet": "Vui lòng chọn ví",
   "stopRecurringEventTitle": "Tắt lặp lại sự kiện?",
   "stopRecurringEventMessage": "Giao dịch định kỳ liên kết sẽ bị xóa. Các giao dịch đã được tạo trước đó vẫn được giữ lại.",
@@ -780,5 +780,9 @@
   "eventTransactionAlreadyRecorded": "Sự kiện này đã có giao dịch trong sổ.",
   "plannedExpense": "Khoản chi dự kiến",
   "plannedIncome": "Khoản thu dự kiến",
-  "selectItemsToDelete": "Chọn mục cần xóa"
+  "selectItemsToDelete": "Chọn mục cần xóa",
+  "deleteEventTransactionsTitle": "Xóa giao dịch liên quan?",
+  "deleteEventTransactionsMessage": "Bạn có muốn xóa các giao dịch đã ghi từ sự kiện này không?",
+  "keepEventTransactions": "Giữ lại giao dịch",
+  "deleteEventTransactions": "Xóa giao dịch"
 }

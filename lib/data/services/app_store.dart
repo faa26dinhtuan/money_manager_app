@@ -439,6 +439,64 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  List<Transaction> plannedEventTransactions(
+    String eventId, {
+    DateTime? occurrenceDate,
+  }) {
+    final eventIndex = _plannedEvents.indexWhere((event) => event.id == eventId);
+    if (eventIndex == -1) return const [];
+    final event = _plannedEvents[eventIndex];
+    return _transactions.where((transaction) {
+      final sameDate = occurrenceDate == null ||
+          (transaction.date.year == occurrenceDate.year &&
+              transaction.date.month == occurrenceDate.month &&
+              transaction.date.day == occurrenceDate.day);
+      if (!sameDate) return false;
+      if (transaction.id.startsWith('event_${event.id}_')) return true;
+      return transaction.id.startsWith('rec_') &&
+          event.frequency != null &&
+          event.walletId != null &&
+          transaction.type == event.type &&
+          transaction.amount == event.amount &&
+          transaction.walletId == event.walletId &&
+          transaction.note == event.title &&
+          _isPlannedEventOccurrence(event, transaction.date);
+    }).toList();
+  }
+
+  bool _isPlannedEventOccurrence(PlannedEvent event, DateTime date) {
+    final frequency = event.frequency;
+    if (frequency == null) {
+      return event.date.year == date.year &&
+          event.date.month == date.month &&
+          event.date.day == date.day;
+    }
+    var occurrence = DateTime(event.date.year, event.date.month, event.date.day);
+    final target = DateTime(date.year, date.month, date.day);
+    var guard = 0;
+    while (occurrence.isBefore(target) && guard < 100000) {
+      occurrence = _advanceEventDate(occurrence, event.date, frequency);
+      guard++;
+    }
+    return occurrence.year == target.year &&
+        occurrence.month == target.month &&
+        occurrence.day == target.day;
+  }
+
+  void removePlannedEventTransactions(
+    String eventId, {
+    DateTime? occurrenceDate,
+  }) {
+    final ids = plannedEventTransactions(
+      eventId,
+      occurrenceDate: occurrenceDate,
+    ).map((transaction) => transaction.id).toSet();
+    if (ids.isEmpty) return;
+    _transactions.removeWhere((transaction) => ids.contains(transaction.id));
+    notifyListeners();
+    _save();
+  }
+
   void removeTransaction(String id) {
     _transactions.removeWhere((t) => t.id == id);
     notifyListeners();

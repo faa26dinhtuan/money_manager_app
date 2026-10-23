@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteRecurringEventWarning =>
-      'Deleting an event does not remove transactions already recorded in the ledger.';
+      'Choose which event occurrences to delete.';
 
   @override
   String get pleaseSelectWallet => 'Select a wallet';
@@ -1409,4 +1409,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectItemsToDelete => 'Select items to delete';
+
+  @override
+  String get deleteEventTransactionsTitle => 'Delete related transactions?';
+
+  @override
+  String get deleteEventTransactionsMessage =>
+      'Do you want to delete transactions recorded from this event?';
+
+  @override
+  String get keepEventTransactions => 'Keep transactions';
+
+  @override
+  String get deleteEventTransactions => 'Delete transactions';
 }

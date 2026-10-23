@@ -91,10 +91,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
+  Future<bool?> _confirmDeleteEventTransactions(
+    PlannedEvent event, {
+    DateTime? occurrenceDate,
+  }) async {
+    final transactions = _store.plannedEventTransactions(
+      event.id,
+      occurrenceDate: occurrenceDate,
+    );
+    if (transactions.isEmpty) return false;
+    final l = context.l10n;
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l.deleteEventTransactionsTitle),
+        content: Text(l.deleteEventTransactionsMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(null),
+            child: Text(l.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l.keepEventTransactions),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: context.negativeColor),
+            child: Text(l.deleteEventTransactions),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _deletePlannedEvent(PlannedEvent event) async {
     final l = context.l10n;
     if (event.frequency != null) {
-      final deleteSeries = await showDialog<bool>(
+      final deleteAll = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: Text(l.deletePlannedEventTitle),
@@ -116,8 +150,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
         ),
       );
-      if (deleteSeries == null) return;
-      if (deleteSeries) {
+      if (deleteAll == null) return;
+      final removeTransactions = await _confirmDeleteEventTransactions(
+        event,
+        occurrenceDate: deleteAll ? null : event.date,
+      );
+      if (removeTransactions == null) return;
+      if (removeTransactions) {
+        _store.removePlannedEventTransactions(
+          event.id,
+          occurrenceDate: deleteAll ? null : event.date,
+        );
+      }
+      if (deleteAll) {
         _store.removePlannedEvent(event.id);
       } else {
         _store.skipPlannedEventOccurrence(event.id, event.date);
@@ -129,7 +174,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
       title: l.deletePlannedEventTitle,
       message: l.deletePlannedEventMessage,
     );
-    if (confirmed) _store.removePlannedEvent(event.id);
+    if (!confirmed) return;
+    final removeTransactions = await _confirmDeleteEventTransactions(event);
+    if (removeTransactions == null) return;
+    if (removeTransactions) {
+      _store.removePlannedEventTransactions(event.id);
+    }
+    _store.removePlannedEvent(event.id);
   }
 
   @override
