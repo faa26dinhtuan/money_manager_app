@@ -14,9 +14,19 @@ import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class PlannedEventFormResult {
-  const PlannedEventFormResult({required this.event});
+  const PlannedEventFormResult({
+    required this.event,
+    required this.linkToRecurring,
+    required this.autoRecord,
+    this.categoryId,
+    this.walletId,
+  });
 
   final PlannedEvent event;
+  final bool linkToRecurring;
+  final bool autoRecord;
+  final String? categoryId;
+  final String? walletId;
 }
 
 class PlannedEventFormSheet extends StatefulWidget {
@@ -44,6 +54,11 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   late TxType _type;
   late Frequency _frequency;
   late bool _repeat;
+  late bool _linkToRecurring;
+  late bool _autoRecord;
+  String? _categoryId;
+  String? _walletId;
+  String? _amountError;
 
   @override
   void initState() {
@@ -55,6 +70,14 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
     _type = event?.type ?? TxType.expense;
     _frequency = event?.frequency ?? Frequency.monthly;
     _repeat = event?.frequency != null;
+    final recurring = event?.recurringId == null
+        ? null
+        : _store.recurringById(event!.recurringId!);
+    _linkToRecurring = recurring != null;
+    _autoRecord = recurring?.active ?? false;
+    final categories = _store.categoriesOf(_type);
+    _categoryId = recurring?.categoryId ?? (categories.isEmpty ? null : categories.first.id);
+    _walletId = recurring?.walletId ?? event?.walletId ?? _store.selectedWalletId;
     _nameController.text = event?.title ?? '';
     _noteController.text = event?.note ?? '';
     if (event != null) _amountController.amount = event.amount;
@@ -90,9 +113,14 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
       );
       return;
     }
-    if (_amountController.amount <= 0) {
+    if (_repeat && _linkToRecurring && _amountController.amount <= 0) {
+      setState(() => _amountError = l.pleaseEnterAmount);
+      return;
+    }
+    if (_repeat && _linkToRecurring &&
+        (_categoryId == null || _walletId == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.pleaseEnterAmount)),
+        SnackBar(content: Text(l.eventTransactionNeedsSetup)),
       );
       return;
     }
@@ -108,12 +136,21 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
       date: DateTime(_date.year, _date.month, _date.day, 12),
       currencyCode: currency.code,
       note: _noteController.text.trim(),
-      walletId: widget.event?.walletId ?? _store.selectedWalletId,
+      walletId: _repeat && _linkToRecurring
+          ? _walletId
+          : widget.event?.walletId ?? _store.selectedWalletId,
+      recurringId: widget.event?.recurringId,
       frequency: _repeat ? _frequency : null,
       skippedDates: scheduleChanged ? const [] : widget.event?.skippedDates ?? const [],
     );
     Navigator.of(context).pop(
-      PlannedEventFormResult(event: plannedEvent),
+      PlannedEventFormResult(
+        event: plannedEvent,
+        linkToRecurring: _repeat && _linkToRecurring,
+        autoRecord: _repeat && _linkToRecurring && _autoRecord,
+        categoryId: _repeat && _linkToRecurring ? _categoryId : null,
+        walletId: _repeat && _linkToRecurring ? _walletId : null,
+      ),
     );
   }
 
@@ -121,6 +158,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   Widget build(BuildContext context) {
     final l = context.l10n;
     final event = widget.event;
+    final currency = AppCurrency.byCode(event?.currencyCode ?? _store.currency.code);
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -165,6 +203,10 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                 type: _type,
                 onChanged: (type) => setState(() {
                   _type = type;
+                  final categories = _store.categoriesOf(type);
+                  if (!categories.any((category) => category.id == _categoryId)) {
+                    _categoryId = categories.isEmpty ? null : categories.first.id;
+                  }
                 }),
               ),
               const SizedBox(height: 12),
@@ -173,8 +215,17 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                 title: l.amount,
                 decoration: InputDecoration(
                   labelText: l.amount,
+                  helperText: _repeat && _linkToRecurring
+                      ? null
+                      : l.eventAmountOptional,
+                  errorText: _amountError,
                   prefixIcon: const AppIcon(AppIcons.wallet),
                 ),
+                onChanged: (amount) {
+                  if (_amountError != null && amount > 0) {
+                    setState(() => _amountError = null);
+                  }
+                },
               ),
               const SizedBox(height: 10),
               if (widget.allowDateChange) Material(
@@ -219,6 +270,53 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                   },
                 ),
                 const SizedBox(height: 12),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: _linkToRecurring,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(l.linkEventToRecurring),
+                  onChanged: (value) => setState(() {
+                    _linkToRecurring = value ?? false;
+                  }),
+                ),
+                if (_linkToRecurring) ...[
+                  DropdownButtonFormField<String>(
+                    value: _categoryId,
+                    decoration: InputDecoration(labelText: l.category),
+                    items: [
+                      for (final category in _store.categoriesOf(_type))
+                        DropdownMenuItem(
+                          value: category.id,
+                          child: Text(category.localizedName(context)),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() => _categoryId = value),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: _walletId,
+                    decoration: InputDecoration(labelText: l.wallet),
+                    items: [
+                      for (final wallet in _store.wallets.where(
+                        (item) => item.currencyCode == currency.code,
+                      ))
+                        DropdownMenuItem(
+                          value: wallet.id,
+                          child: Text(wallet.localizedName(context)),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() => _walletId = value),
+                  ),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: _autoRecord,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(l.autoRecordLinkedRecurring),
+                    onChanged: (value) => setState(() {
+                      _autoRecord = value ?? false;
+                    }),
+                  ),
+                ],
               ],
               const SizedBox(height: 12),
               TextField(

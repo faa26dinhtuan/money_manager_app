@@ -1421,4 +1421,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get deleteEventTransactions => 'Xóa giao dịch';
+
+  @override
+  String get actualAmount => 'Số tiền thực tế';
+
+  @override
+  String get linkEventToRecurring => 'Liên kết với giao dịch định kỳ';
+
+  @override
+  String get autoRecordLinkedRecurring => 'Tự động ghi giao dịch khi đến hạn';
+
+  @override
+  String get eventAmountOptional => 'Không bắt buộc';
 }

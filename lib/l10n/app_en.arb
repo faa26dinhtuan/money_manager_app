@@ -459,5 +459,9 @@
   "deleteEventTransactionsTitle": "Delete related transactions?",
   "deleteEventTransactionsMessage": "Do you want to delete transactions recorded from this event?",
   "keepEventTransactions": "Keep transactions",
-  "deleteEventTransactions": "Delete transactions"
+  "deleteEventTransactions": "Delete transactions",
+  "actualAmount": "Actual amount",
+  "linkEventToRecurring": "Link to a recurring transaction",
+  "autoRecordLinkedRecurring": "Automatically record when due",
+  "eventAmountOptional": "Optional"
 }

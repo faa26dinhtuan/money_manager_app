@@ -12,6 +12,7 @@ import 'package:money_manager_app/core/widgets/app_card.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/donut_chart.dart';
 import 'package:money_manager_app/core/widgets/gradient_header.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
@@ -74,6 +75,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
     var walletId = wallets.any((wallet) => wallet.id == preferredWalletId)
         ? preferredWalletId!
         : wallets.first.id;
+    final amountController = MoneyController(
+      currency: AppCurrency.byCode(event.currencyCode),
+    )..amount = event.amount;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -91,10 +95,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   style: Theme.of(dialogContext).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  formatMoney(
-                    event.amount,
-                    AppCurrency.byCode(event.currencyCode),
+                MoneyField(
+                  controller: amountController,
+                  title: l.actualAmount,
+                  decoration: InputDecoration(
+                    labelText: l.actualAmount,
+                    prefixIcon: const AppIcon(AppIcons.wallet),
                   ),
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
@@ -102,6 +108,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                         ? context.negativeColor
                         : context.positiveColor,
                   ),
+                  onChanged: (_) => setDialogState(() {}),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
@@ -137,20 +144,27 @@ class _OverviewScreenState extends State<OverviewScreen> {
               child: Text(l.cancel),
             ),
             FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
+              onPressed: amountController.amount <= 0
+                  ? null
+                  : () => Navigator.of(dialogContext).pop(true),
               child: Text(l.recordEventTransaction),
             ),
           ],
         ),
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) {
+      amountController.dispose();
+      return;
+    }
     final recorded = _store.recordPlannedEventTransaction(
       event: event,
       date: event.date,
       categoryId: categoryId,
       walletId: walletId,
+      amount: amountController.amount,
     );
+    amountController.dispose();
     if (!recorded) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l.eventTransactionAlreadyRecorded)),
@@ -352,7 +366,10 @@ class _TodayEventReminder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = event.type == TxType.expense
+    final hasAmount = event.amount > 0;
+    final color = !hasAmount
+        ? context.textSecondary
+        : event.type == TxType.expense
         ? context.negativeColor
         : context.positiveColor;
     return Column(
@@ -367,7 +384,9 @@ class _TodayEventReminder extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.type == TxType.expense
+                    !hasAmount
+                        ? context.l10n.plannedEvent
+                        : event.type == TxType.expense
                         ? context.l10n.plannedExpense
                         : context.l10n.plannedIncome,
                     style: TextStyle(
@@ -385,25 +404,28 @@ class _TodayEventReminder extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              formatMoney(event.amount, AppCurrency.byCode(event.currencyCode)),
-              style: TextStyle(color: color, fontWeight: FontWeight.w700),
-            ),
+            if (hasAmount) ...[
+              const SizedBox(width: 8),
+              Text(
+                formatMoney(event.amount, AppCurrency.byCode(event.currencyCode)),
+                style: TextStyle(color: color, fontWeight: FontWeight.w700),
+              ),
+            ],
           ],
         ),
         if (event.note.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(event.note, style: TextStyle(color: context.textSecondary)),
         ],
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            onPressed: () => onRecord(event),
-            icon: const AppIcon(AppIcons.check, size: 18),
-            label: Text(context.l10n.recordEventTransaction),
+        if (hasAmount)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => onRecord(event),
+              icon: const AppIcon(AppIcons.check, size: 18),
+              label: Text(context.l10n.recordEventTransaction),
+            ),
           ),
-        ),
       ],
     );
   }

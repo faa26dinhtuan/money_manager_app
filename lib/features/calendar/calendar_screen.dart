@@ -15,6 +15,7 @@ import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/planned_event.dart';
+import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
@@ -76,18 +77,76 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
     if (result == null) return;
+    var savedEvent = result.event;
+    final oldRecurringId = event?.recurringId;
+    final oldRecurring = oldRecurringId == null
+        ? null
+        : _store.recurringById(oldRecurringId);
+    if (result.linkToRecurring &&
+        result.categoryId != null &&
+        result.walletId != null &&
+        savedEvent.frequency != null) {
+      final recurringId = oldRecurring?.id ?? _store.newId();
+      final start = RecurringTransaction.dateOnly(savedEvent.date);
+      final scheduleChanged = oldRecurring == null ||
+          oldRecurring.frequency != savedEvent.frequency ||
+          !isSameDay(oldRecurring.startDate, start);
+      var nextDate = scheduleChanged ? start : oldRecurring!.nextDate;
+      final shouldCatchUp = result.autoRecord &&
+          (scheduleChanged || oldRecurring?.active != true);
+      if (shouldCatchUp) {
+        final today = RecurringTransaction.dateOnly(DateTime.now());
+        while (nextDate.isBefore(today)) {
+          final seed = RecurringTransaction(
+            id: recurringId,
+            type: savedEvent.type,
+            categoryId: result.categoryId!,
+            walletId: result.walletId!,
+            amount: savedEvent.amount,
+            frequency: savedEvent.frequency!,
+            startDate: start,
+            nextDate: nextDate,
+          );
+          nextDate = seed.advance(nextDate);
+        }
+      }
+      final recurring = RecurringTransaction(
+        id: recurringId,
+        type: savedEvent.type,
+        categoryId: result.categoryId!,
+        walletId: result.walletId!,
+        amount: savedEvent.amount,
+        frequency: savedEvent.frequency!,
+        startDate: start,
+        nextDate: nextDate,
+        note: savedEvent.note.isEmpty
+            ? savedEvent.title
+            : '${savedEvent.title}\n${savedEvent.note}',
+        active: result.autoRecord,
+        skippedDates: oldRecurring?.skippedDates ?? const [],
+      );
+      if (oldRecurring == null) {
+        _store.addRecurring(recurring);
+      } else {
+        _store.updateRecurring(recurring);
+      }
+      savedEvent = savedEvent.copyWith(recurringId: recurringId);
+    } else if (oldRecurringId != null) {
+      _store.removeRecurring(oldRecurringId, preservePlannedEvent: true);
+      savedEvent = savedEvent.copyWith(clearRecurringId: true);
+    }
     if (event == null) {
-      _store.addPlannedEvent(result.event);
+      _store.addPlannedEvent(savedEvent);
     } else {
-      _store.updatePlannedEvent(result.event);
+      _store.updatePlannedEvent(savedEvent);
     }
     setState(() {
       _selectedDay = DateTime(
-        result.event.date.year,
-        result.event.date.month,
-        result.event.date.day,
+        savedEvent.date.year,
+        savedEvent.date.month,
+        savedEvent.date.day,
       );
-      _month = DateTime(result.event.date.year, result.event.date.month);
+      _month = DateTime(savedEvent.date.year, savedEvent.date.month);
     });
   }
 
@@ -163,9 +222,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
         );
       }
       if (deleteAll) {
+        final recurringId = event.recurringId;
+        if (recurringId != null) {
+          _store.removeRecurring(recurringId, preservePlannedEvent: true);
+        }
         _store.removePlannedEvent(event.id);
       } else {
         _store.skipPlannedEventOccurrence(event.id, event.date);
+        final recurringId = event.recurringId;
+        if (recurringId != null) {
+          _store.skipRecurringOccurrence(recurringId, event.date);
+        }
       }
       return;
     }
@@ -179,6 +246,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     if (removeTransactions == null) return;
     if (removeTransactions) {
       _store.removePlannedEventTransactions(event.id);
+    }
+    final recurringId = event.recurringId;
+    if (recurringId != null) {
+      _store.removeRecurring(recurringId, preservePlannedEvent: true);
     }
     _store.removePlannedEvent(event.id);
   }
@@ -644,6 +715,7 @@ class _PlannedEventRow extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+          if (event.amount > 0)
             Text(
               '${isExpense ? '−' : '+'}${formatMoney(event.amount, AppCurrency.byCode(event.currencyCode))}',
               style: TextStyle(color: color, fontWeight: FontWeight.w700),

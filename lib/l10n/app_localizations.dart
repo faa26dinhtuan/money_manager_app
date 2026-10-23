@@ -2671,6 +2671,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Xóa giao dịch'**
   String get deleteEventTransactions;
+
+  /// No description provided for @actualAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền thực tế'**
+  String get actualAmount;
+
+  /// No description provided for @linkEventToRecurring.
+  ///
+  /// In vi, this message translates to:
+  /// **'Liên kết với giao dịch định kỳ'**
+  String get linkEventToRecurring;
+
+  /// No description provided for @autoRecordLinkedRecurring.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tự động ghi giao dịch khi đến hạn'**
+  String get autoRecordLinkedRecurring;
+
+  /// No description provided for @eventAmountOptional.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không bắt buộc'**
+  String get eventAmountOptional;
 }
 
 class _AppLocalizationsDelegate

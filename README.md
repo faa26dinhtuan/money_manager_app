@@ -14,3 +14,7 @@ có cài đặt tự động che số dư bằng \*\*\*, chỉ hiển thị khi 
 
 đồng hồ nhắc nhở
 
+đổi icon app
+
+khi mở app các lần sau vẫn hiện icon và tên app, tên app hiện trước icon hiện sau 1 chút
+

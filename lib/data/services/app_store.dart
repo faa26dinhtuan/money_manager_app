@@ -404,12 +404,15 @@ class AppStore extends ChangeNotifier {
     required DateTime date,
     required String categoryId,
     required String walletId,
+    double? amount,
   }) {
     final category = categoryById(categoryId);
     final wallet = walletById(walletId);
+    final actualAmount = amount ?? event.amount;
     if (category?.type != event.type ||
         wallet == null ||
         wallet.currencyCode != event.currencyCode ||
+        actualAmount <= 0 ||
         hasPlannedEventTransaction(event, date)) {
       return false;
     }
@@ -421,11 +424,24 @@ class AppStore extends ChangeNotifier {
         type: event.type,
         categoryId: categoryId,
         walletId: walletId,
-        amount: event.amount,
+        amount: actualAmount,
         date: DateTime(date.year, date.month, date.day, 12),
         note: note,
       ),
     );
+    final recurringId = event.recurringId;
+    if (recurringId != null) {
+      final index = _recurrings.indexWhere((item) => item.id == recurringId);
+      if (index != -1) {
+        final recurring = _recurrings[index];
+        final occurrence = RecurringTransaction.dateOnly(date);
+        if (!recurring.isSkipped(occurrence)) {
+          _recurrings[index] = recurring.copyWith(
+            skippedDates: [...recurring.skippedDates, occurrence],
+          );
+        }
+      }
+    }
     notifyListeners();
     _save();
     return true;

@@ -784,5 +784,9 @@
   "deleteEventTransactionsTitle": "Xóa giao dịch liên quan?",
   "deleteEventTransactionsMessage": "Bạn có muốn xóa các giao dịch đã ghi từ sự kiện này không?",
   "keepEventTransactions": "Giữ lại giao dịch",
-  "deleteEventTransactions": "Xóa giao dịch"
+  "deleteEventTransactions": "Xóa giao dịch",
+  "actualAmount": "Số tiền thực tế",
+  "linkEventToRecurring": "Liên kết với giao dịch định kỳ",
+  "autoRecordLinkedRecurring": "Tự động ghi giao dịch khi đến hạn",
+  "eventAmountOptional": "Không bắt buộc"
 }

@@ -1422,4 +1422,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteEventTransactions => 'Delete transactions';
+
+  @override
+  String get actualAmount => 'Actual amount';
+
+  @override
+  String get linkEventToRecurring => 'Link to a recurring transaction';
+
+  @override
+  String get autoRecordLinkedRecurring => 'Automatically record when due';
+
+  @override
+  String get eventAmountOptional => 'Optional';
 }
