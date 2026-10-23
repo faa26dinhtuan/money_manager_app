@@ -884,6 +884,7 @@ class AppStore extends ChangeNotifier {
           currencyCode: event.currencyCode,
           note: event.note,
           walletId: event.walletId,
+          reminderMinutes: event.reminderMinutes,
         );
       }
     } else {

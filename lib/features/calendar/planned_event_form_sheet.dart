@@ -12,6 +12,7 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/data/services/event_reminder_service.dart';
 
 class PlannedEventFormResult {
   const PlannedEventFormResult({
@@ -59,6 +60,8 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   String? _categoryId;
   String? _walletId;
   String? _amountError;
+  late bool _reminderEnabled;
+  late TimeOfDay _reminderTime;
 
   @override
   void initState() {
@@ -78,6 +81,11 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
     final categories = _store.categoriesOf(_type);
     _categoryId = recurring?.categoryId ?? (categories.isEmpty ? null : categories.first.id);
     _walletId = recurring?.walletId ?? event?.walletId ?? _store.selectedWalletId;
+    final reminderMinutes = event?.reminderMinutes;
+    _reminderEnabled = reminderMinutes != null;
+    _reminderTime = reminderMinutes == null
+        ? const TimeOfDay(hour: 9, minute: 0)
+        : TimeOfDay(hour: reminderMinutes ~/ 60, minute: reminderMinutes % 60);
     _nameController.text = event?.title ?? '';
     _noteController.text = event?.note ?? '';
     if (event != null) _amountController.amount = event.amount;
@@ -99,6 +107,14 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
       lastDate: DateTime(2100),
     );
     if (picked != null) setState(() => _date = picked);
+  }
+
+  Future<void> _pickReminderTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _reminderTime,
+    );
+    if (picked != null) setState(() => _reminderTime = picked);
   }
 
   void _save() {
@@ -141,6 +157,9 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
           : widget.event?.walletId ?? _store.selectedWalletId,
       recurringId: widget.event?.recurringId,
       frequency: _repeat ? _frequency : null,
+      reminderMinutes: _reminderEnabled
+          ? _reminderTime.hour * 60 + _reminderTime.minute
+          : null,
       skippedDates: scheduleChanged ? const [] : widget.event?.skippedDates ?? const [],
     );
     Navigator.of(context).pop(
@@ -317,6 +336,40 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                     }),
                   ),
                 ],
+              ],
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _reminderEnabled,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(l.eventReminderToggle),
+                onChanged: (value) async {
+                  final enabled = value ?? false;
+                  if (enabled) {
+                    final granted =
+                        await EventReminderService.instance.requestPermission();
+                    if (!mounted) return;
+                    if (!granted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l.eventReminderPermissionDenied)),
+                      );
+                      return;
+                    }
+                  }
+                  setState(() => _reminderEnabled = enabled);
+                },
+              ),
+              if (_reminderEnabled) ...[
+                ListTile(
+                  contentPadding: const EdgeInsets.only(left: 44),
+                  onTap: _pickReminderTime,
+                  title: Text(l.reminderTime),
+                  trailing: Text(
+                    MaterialLocalizations.of(context).formatTimeOfDay(
+                      _reminderTime,
+                    ),
+                  ),
+                ),
+                
               ],
               const SizedBox(height: 12),
               TextField(

@@ -18,6 +18,7 @@ import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/data/services/event_reminder_service.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/calendar/planned_event_form_sheet.dart';
 
@@ -140,6 +141,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     } else {
       _store.updatePlannedEvent(savedEvent);
     }
+    await EventReminderService.instance.sync(
+      _store.allPlannedEvents,
+      localization: context.l10n,
+    );
     setState(() {
       _selectedDay = DateTime(
         savedEvent.date.year,
@@ -234,6 +239,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           _store.skipRecurringOccurrence(recurringId, event.date);
         }
       }
+      await EventReminderService.instance.sync(
+        _store.allPlannedEvents,
+        localization: context.l10n,
+      );
       return;
     }
     final confirmed = await confirmDelete(
@@ -252,6 +261,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       _store.removeRecurring(recurringId, preservePlannedEvent: true);
     }
     _store.removePlannedEvent(event.id);
+    await EventReminderService.instance.sync(
+      _store.allPlannedEvents,
+      localization: context.l10n,
+    );
   }
 
   @override

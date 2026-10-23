@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/data/services/event_reminder_service.dart';
 import 'package:money_manager_app/features/intro/intro_screen.dart';
 import 'package:money_manager_app/features/calendar/calendar_screen.dart';
 import 'package:money_manager_app/features/onboarding/onboarding_screen.dart';
@@ -75,6 +76,10 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   void _runRecurring() {
     final count = AppStore.instance.processRecurring();
+    EventReminderService.instance.sync(
+      AppStore.instance.allPlannedEvents,
+      localization: context.l10n,
+    );
     if (count > 0 && mounted) {
       ScaffoldMessenger.of(
         context,

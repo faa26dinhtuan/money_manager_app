@@ -1434,4 +1434,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventAmountOptional => 'Optional';
+
+  @override
+  String get eventReminderToggle => 'Remind me';
+
+  @override
+  String get reminderTime => 'Reminder time';
+
+  @override
+  String get eventReminderPermissionDenied =>
+      'Notification permission is off. Enable it in your device settings.';
+
+  @override
+  String get eventReminderNotificationTitle => 'Event reminder';
+
+  @override
+  String get eventReminderChannel => 'Event reminders';
+
+  @override
+  String get eventReminderChannelDescription =>
+      'Notifications for scheduled events';
 }

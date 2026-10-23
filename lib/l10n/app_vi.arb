@@ -788,5 +788,11 @@
   "actualAmount": "Số tiền thực tế",
   "linkEventToRecurring": "Liên kết với giao dịch định kỳ",
   "autoRecordLinkedRecurring": "Tự động ghi giao dịch khi đến hạn",
-  "eventAmountOptional": "Không bắt buộc"
+  "eventAmountOptional": "Không bắt buộc",
+  "eventReminderToggle": "Nhắc tôi",
+  "reminderTime": "Giờ nhắc",
+  "eventReminderPermissionDenied": "Chưa có quyền gửi thông báo. Hãy bật quyền trong cài đặt thiết bị.",
+  "eventReminderNotificationTitle": "Nhắc nhở sự kiện",
+  "eventReminderChannel": "Nhắc nhở sự kiện",
+  "eventReminderChannelDescription": "Thông báo về các sự kiện đã lên lịch"
 }

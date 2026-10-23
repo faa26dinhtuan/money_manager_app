@@ -13,6 +13,7 @@ class PlannedEvent {
     this.walletId,
     this.recurringId,
     this.frequency,
+    this.reminderMinutes,
     this.seriesStartDate,
     this.skippedDates = const [],
   });
@@ -27,6 +28,7 @@ class PlannedEvent {
   final String? walletId;
   final String? recurringId;
   final Frequency? frequency;
+  final int? reminderMinutes;
   final DateTime? seriesStartDate;
   final List<DateTime> skippedDates;
 
@@ -39,9 +41,11 @@ class PlannedEvent {
     String? note,
     String? recurringId,
     Frequency? frequency,
+    int? reminderMinutes,
     DateTime? seriesStartDate,
     List<DateTime>? skippedDates,
     bool clearRecurringId = false,
+    bool clearReminder = false,
   }) => PlannedEvent(
     id: id,
     title: title ?? this.title,
@@ -53,6 +57,7 @@ class PlannedEvent {
     walletId: walletId,
     recurringId: clearRecurringId ? null : recurringId ?? this.recurringId,
     frequency: frequency ?? this.frequency,
+    reminderMinutes: clearReminder ? null : reminderMinutes ?? this.reminderMinutes,
     seriesStartDate: seriesStartDate ?? this.seriesStartDate,
     skippedDates: skippedDates ?? this.skippedDates,
   );
@@ -70,6 +75,7 @@ class PlannedEvent {
     frequency: json['frequency'] == null
         ? null
         : Frequency.values.byName(json['frequency'] as String),
+    reminderMinutes: (json['reminderMinutes'] as num?)?.toInt(),
     seriesStartDate: json['seriesStartDate'] == null
         ? null
         : DateTime.parse(json['seriesStartDate'] as String),
@@ -89,6 +95,7 @@ class PlannedEvent {
     'walletId': walletId,
     'recurringId': recurringId,
     'frequency': frequency?.name,
+    'reminderMinutes': reminderMinutes,
     'seriesStartDate': seriesStartDate?.toIso8601String(),
     'skippedDates': skippedDates.map((date) => date.toIso8601String()).toList(),
   };

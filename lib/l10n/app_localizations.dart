@@ -2695,6 +2695,42 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Không bắt buộc'**
   String get eventAmountOptional;
+
+  /// No description provided for @eventReminderToggle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc tôi'**
+  String get eventReminderToggle;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ nhắc'**
+  String get reminderTime;
+
+  /// No description provided for @eventReminderPermissionDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có quyền gửi thông báo. Hãy bật quyền trong cài đặt thiết bị.'**
+  String get eventReminderPermissionDenied;
+
+  /// No description provided for @eventReminderNotificationTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nhở sự kiện'**
+  String get eventReminderNotificationTitle;
+
+  /// No description provided for @eventReminderChannel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nhở sự kiện'**
+  String get eventReminderChannel;
+
+  /// No description provided for @eventReminderChannelDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông báo về các sự kiện đã lên lịch'**
+  String get eventReminderChannelDescription;
 }
 
 class _AppLocalizationsDelegate

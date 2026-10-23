@@ -1433,4 +1433,24 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get eventAmountOptional => 'Không bắt buộc';
+
+  @override
+  String get eventReminderToggle => 'Nhắc tôi';
+
+  @override
+  String get reminderTime => 'Giờ nhắc';
+
+  @override
+  String get eventReminderPermissionDenied =>
+      'Chưa có quyền gửi thông báo. Hãy bật quyền trong cài đặt thiết bị.';
+
+  @override
+  String get eventReminderNotificationTitle => 'Nhắc nhở sự kiện';
+
+  @override
+  String get eventReminderChannel => 'Nhắc nhở sự kiện';
+
+  @override
+  String get eventReminderChannelDescription =>
+      'Thông báo về các sự kiện đã lên lịch';
 }

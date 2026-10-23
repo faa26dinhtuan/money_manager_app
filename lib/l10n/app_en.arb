@@ -463,5 +463,11 @@
   "actualAmount": "Actual amount",
   "linkEventToRecurring": "Link to a recurring transaction",
   "autoRecordLinkedRecurring": "Automatically record when due",
-  "eventAmountOptional": "Optional"
+  "eventAmountOptional": "Optional",
+  "eventReminderToggle": "Remind me",
+  "reminderTime": "Reminder time",
+  "eventReminderPermissionDenied": "Notification permission is off. Enable it in your device settings.",
+  "eventReminderNotificationTitle": "Event reminder",
+  "eventReminderChannel": "Event reminders",
+  "eventReminderChannelDescription": "Notifications for scheduled events"
 }
