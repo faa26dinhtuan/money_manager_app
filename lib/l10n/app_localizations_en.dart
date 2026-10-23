@@ -19,6 +19,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactions => 'Transactions';
 
   @override
+  String get calendar => 'Calendar';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
   String get categories => 'Categories';
 
   @override

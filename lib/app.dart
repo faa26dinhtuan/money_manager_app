@@ -8,6 +8,7 @@ import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/intro/intro_screen.dart';
+import 'package:money_manager_app/features/calendar/calendar_screen.dart';
 import 'package:money_manager_app/features/onboarding/onboarding_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
 import 'package:money_manager_app/features/splash/splash_screen.dart';
@@ -84,6 +85,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   static const List<Widget> _screens = [
     OverviewScreen(),
     TransactionsScreen(),
+    CalendarScreen(),
     WalletScreen(),
   ];
 

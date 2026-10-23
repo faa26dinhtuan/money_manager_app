@@ -43,7 +43,8 @@ class CustomBottomNav extends StatelessWidget {
           _item(context, 0, AppIcons.overview, context.l10n.overview),
           _item(context, 1, AppIcons.transactions, context.l10n.transactions),
           const Expanded(child: SizedBox.shrink()),
-          _item(context, 2, AppIcons.wallet, context.l10n.wallet),
+          _item(context, 2, AppIcons.calendar, context.l10n.calendar),
+          _item(context, 3, AppIcons.wallet, context.l10n.wallet),
         ],
       ),
     );

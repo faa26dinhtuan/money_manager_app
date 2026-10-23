@@ -19,6 +19,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactions => 'Sổ giao dịch';
 
   @override
+  String get calendar => 'Lịch';
+
+  @override
+  String get previousMonth => 'Tháng trước';
+
+  @override
+  String get nextMonth => 'Tháng sau';
+
+  @override
   String get categories => 'Danh mục';
 
   @override

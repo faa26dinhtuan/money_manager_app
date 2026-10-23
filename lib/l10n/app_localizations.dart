@@ -116,6 +116,24 @@ abstract class AppLocalizations {
   /// **'Sổ giao dịch'**
   String get transactions;
 
+  /// No description provided for @calendar.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch'**
+  String get calendar;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng trước'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng sau'**
+  String get nextMonth;
+
   /// No description provided for @categories.
   ///
   /// In vi, this message translates to:
