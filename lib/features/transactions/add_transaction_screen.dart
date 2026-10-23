@@ -96,7 +96,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final l = context.l10n;
     final amount = _amountCtrl.amount;
     if (amount <= 0) {
@@ -116,6 +116,27 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       date: _date,
       note: _noteCtrl.text.trim(),
     );
+    if (transaction.type == TxType.expense && _projectedWalletBalance(transaction) < 0) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(context.l10n.negativeWalletBalanceTitle),
+          content: Text(context.l10n.negativeWalletBalanceMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(context.l10n.recordAnyway),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || confirmed != true) return;
+    }
     final messenger = ScaffoldMessenger.of(context);
     if (_isEditing) {
       _store.updateTransaction(transaction);
@@ -127,6 +148,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (warning != null) messenger.showApp(warning);
   }
 
+  double _projectedWalletBalance(Transaction transaction) {
+    var balance = _store.walletBalance(transaction.walletId);
+    final previous = widget.transaction;
+    if (previous != null && previous.walletId == transaction.walletId) {
+      balance -= previous.type == TxType.income
+          ? previous.amount
+          : -previous.amount;
+    }
+    balance += transaction.type == TxType.income
+        ? transaction.amount
+        : -transaction.amount;
+    return balance;
+  }
   String? _budgetWarning(Transaction t) {
     if (t.type != TxType.expense) return null;
     final budget = _store.budgetOfCategory(t.categoryId);

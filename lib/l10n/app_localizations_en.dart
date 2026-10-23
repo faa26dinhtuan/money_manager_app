@@ -1454,4 +1454,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventReminderChannelDescription =>
       'Notifications for scheduled events';
+
+  @override
+  String get negativeWalletBalanceTitle => 'Insufficient wallet balance';
+
+  @override
+  String get negativeWalletBalanceMessage =>
+      'This wallet does not have enough money for this expense. Continuing will make its balance negative.';
+
+  @override
+  String get recordAnyway => 'Record anyway';
 }

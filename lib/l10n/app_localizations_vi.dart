@@ -1453,4 +1453,14 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get eventReminderChannelDescription =>
       'Thông báo về các sự kiện đã lên lịch';
+
+  @override
+  String get negativeWalletBalanceTitle => 'Ví không đủ tiền';
+
+  @override
+  String get negativeWalletBalanceMessage =>
+      'Số dư ví không đủ cho khoản chi này. Nếu tiếp tục, số dư ví sẽ thành số âm.';
+
+  @override
+  String get recordAnyway => 'Vẫn ghi giao dịch';
 }

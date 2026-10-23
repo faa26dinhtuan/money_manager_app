@@ -469,5 +469,8 @@
   "eventReminderPermissionDenied": "Notification permission is off. Enable it in your device settings.",
   "eventReminderNotificationTitle": "Event reminder",
   "eventReminderChannel": "Event reminders",
-  "eventReminderChannelDescription": "Notifications for scheduled events"
+  "eventReminderChannelDescription": "Notifications for scheduled events",
+  "negativeWalletBalanceTitle": "Insufficient wallet balance",
+  "negativeWalletBalanceMessage": "This wallet does not have enough money for this expense. Continuing will make its balance negative.",
+  "recordAnyway": "Record anyway"
 }

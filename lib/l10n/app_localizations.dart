@@ -2731,6 +2731,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Thông báo về các sự kiện đã lên lịch'**
   String get eventReminderChannelDescription;
+
+  /// No description provided for @negativeWalletBalanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví không đủ tiền'**
+  String get negativeWalletBalanceTitle;
+
+  /// No description provided for @negativeWalletBalanceMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số dư ví không đủ cho khoản chi này. Nếu tiếp tục, số dư ví sẽ thành số âm.'**
+  String get negativeWalletBalanceMessage;
+
+  /// No description provided for @recordAnyway.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vẫn ghi giao dịch'**
+  String get recordAnyway;
 }
 
 class _AppLocalizationsDelegate
