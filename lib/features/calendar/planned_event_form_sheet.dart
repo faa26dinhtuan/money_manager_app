@@ -60,6 +60,9 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   String? _categoryId;
   String? _walletId;
   String? _amountError;
+  String? _nameError;
+  String? _setupError;
+  String? _reminderError;
   late bool _reminderEnabled;
   late TimeOfDay _reminderTime;
 
@@ -124,22 +127,19 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
     );
     final title = _nameController.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.pleaseEnterEventName)),
-      );
+      setState(() => _nameError = l.pleaseEnterEventName);
       return;
     }
+    if (_nameError != null) setState(() => _nameError = null);
     if (_repeat && _linkToRecurring && _amountController.amount <= 0) {
       setState(() => _amountError = l.pleaseEnterAmount);
       return;
     }
-    if (_repeat && _linkToRecurring &&
-        (_categoryId == null || _walletId == null)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.eventTransactionNeedsSetup)),
-      );
+    if (_repeat && _linkToRecurring && (_categoryId == null || _walletId == null)) {
+      setState(() => _setupError = l.eventTransactionNeedsSetup);
       return;
     }
+    if (_setupError != null) setState(() => _setupError = null);
     final oldStart = widget.event?.seriesStartDate ?? widget.event?.date;
     final scheduleChanged = oldStart == null ||
         widget.event?.frequency != (_repeat ? _frequency : null) ||
@@ -212,8 +212,14 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
               TextField(
                 controller: _nameController,
                 textCapitalization: TextCapitalization.sentences,
+                onChanged: (value) {
+                  if (_nameError != null && value.trim().isNotEmpty) {
+                    setState(() => _nameError = null);
+                  }
+                },
                 decoration: InputDecoration(
                   labelText: l.plannedEventName,
+                  errorText: _nameError,
                   prefixIcon: const AppIcon(AppIcons.notes),
                 ),
               ),
@@ -309,7 +315,10 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                           child: Text(category.localizedName(context)),
                         ),
                     ],
-                    onChanged: (value) => setState(() => _categoryId = value),
+                    onChanged: (value) => setState(() {
+                      _categoryId = value;
+                      _setupError = null;
+                    }),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
@@ -324,9 +333,19 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                           child: Text(wallet.localizedName(context)),
                         ),
                     ],
-                    onChanged: (value) => setState(() => _walletId = value),
+                    onChanged: (value) => setState(() {
+                      _walletId = value;
+                      _setupError = null;
+                    }),
                   ),
-                  CheckboxListTile(
+                  if (_setupError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        _setupError!,
+                        style: TextStyle(color: context.negativeColor),
+                      ),
+                    ),                  CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
                     value: _autoRecord,
                     controlAffinity: ListTileControlAffinity.leading,
@@ -349,16 +368,24 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                         await EventReminderService.instance.requestPermission();
                     if (!mounted) return;
                     if (!granted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l.eventReminderPermissionDenied)),
-                      );
+                      setState(() => _reminderError = l.eventReminderPermissionDenied);
                       return;
                     }
                   }
-                  setState(() => _reminderEnabled = enabled);
+                  setState(() {
+                    _reminderEnabled = enabled;
+                    _reminderError = null;
+                  });
                 },
               ),
-              if (_reminderEnabled) ...[
+              if (_reminderError != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 44, bottom: 8),
+                  child: Text(
+                    _reminderError!,
+                    style: TextStyle(color: context.negativeColor),
+                  ),
+                ),              if (_reminderEnabled) ...[
                 ListTile(
                   contentPadding: const EdgeInsets.only(left: 44),
                   onTap: _pickReminderTime,

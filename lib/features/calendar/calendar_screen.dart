@@ -63,6 +63,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     DateTime? date,
     bool allowDateChange = true,
   }) async {
+    final l = context.l10n;
     final result = await showModalBottomSheet<PlannedEventFormResult>(
       context: context,
       isScrollControlled: true,
@@ -77,7 +78,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         event: event,
       ),
     );
-    if (result == null) return;
+    if (!mounted || result == null) return;
     var savedEvent = result.event;
     final oldRecurringId = event?.recurringId;
     final oldRecurring = oldRecurringId == null
@@ -92,9 +93,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       final scheduleChanged = oldRecurring == null ||
           oldRecurring.frequency != savedEvent.frequency ||
           !isSameDay(oldRecurring.startDate, start);
-      var nextDate = scheduleChanged ? start : oldRecurring!.nextDate;
+      var nextDate = scheduleChanged || oldRecurring == null
+          ? start
+          : oldRecurring.nextDate;
       final shouldCatchUp = result.autoRecord &&
-          (scheduleChanged || oldRecurring?.active != true);
+          (scheduleChanged || oldRecurring == null || !oldRecurring.active);
       if (shouldCatchUp) {
         final today = RecurringTransaction.dateOnly(DateTime.now());
         while (nextDate.isBefore(today)) {
@@ -143,7 +146,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
     await EventReminderService.instance.sync(
       _store.allPlannedEvents,
-      localization: context.l10n,
+      localization: l,
     );
     setState(() {
       _selectedDay = DateTime(
@@ -214,12 +217,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
         ),
       );
-      if (deleteAll == null) return;
+      if (!mounted || deleteAll == null) return;
       final removeTransactions = await _confirmDeleteEventTransactions(
         event,
         occurrenceDate: deleteAll ? null : event.date,
       );
-      if (removeTransactions == null) return;
+      if (!mounted || removeTransactions == null) return;
       if (removeTransactions) {
         _store.removePlannedEventTransactions(
           event.id,
@@ -241,7 +244,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       }
       await EventReminderService.instance.sync(
         _store.allPlannedEvents,
-        localization: context.l10n,
+        localization: l,
       );
       return;
     }
@@ -250,9 +253,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       title: l.deletePlannedEventTitle,
       message: l.deletePlannedEventMessage,
     );
-    if (!confirmed) return;
+    if (!mounted || !confirmed) return;
     final removeTransactions = await _confirmDeleteEventTransactions(event);
-    if (removeTransactions == null) return;
+    if (!mounted || removeTransactions == null) return;
     if (removeTransactions) {
       _store.removePlannedEventTransactions(event.id);
     }
@@ -263,7 +266,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _store.removePlannedEvent(event.id);
     await EventReminderService.instance.sync(
       _store.allPlannedEvents,
-      localization: context.l10n,
+      localization: l,
     );
   }
 

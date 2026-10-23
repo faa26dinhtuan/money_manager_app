@@ -70,108 +70,55 @@ class _OverviewScreenState extends State<OverviewScreen> {
       );
       return;
     }
-    var categoryId = categories.first.id;
     final preferredWalletId = event.walletId ?? _store.selectedWalletId;
-    var walletId = wallets.any((wallet) => wallet.id == preferredWalletId)
+    final initialWalletId = wallets.any((wallet) => wallet.id == preferredWalletId)
         ? preferredWalletId!
         : wallets.first.id;
-    final amountController = MoneyController(
-      currency: AppCurrency.byCode(event.currencyCode),
-    )..amount = event.amount;
-    final confirmed = await showDialog<bool>(
+    final input = await showDialog<_EventTransactionInput>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text(l.confirmEventTransactionTitle),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(l.confirmEventTransactionMessage),
-                const SizedBox(height: 8),
-                Text(
-                  event.title,
-                  style: Theme.of(dialogContext).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 4),
-                MoneyField(
-                  controller: amountController,
-                  title: l.actualAmount,
-                  decoration: InputDecoration(
-                    labelText: l.actualAmount,
-                    prefixIcon: const AppIcon(AppIcons.wallet),
-                  ),
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: event.type == TxType.expense
-                        ? context.negativeColor
-                        : context.positiveColor,
-                  ),
-                  onChanged: (_) => setDialogState(() {}),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: categoryId,
-                  decoration: InputDecoration(labelText: l.category),
-                  items: [
-                    for (final category in categories)
-                      DropdownMenuItem(
-                        value: category.id,
-                        child: Text(category.localizedName(dialogContext)),
-                      ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setDialogState(() => categoryId = value);
-                  },
-                ),
-                const SizedBox(height: 12),
-                Text(l.wallet, style: TextStyle(color: context.textSecondary)),
-                const SizedBox(height: 6),
-                WalletPicker(
-                  selectedId: walletId,
-                  currencyCode: event.currencyCode,
-                  onChanged: (value) {
-                    if (value != null) setDialogState(() => walletId = value);
-                  },
-                ),
-              ],
-            ),
-          ),
+      builder: (_) => _RecordEventTransactionDialog(
+        event: event,
+        categoryId: categories.first.id,
+        walletId: initialWalletId,
+      ),
+    );
+    if (!mounted || input == null) return;
+    final projectedBalance = _store.walletBalance(input.walletId) -
+        (event.type == TxType.expense ? input.amount : -input.amount);
+    if (projectedBalance < 0) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(l.negativeWalletBalanceTitle),
+          content: Text(l.negativeWalletBalanceMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(l.cancel),
             ),
             FilledButton(
-              onPressed: amountController.amount <= 0
-                  ? null
-                  : () => Navigator.of(dialogContext).pop(true),
-              child: Text(l.recordEventTransaction),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l.recordAnyway),
             ),
           ],
         ),
-      ),
-    );
-    if (confirmed != true || !mounted) {
-      amountController.dispose();
-      return;
+      );
+      if (!mounted || confirmed != true) return;
     }
     final recorded = _store.recordPlannedEventTransaction(
       event: event,
       date: event.date,
-      categoryId: categoryId,
-      walletId: walletId,
-      amount: amountController.amount,
+      categoryId: input.categoryId,
+      walletId: input.walletId,
+      amount: input.amount,
     );
-    amountController.dispose();
-    if (!recorded) {
+    if (!recorded && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l.eventTransactionAlreadyRecorded)),
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -180,8 +127,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         final range = DateRange.of(_period, _anchor, _customRange);
         final todayRange = DateRange.of(Period.day, DateTime.now());
         final todayEvents = _store
-            .plannedEventsInRange(todayRange)
-            .where((event) => !_store.hasPlannedEventTransaction(event, event.date))
+            .plannedEventsInRange(todayRange, includeAllWallets: true)
             .toList();
         final items = _store.query(
           _type,
@@ -223,6 +169,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       _TodayEventsCard(
                         events: todayEvents,
                         onRecord: _confirmEventTransaction,
+                        isRecorded: (event) => _store.hasPlannedEventTransaction(
+                          event,
+                          event.date,
+                        ),
                       ),
                       const SizedBox(height: 14),
                     ],
@@ -327,11 +277,145 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 }
 
+class _EventTransactionInput {
+  const _EventTransactionInput({
+    required this.categoryId,
+    required this.walletId,
+    required this.amount,
+  });
+
+  final String categoryId;
+  final String walletId;
+  final double amount;
+}
+
+class _RecordEventTransactionDialog extends StatefulWidget {
+  const _RecordEventTransactionDialog({
+    required this.event,
+    required this.categoryId,
+    required this.walletId,
+  });
+
+  final PlannedEvent event;
+  final String categoryId;
+  final String walletId;
+
+  @override
+  State<_RecordEventTransactionDialog> createState() =>
+      _RecordEventTransactionDialogState();
+}
+
+class _RecordEventTransactionDialogState
+    extends State<_RecordEventTransactionDialog> {
+  final _store = AppStore.instance;
+  late final MoneyController _amountController;
+  late String _categoryId = widget.categoryId;
+  late String _walletId = widget.walletId;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = MoneyController(
+      currency: AppCurrency.byCode(widget.event.currencyCode),
+    )..amount = widget.event.amount;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final event = widget.event;
+    final categories = _store.categoriesOf(event.type);
+    return AlertDialog(
+      title: Text(l.confirmEventTransactionTitle),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l.confirmEventTransactionMessage),
+            const SizedBox(height: 8),
+            Text(event.title, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 4),
+            MoneyField(
+              controller: _amountController,
+              title: l.actualAmount,
+              decoration: InputDecoration(
+                labelText: l.actualAmount,
+                prefixIcon: const AppIcon(AppIcons.wallet),
+              ),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: event.type == TxType.expense
+                    ? context.negativeColor
+                    : context.positiveColor,
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _categoryId,
+              decoration: InputDecoration(labelText: l.category),
+              items: [
+                for (final category in categories)
+                  DropdownMenuItem(
+                    value: category.id,
+                    child: Text(category.localizedName(context)),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _categoryId = value);
+              },
+            ),
+            const SizedBox(height: 12),
+            Text(l.wallet, style: TextStyle(color: context.textSecondary)),
+            const SizedBox(height: 6),
+            WalletPicker(
+              selectedId: _walletId,
+              currencyCode: event.currencyCode,
+              onChanged: (value) {
+                if (value != null) setState(() => _walletId = value);
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.cancel),
+        ),
+        FilledButton(
+          onPressed: _amountController.amount <= 0
+              ? null
+              : () => Navigator.of(context).pop(
+                    _EventTransactionInput(
+                      categoryId: _categoryId,
+                      walletId: _walletId,
+                      amount: _amountController.amount,
+                    ),
+                  ),
+          child: Text(l.recordEventTransaction),
+        ),
+      ],
+    );
+  }
+}
 class _TodayEventsCard extends StatelessWidget {
-  const _TodayEventsCard({required this.events, required this.onRecord});
+  const _TodayEventsCard({
+    required this.events,
+    required this.onRecord,
+    required this.isRecorded,
+  });
 
   final List<PlannedEvent> events;
   final ValueChanged<PlannedEvent> onRecord;
+  final bool Function(PlannedEvent) isRecorded;
 
   @override
   Widget build(BuildContext context) {
@@ -350,7 +434,11 @@ class _TodayEventsCard extends StatelessWidget {
           const SizedBox(height: 8),
           for (var index = 0; index < events.length; index++) ...[
             if (index > 0) const Divider(height: 16),
-            _TodayEventReminder(event: events[index], onRecord: onRecord),
+            _TodayEventReminder(
+              event: events[index],
+              onRecord: onRecord,
+              isRecorded: isRecorded(events[index]),
+            ),
           ],
         ],
       ),
@@ -359,10 +447,15 @@ class _TodayEventsCard extends StatelessWidget {
 }
 
 class _TodayEventReminder extends StatelessWidget {
-  const _TodayEventReminder({required this.event, required this.onRecord});
+  const _TodayEventReminder({
+    required this.event,
+    required this.onRecord,
+    required this.isRecorded,
+  });
 
   final PlannedEvent event;
   final ValueChanged<PlannedEvent> onRecord;
+  final bool isRecorded;
 
   @override
   Widget build(BuildContext context) {
@@ -423,16 +516,25 @@ class _TodayEventReminder extends StatelessWidget {
                   style: TextStyle(color: color, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 4),
-                TextButton.icon(
-                  onPressed: () => onRecord(event),
-                  icon: const AppIcon(AppIcons.check, size: 18),
-                  label: Text(context.l10n.recordEventTransaction),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: const Size(0, 36),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                if (isRecorded)
+                  Text(
+                    context.l10n.eventTransactionAlreadyRecorded,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: TextStyle(color: context.textSecondary, fontSize: 10),
+                  )
+                else
+                  TextButton.icon(
+                    onPressed: () => onRecord(event),
+                    icon: const AppIcon(AppIcons.check, size: 18),
+                    label: Text(context.l10n.recordEventTransaction),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: const Size(0, 36),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

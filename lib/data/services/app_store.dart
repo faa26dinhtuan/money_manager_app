@@ -553,9 +553,15 @@ class AppStore extends ChangeNotifier {
     return changed;
   }
 
-  List<PlannedEvent> plannedEventsInRange(DateRange range) {
+  List<PlannedEvent> plannedEventsInRange(
+    DateRange range, {
+    bool includeAllWallets = false,
+  }) {
     final result = <PlannedEvent>[];
-    for (final event in plannedEvents) {
+    final source = includeAllWallets
+        ? _plannedEvents.where((event) => event.currencyCode == _currency.code)
+        : plannedEvents;
+    for (final event in source) {
       final frequency = event.frequency;
       if (frequency == null) {
         if (range.contains(event.date)) result.add(event);
