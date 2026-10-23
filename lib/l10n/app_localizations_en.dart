@@ -1379,4 +1379,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get todayEvent => 'Event today';
+
+  @override
+  String get todayEvents => 'Events due today';
+
+  @override
+  String get recordEventTransaction => 'Record transaction';
+
+  @override
+  String get confirmEventTransactionTitle => 'Record this transaction?';
+
+  @override
+  String get confirmEventTransactionMessage =>
+      'This planned amount will be added to your ledger and wallet balance.';
+
+  @override
+  String get eventTransactionNeedsSetup =>
+      'Set up a matching category and a wallet in this currency before recording.';
+
+  @override
+  String get eventTransactionAlreadyRecorded =>
+      'A transaction for this event is already in your ledger.';
 }

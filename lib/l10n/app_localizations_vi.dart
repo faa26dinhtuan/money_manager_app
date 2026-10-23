@@ -1379,4 +1379,25 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get todayEvent => 'Sự kiện hôm nay';
+
+  @override
+  String get todayEvents => 'Sự kiện hôm nay';
+
+  @override
+  String get recordEventTransaction => 'Ghi giao dịch';
+
+  @override
+  String get confirmEventTransactionTitle => 'Xác nhận tạo giao dịch?';
+
+  @override
+  String get confirmEventTransactionMessage =>
+      'Khoản dự kiến dưới đây sẽ được ghi vào sổ và cập nhật số dư ví.';
+
+  @override
+  String get eventTransactionNeedsSetup =>
+      'Cần có danh mục phù hợp và ví cùng loại tiền tệ để ghi giao dịch.';
+
+  @override
+  String get eventTransactionAlreadyRecorded =>
+      'Sự kiện này đã có giao dịch trong sổ.';
 }

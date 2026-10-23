@@ -382,6 +382,55 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  bool hasPlannedEventTransaction(PlannedEvent event, DateTime date) {
+    final key = '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    return _transactions.any((transaction) {
+      if (transaction.id == 'event_$key') return true;
+      final transactionDate = transaction.date;
+      final sameDate = transactionDate.year == date.year &&
+          transactionDate.month == date.month &&
+          transactionDate.day == date.day;
+      final sameEvent = transaction.id.startsWith('rec_') &&
+          transaction.type == event.type &&
+          transaction.amount == event.amount &&
+          (event.walletId == null || transaction.walletId == event.walletId) &&
+          (transaction.note == event.title || transaction.note.startsWith('${event.title}\n'));
+      return sameDate && sameEvent;
+    });
+  }
+
+  bool recordPlannedEventTransaction({
+    required PlannedEvent event,
+    required DateTime date,
+    required String categoryId,
+    required String walletId,
+  }) {
+    final category = categoryById(categoryId);
+    final wallet = walletById(walletId);
+    if (category?.type != event.type ||
+        wallet == null ||
+        wallet.currencyCode != event.currencyCode ||
+        hasPlannedEventTransaction(event, date)) {
+      return false;
+    }
+    final key = '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    final note = event.note.isEmpty ? event.title : '${event.title}\n${event.note}';
+    _transactions.add(
+      Transaction(
+        id: 'event_$key',
+        type: event.type,
+        categoryId: categoryId,
+        walletId: walletId,
+        amount: event.amount,
+        date: DateTime(date.year, date.month, date.day, 12),
+        note: note,
+      ),
+    );
+    notifyListeners();
+    _save();
+    return true;
+  }
+
   void updateTransaction(Transaction updated) {
     final index = _transactions.indexWhere((t) => t.id == updated.id);
     if (index == -1) return;

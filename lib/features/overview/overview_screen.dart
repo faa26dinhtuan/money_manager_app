@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
+import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/date_range_dialog.dart';
 import 'package:money_manager_app/core/widgets/app_card.dart';
@@ -14,8 +15,10 @@ import 'package:money_manager_app/core/widgets/gradient_header.dart';
 import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
+import 'package:money_manager_app/core/widgets/wallet_picker.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/category_transactions_screen.dart';
 
@@ -54,12 +57,118 @@ class _OverviewScreenState extends State<OverviewScreen> {
     });
   }
 
+  Future<void> _confirmEventTransaction(PlannedEvent event) async {
+    final l = context.l10n;
+    final categories = _store.categoriesOf(event.type);
+    final wallets = _store.wallets
+        .where((wallet) => wallet.currencyCode == event.currencyCode)
+        .toList();
+    if (categories.isEmpty || wallets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.eventTransactionNeedsSetup)),
+      );
+      return;
+    }
+    var categoryId = categories.first.id;
+    final preferredWalletId = event.walletId ?? _store.selectedWalletId;
+    var walletId = wallets.any((wallet) => wallet.id == preferredWalletId)
+        ? preferredWalletId!
+        : wallets.first.id;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text(l.confirmEventTransactionTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l.confirmEventTransactionMessage),
+                const SizedBox(height: 8),
+                Text(
+                  event.title,
+                  style: Theme.of(dialogContext).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  formatMoney(
+                    event.amount,
+                    AppCurrency.byCode(event.currencyCode),
+                  ),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: event.type == TxType.expense
+                        ? context.negativeColor
+                        : context.positiveColor,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: categoryId,
+                  decoration: InputDecoration(labelText: l.category),
+                  items: [
+                    for (final category in categories)
+                      DropdownMenuItem(
+                        value: category.id,
+                        child: Text(category.localizedName(dialogContext)),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) setDialogState(() => categoryId = value);
+                  },
+                ),
+                const SizedBox(height: 12),
+                Text(l.wallet, style: TextStyle(color: context.textSecondary)),
+                const SizedBox(height: 6),
+                WalletPicker(
+                  selectedId: walletId,
+                  currencyCode: event.currencyCode,
+                  onChanged: (value) {
+                    if (value != null) setDialogState(() => walletId = value);
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l.recordEventTransaction),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final recorded = _store.recordPlannedEventTransaction(
+      event: event,
+      date: event.date,
+      categoryId: categoryId,
+      walletId: walletId,
+    );
+    if (!recorded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.eventTransactionAlreadyRecorded)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
         final range = DateRange.of(_period, _anchor, _customRange);
+        final todayRange = DateRange.of(Period.day, DateTime.now());
+        final todayEvents = _store
+            .plannedEventsInRange(todayRange)
+            .where((event) => !_store.hasPlannedEventTransaction(event, event.date))
+            .toList();
         final items = _store.query(
           _type,
           range,
@@ -96,6 +205,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                   children: [
+                    if (todayEvents.isNotEmpty) ...[
+                      _TodayEventsCard(
+                        events: todayEvents,
+                        onRecord: _confirmEventTransaction,
+                      ),
+                      const SizedBox(height: 14),
+                    ],
                     AppCard(
                       padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
                       radius: 24,
@@ -193,6 +309,87 @@ class _OverviewScreenState extends State<OverviewScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _TodayEventsCard extends StatelessWidget {
+  const _TodayEventsCard({required this.events, required this.onRecord});
+
+  final List<PlannedEvent> events;
+  final ValueChanged<PlannedEvent> onRecord;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      radius: 20,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.todayEvents,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (var index = 0; index < events.length; index++) ...[
+            if (index > 0) const Divider(height: 16),
+            _TodayEventReminder(event: events[index], onRecord: onRecord),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TodayEventReminder extends StatelessWidget {
+  const _TodayEventReminder({required this.event, required this.onRecord});
+
+  final PlannedEvent event;
+  final ValueChanged<PlannedEvent> onRecord;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = event.type == TxType.expense
+        ? context.negativeColor
+        : context.positiveColor;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const AppIcon(AppIcons.calendar, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                event.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              formatMoney(event.amount, AppCurrency.byCode(event.currencyCode)),
+              style: TextStyle(color: color, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+        if (event.note.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(event.note, style: TextStyle(color: context.textSecondary)),
+        ],
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () => onRecord(event),
+            icon: const AppIcon(AppIcons.check, size: 18),
+            label: Text(context.l10n.recordEventTransaction),
+          ),
+        ),
+      ],
     );
   }
 }

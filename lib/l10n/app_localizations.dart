@@ -2593,6 +2593,42 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Sự kiện hôm nay'**
   String get todayEvent;
+
+  /// No description provided for @todayEvents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện hôm nay'**
+  String get todayEvents;
+
+  /// No description provided for @recordEventTransaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi giao dịch'**
+  String get recordEventTransaction;
+
+  /// No description provided for @confirmEventTransactionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận tạo giao dịch?'**
+  String get confirmEventTransactionTitle;
+
+  /// No description provided for @confirmEventTransactionMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản dự kiến dưới đây sẽ được ghi vào sổ và cập nhật số dư ví.'**
+  String get confirmEventTransactionMessage;
+
+  /// No description provided for @eventTransactionNeedsSetup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần có danh mục phù hợp và ví cùng loại tiền tệ để ghi giao dịch.'**
+  String get eventTransactionNeedsSetup;
+
+  /// No description provided for @eventTransactionAlreadyRecorded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện này đã có giao dịch trong sổ.'**
+  String get eventTransactionAlreadyRecorded;
 }
 
 class _AppLocalizationsDelegate
