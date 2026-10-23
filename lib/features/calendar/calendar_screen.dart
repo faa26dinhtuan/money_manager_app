@@ -93,11 +93,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       final scheduleChanged = oldRecurring == null ||
           oldRecurring.frequency != savedEvent.frequency ||
           !isSameDay(oldRecurring.startDate, start);
-      var nextDate = scheduleChanged || oldRecurring == null
+      var nextDate = scheduleChanged
           ? start
           : oldRecurring.nextDate;
       final shouldCatchUp = result.autoRecord &&
-          (scheduleChanged || oldRecurring == null || !oldRecurring.active);
+          (scheduleChanged || !oldRecurring.active);
       if (shouldCatchUp) {
         final today = RecurringTransaction.dateOnly(DateTime.now());
         while (nextDate.isBefore(today)) {
