@@ -35,6 +35,7 @@ class AppStore extends ChangeNotifier {
   static const _selectedWalletKey = 'selectedWallet';
   static const _localeKey = 'locale';
   static const _hideBalancesKey = 'hideBalancesByDefault';
+  static const _dateFormatKey = 'dateFormat';
 
 
   late final SharedPreferences _prefs;
@@ -53,12 +54,15 @@ class AppStore extends ChangeNotifier {
   Locale? _locale;
   String? _selectedWalletId;
   bool _hideBalancesByDefault = true;
+  String _dateFormat = 'dd/MM/yyyy';
 
   bool get onboarded => _onboarded;
 
   ThemeMode get themeMode => _themeMode;
 
   bool get hideBalancesByDefault => _hideBalancesByDefault;
+
+  String get dateFormat => _dateFormat;
 
 
   AppCurrency get currency => _currency;
@@ -69,6 +73,7 @@ class AppStore extends ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
     _hideBalancesByDefault = _prefs.getBool(_hideBalancesKey) ?? true;
+    _dateFormat = _prefs.getString(_dateFormatKey) ?? 'dd/MM/yyyy';
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
         ThemeMode.system;
@@ -970,6 +975,12 @@ class AppStore extends ChangeNotifier {
   void setHideBalancesByDefault(bool value) {
     _hideBalancesByDefault = value;
     _prefs.setBool(_hideBalancesKey, value);
+    notifyListeners();
+  }
+
+  void setDateFormat(String value) {
+    _dateFormat = value;
+    _prefs.setString(_dateFormatKey, value);
     notifyListeners();
   }
 

@@ -1477,4 +1477,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hideBalance => 'Hide balance';
+
+  @override
+  String get dateFormat => 'Date format';
+
+  @override
+  String get dateFormatDayMonthYear => 'Day / month / year';
+
+  @override
+  String get dateFormatMonthDayYear => 'Month / day / year';
+
+  @override
+  String get dateFormatYearMonthDay => 'Year - month - day';
 }

@@ -1475,4 +1475,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get hideBalance => 'Ẩn số dư';
+
+  @override
+  String get dateFormat => 'Định dạng ngày';
+
+  @override
+  String get dateFormatDayMonthYear => 'Ngày / tháng / năm';
+
+  @override
+  String get dateFormatMonthDayYear => 'Tháng / ngày / năm';
+
+  @override
+  String get dateFormatYearMonthDay => 'Năm - tháng - ngày';
 }

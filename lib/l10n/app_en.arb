@@ -476,5 +476,9 @@
   "hideBalanceByDefault": "Hide balances by default",
   "hideBalanceDescription": "Tap a balance to reveal it temporarily.",
   "showBalance": "Show balance",
-  "hideBalance": "Hide balance"
+  "hideBalance": "Hide balance",
+  "dateFormat": "Date format",
+  "dateFormatDayMonthYear": "Day / month / year",
+  "dateFormatMonthDayYear": "Month / day / year",
+  "dateFormatYearMonthDay": "Year - month - day"
 }

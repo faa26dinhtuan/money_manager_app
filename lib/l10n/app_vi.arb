@@ -801,5 +801,9 @@
   "hideBalanceByDefault": "Ẩn số dư mặc định",
   "hideBalanceDescription": "Chạm vào số dư để hiện tạm thời.",
   "showBalance": "Hiện số dư",
-  "hideBalance": "Ẩn số dư"
+  "hideBalance": "Ẩn số dư",
+  "dateFormat": "Định dạng ngày",
+  "dateFormatDayMonthYear": "Ngày / tháng / năm",
+  "dateFormatMonthDayYear": "Tháng / ngày / năm",
+  "dateFormatYearMonthDay": "Năm - tháng - ngày"
 }

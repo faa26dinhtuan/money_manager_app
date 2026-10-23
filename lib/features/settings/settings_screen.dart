@@ -90,6 +90,37 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _pickDateFormat(BuildContext context) {
+    final store = AppStore.instance;
+    final l = context.l10n;
+    final options = <(String, String)>[
+      ('dd/MM/yyyy', l.dateFormatDayMonthYear),
+      ('MM/dd/yyyy', l.dateFormatMonthDayYear),
+      ('yyyy-MM-dd', l.dateFormatYearMonthDay),
+    ];
+
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(l.dateFormat),
+        children: [
+          for (final (value, label) in options)
+            ListTile(
+              title: Text(label),
+              subtitle: Text(value),
+              trailing: store.dateFormat == value
+                  ? const AppIcon(AppIcons.check, color: AppTheme.primary)
+                  : null,
+              onTap: () {
+                store.setDateFormat(value);
+                Navigator.of(ctx).pop();
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _pickCurrency(BuildContext context) async {
     final store = AppStore.instance;
     final action = await showDialog<_DefaultCurrencyAction>(
@@ -167,6 +198,12 @@ class SettingsScreen extends StatelessWidget {
             l.language,
             _localeLabel(context, AppStore.instance.locale),
             () => _pickLanguage(context),
+          ),
+          (
+            AppIcons.calendar,
+            l.dateFormat,
+            AppStore.instance.dateFormat,
+            () => _pickDateFormat(context),
           ),
           (
             AppIcons.backup,

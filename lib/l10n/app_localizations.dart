@@ -2773,6 +2773,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Ẩn số dư'**
   String get hideBalance;
+
+  /// No description provided for @dateFormat.
+  ///
+  /// In vi, this message translates to:
+  /// **'Định dạng ngày'**
+  String get dateFormat;
+
+  /// No description provided for @dateFormatDayMonthYear.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày / tháng / năm'**
+  String get dateFormatDayMonthYear;
+
+  /// No description provided for @dateFormatMonthDayYear.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng / ngày / năm'**
+  String get dateFormatMonthDayYear;
+
+  /// No description provided for @dateFormatYearMonthDay.
+  ///
+  /// In vi, this message translates to:
+  /// **'Năm - tháng - ngày'**
+  String get dateFormatYearMonthDay;
 }
 
 class _AppLocalizationsDelegate
