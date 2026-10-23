@@ -116,6 +116,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
       endDate: end == null ? null : RecurringTransaction.dateOnly(end),
       note: _noteCtrl.text.trim(),
       active: existing?.active ?? true,
+      skippedDates: existing?.skippedDates ?? const [],
     );
     final messenger = ScaffoldMessenger.of(context);
     final created = _isEditing

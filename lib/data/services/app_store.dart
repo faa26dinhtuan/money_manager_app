@@ -347,6 +347,7 @@ class AppStore extends ChangeNotifier {
     _wallets.removeWhere((w) => w.id == id);
     _transactions.removeWhere((t) => t.walletId == id);
     _recurrings.removeWhere((r) => r.walletId == id);
+    _plannedEvents.removeWhere((event) => event.walletId == id);
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
       if (g.entries.any((e) => e.walletId == id)) {
@@ -403,6 +404,44 @@ class AppStore extends ChangeNotifier {
 
   List<PlannedEvent> get allPlannedEvents => List.unmodifiable(_plannedEvents);
 
+  List<PlannedEvent> plannedEventsInRange(DateRange range) {
+    final result = <PlannedEvent>[];
+    for (final event in plannedEvents) {
+      final recurringId = event.recurringId;
+      if (recurringId == null || event.frequency == null) {
+        if (range.contains(event.date)) result.add(event);
+        continue;
+      }
+      final recurring = recurringById(recurringId);
+      if (recurring == null) {
+        if (range.contains(event.date)) result.add(event);
+        continue;
+      }
+      if (!recurring.active || recurring.isFinished) continue;
+      var date = recurring.nextDate;
+      var guard = 0;
+      while (date.isBefore(range.start) && guard < 100000) {
+        date = recurring.advance(date);
+        guard++;
+      }
+      while (date.isBefore(range.end) && guard < 100000) {
+        if (!recurring.isSkipped(date)) {
+          result.add(event.copyWith(date: date, seriesStartDate: event.date));
+        }
+        date = recurring.advance(date);
+        guard++;
+      }
+    }
+    return result;
+  }
+
+  void skipRecurringOccurrence(String recurringId, DateTime date) {
+    final recurring = recurringById(recurringId);
+    if (recurring == null || recurring.isSkipped(date)) return;
+    final skipped = [...recurring.skippedDates, RecurringTransaction.dateOnly(date)];
+    updateRecurring(recurring.copyWith(skippedDates: skipped));
+  }
+
   void addPlannedEvent(PlannedEvent event) {
     _plannedEvents.add(event);
     notifyListeners();
@@ -444,7 +483,14 @@ class AppStore extends ChangeNotifier {
     _categories.removeWhere((c) => c.id == id);
     _transactions.removeWhere((t) => t.categoryId == id);
     _budgets.removeWhere((b) => b.categoryId == id);
-    _recurrings.removeWhere((r) => r.categoryId == id);
+    final recurringIds = _recurrings
+        .where((r) => r.categoryId == id)
+        .map((r) => r.id)
+        .toSet();
+    _recurrings.removeWhere((r) => recurringIds.contains(r.id));
+    _plannedEvents.removeWhere(
+      (event) => recurringIds.contains(event.recurringId),
+    );
     notifyListeners();
     _save();
   }
@@ -642,8 +688,26 @@ class AppStore extends ChangeNotifier {
     return processRecurring();
   }
 
-  void removeRecurring(String id) {
+  void removeRecurring(String id, {bool preservePlannedEvent = false}) {
     _recurrings.removeWhere((r) => r.id == id);
+    if (preservePlannedEvent) {
+      for (var i = 0; i < _plannedEvents.length; i++) {
+        final event = _plannedEvents[i];
+        if (event.recurringId != id) continue;
+        _plannedEvents[i] = PlannedEvent(
+          id: event.id,
+          title: event.title,
+          type: event.type,
+          amount: event.amount,
+          date: event.date,
+          currencyCode: event.currencyCode,
+          note: event.note,
+          walletId: event.walletId,
+        );
+      }
+    } else {
+      _plannedEvents.removeWhere((event) => event.recurringId == id);
+    }
     notifyListeners();
     _save();
   }
@@ -680,17 +744,19 @@ class AppStore extends ChangeNotifier {
       var steps = 0;
       while (r.isDue(today) && steps < 400) {
         final d = r.nextDate;
-        _transactions.add(
-          Transaction(
-            id: 'rec_${r.id}_${d.millisecondsSinceEpoch}',
-            type: r.type,
-            categoryId: r.categoryId,
-            walletId: r.walletId,
-            amount: r.amount,
-            date: DateTime(d.year, d.month, d.day, 12),
-            note: r.note,
-          ),
-        );
+        if (!r.isSkipped(d)) {
+          _transactions.add(
+            Transaction(
+              id: 'rec_${r.id}_${d.millisecondsSinceEpoch}',
+              type: r.type,
+              categoryId: r.categoryId,
+              walletId: r.walletId,
+              amount: r.amount,
+              date: DateTime(d.year, d.month, d.day, 12),
+              note: r.note,
+            ),
+          );
+        }
         r = r.copyWith(nextDate: r.advance(d));
         steps++;
       }

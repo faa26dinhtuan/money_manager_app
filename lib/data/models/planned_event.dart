@@ -1,4 +1,5 @@
 import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/recurring_transaction.dart';
 
 class PlannedEvent {
   const PlannedEvent({
@@ -10,6 +11,9 @@ class PlannedEvent {
     required this.currencyCode,
     this.note = '',
     this.walletId,
+    this.recurringId,
+    this.frequency,
+    this.seriesStartDate,
   });
 
   final String id;
@@ -20,6 +24,9 @@ class PlannedEvent {
   final String currencyCode;
   final String note;
   final String? walletId;
+  final String? recurringId;
+  final Frequency? frequency;
+  final DateTime? seriesStartDate;
 
   PlannedEvent copyWith({
     String? title,
@@ -28,6 +35,9 @@ class PlannedEvent {
     DateTime? date,
     String? currencyCode,
     String? note,
+    String? recurringId,
+    Frequency? frequency,
+    DateTime? seriesStartDate,
   }) => PlannedEvent(
     id: id,
     title: title ?? this.title,
@@ -37,6 +47,9 @@ class PlannedEvent {
     currencyCode: currencyCode ?? this.currencyCode,
     note: note ?? this.note,
     walletId: walletId,
+    recurringId: recurringId ?? this.recurringId,
+    frequency: frequency ?? this.frequency,
+    seriesStartDate: seriesStartDate ?? this.seriesStartDate,
   );
 
   factory PlannedEvent.fromJson(Map<String, dynamic> json) => PlannedEvent(
@@ -48,6 +61,13 @@ class PlannedEvent {
     currencyCode: json['currencyCode'] as String? ?? 'VND',
     note: json['note'] as String? ?? '',
     walletId: json['walletId'] as String?,
+    recurringId: json['recurringId'] as String?,
+    frequency: json['frequency'] == null
+        ? null
+        : Frequency.values.byName(json['frequency'] as String),
+    seriesStartDate: json['seriesStartDate'] == null
+        ? null
+        : DateTime.parse(json['seriesStartDate'] as String),
   );
 
   Map<String, dynamic> toJson() => {
@@ -59,5 +79,8 @@ class PlannedEvent {
     'currencyCode': currencyCode,
     'note': note,
     'walletId': walletId,
+    'recurringId': recurringId,
+    'frequency': frequency?.name,
+    'seriesStartDate': seriesStartDate?.toIso8601String(),
   };
 }

@@ -56,8 +56,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
-  Future<void> _editPlannedEvent({PlannedEvent? event, DateTime? date}) async {
-    final result = await showModalBottomSheet<PlannedEvent>(
+  Future<void> _editPlannedEvent({
+    PlannedEvent? event,
+    DateTime? date,
+    bool allowDateChange = true,
+  }) async {
+    final result = await showModalBottomSheet<PlannedEventFormResult>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -67,23 +71,80 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       builder: (_) => PlannedEventFormSheet(
         initialDate: date ?? _selectedDay,
+        allowDateChange: allowDateChange,
         event: event,
       ),
     );
     if (result == null) return;
+    final previousRecurringId = result.previousRecurringId;
+    if (previousRecurringId != null && result.recurring == null) {
+      final confirmed = await confirmDelete(
+        context,
+        title: context.l10n.stopRecurringEventTitle,
+        message: context.l10n.stopRecurringEventMessage,
+      );
+      if (!confirmed) return;
+      _store.removeRecurring(previousRecurringId, preservePlannedEvent: true);
+    } else if (result.recurring != null) {
+      final existingRecurring = previousRecurringId == null
+          ? null
+          : _store.recurringById(previousRecurringId);
+      if (existingRecurring == null) {
+        _store.addRecurring(result.recurring!);
+      } else {
+        _store.updateRecurring(result.recurring!);
+      }
+    }
     if (event == null) {
-      _store.addPlannedEvent(result);
+      _store.addPlannedEvent(result.event);
     } else {
-      _store.updatePlannedEvent(result);
+      _store.updatePlannedEvent(result.event);
     }
     setState(() {
-      _selectedDay = DateTime(result.date.year, result.date.month, result.date.day);
-      _month = DateTime(result.date.year, result.date.month);
+      _selectedDay = DateTime(
+        result.event.date.year,
+        result.event.date.month,
+        result.event.date.day,
+      );
+      _month = DateTime(result.event.date.year, result.event.date.month);
     });
   }
 
   Future<void> _deletePlannedEvent(PlannedEvent event) async {
     final l = context.l10n;
+    final recurringId = event.recurringId;
+    if (recurringId != null) {
+      final deleteSeries = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(l.deletePlannedEventTitle),
+          content: Text(l.deleteRecurringEventWarning),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(null),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l.deleteThisOccurrence),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: context.negativeColor),
+              child: Text(l.deleteEventSeries),
+            ),
+          ],
+        ),
+      );
+      if (deleteSeries == null) return;
+      if (deleteSeries) {
+        _store.removeRecurring(recurringId);
+        _store.removePlannedEvent(event.id);
+      } else {
+        _store.skipRecurringOccurrence(recurringId, event.date);
+      }
+      return;
+    }
     final confirmed = await confirmDelete(
       context,
       title: l.deletePlannedEventTitle,
@@ -110,9 +171,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           monthRange,
           walletId: walletId,
         );
-        final plannedEvents = _store.plannedEvents
-            .where((event) => monthRange.contains(event.date))
-            .toList();
+        final plannedEvents = _store.plannedEventsInRange(monthRange);
         final selectedEvents = plannedEvents
             .where((event) => isSameDay(event.date, _selectedDay))
             .toList();
@@ -205,7 +264,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                   IconButton.filledTonal(
                     tooltip: l.addPlannedEvent,
-                    onPressed: () => _editPlannedEvent(date: _selectedDay),
+                    onPressed: () => _editPlannedEvent(
+                      date: _selectedDay,
+                      allowDateChange: false,
+                    ),
                     icon: const AppIcon(AppIcons.add, size: 20),
                   ),
                 ],
@@ -518,6 +580,10 @@ class _PlannedEventRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isExpense = event.type == TxType.expense;
     final color = isExpense ? context.negativeColor : context.positiveColor;
+    final details = [
+      if (event.note.isNotEmpty) event.note,
+      if (event.frequency != null) event.frequency!.localizedLabel(context),
+    ];
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       color: context.surfaceColor,
@@ -539,7 +605,7 @@ class _PlannedEventRow extends StatelessWidget {
         ),
         title: Text(event.title, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
-          event.note.isEmpty ? context.l10n.plannedEvent : event.note,
+          details.isEmpty ? context.l10n.plannedEvent : details.join(' · '),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

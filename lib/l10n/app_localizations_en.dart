@@ -53,6 +53,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'This event will be removed from the calendar.';
 
   @override
+  String get repeatEvent => 'Repeat event';
+
+  @override
+  String get repeatFrequency => 'Repeat frequency';
+
+  @override
+  String get deleteThisOccurrence => 'Delete this day only';
+
+  @override
+  String get deleteEventSeries => 'Delete all repetitions';
+
+  @override
+  String get deleteRecurringEventWarning =>
+      'Deleting this day skips its matching recurring transaction. Deleting all repetitions also removes the recurring transaction.';
+
+  @override
+  String get pleaseSelectWallet => 'Select a wallet';
+
+  @override
+  String get stopRecurringEventTitle => 'Stop repeating this event?';
+
+  @override
+  String get stopRecurringEventMessage =>
+      'The linked recurring transaction will be deleted. Transactions already created will be kept.';
+
+  @override
   String get categories => 'Categories';
 
   @override

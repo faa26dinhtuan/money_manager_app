@@ -52,6 +52,32 @@ class AppLocalizationsVi extends AppLocalizations {
   String get deletePlannedEventMessage => 'Sự kiện này sẽ bị xóa khỏi lịch.';
 
   @override
+  String get repeatEvent => 'Lặp lại sự kiện';
+
+  @override
+  String get repeatFrequency => 'Tần suất lặp lại';
+
+  @override
+  String get deleteThisOccurrence => 'Chỉ xóa ngày này';
+
+  @override
+  String get deleteEventSeries => 'Xóa toàn bộ lần lặp';
+
+  @override
+  String get deleteRecurringEventWarning =>
+      'Xóa ngày này sẽ bỏ qua giao dịch định kỳ tương ứng. Xóa toàn bộ lần lặp sẽ xóa cả giao dịch định kỳ.';
+
+  @override
+  String get pleaseSelectWallet => 'Vui lòng chọn ví';
+
+  @override
+  String get stopRecurringEventTitle => 'Tắt lặp lại sự kiện?';
+
+  @override
+  String get stopRecurringEventMessage =>
+      'Giao dịch định kỳ liên kết sẽ bị xóa. Các giao dịch đã được tạo trước đó vẫn được giữ lại.';
+
+  @override
   String get categories => 'Danh mục';
 
   @override

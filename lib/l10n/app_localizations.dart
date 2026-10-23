@@ -182,6 +182,54 @@ abstract class AppLocalizations {
   /// **'Sự kiện này sẽ bị xóa khỏi lịch.'**
   String get deletePlannedEventMessage;
 
+  /// No description provided for @repeatEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lặp lại sự kiện'**
+  String get repeatEvent;
+
+  /// No description provided for @repeatFrequency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tần suất lặp lại'**
+  String get repeatFrequency;
+
+  /// No description provided for @deleteThisOccurrence.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ xóa ngày này'**
+  String get deleteThisOccurrence;
+
+  /// No description provided for @deleteEventSeries.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa toàn bộ lần lặp'**
+  String get deleteEventSeries;
+
+  /// No description provided for @deleteRecurringEventWarning.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa ngày này sẽ bỏ qua giao dịch định kỳ tương ứng. Xóa toàn bộ lần lặp sẽ xóa cả giao dịch định kỳ.'**
+  String get deleteRecurringEventWarning;
+
+  /// No description provided for @pleaseSelectWallet.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vui lòng chọn ví'**
+  String get pleaseSelectWallet;
+
+  /// No description provided for @stopRecurringEventTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tắt lặp lại sự kiện?'**
+  String get stopRecurringEventTitle;
+
+  /// No description provided for @stopRecurringEventMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giao dịch định kỳ liên kết sẽ bị xóa. Các giao dịch đã được tạo trước đó vẫn được giữ lại.'**
+  String get stopRecurringEventMessage;
+
   /// No description provided for @categories.
   ///
   /// In vi, this message translates to:
