@@ -14,5 +14,5 @@ có cài đặt tự động che số dư bằng \*\*\*, chỉ hiển thị khi 
 
 đồng hồ nhắc nhở
 
-thêm tính năng nhắc nhở trong lịch chọn 1 ngày nào đó tạo sự kiện rồi điền vào số tiền có thể sẽ thu/chi trong ngày đó
+hiển thị nhắc nhở ở overview...
 

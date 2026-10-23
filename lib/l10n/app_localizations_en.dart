@@ -28,6 +28,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextMonth => 'Next month';
 
   @override
+  String get plannedEvent => 'Planned event';
+
+  @override
+  String get plannedEvents => 'Planned events';
+
+  @override
+  String get addPlannedEvent => 'Add event';
+
+  @override
+  String get editPlannedEvent => 'Edit event';
+
+  @override
+  String get plannedEventName => 'Event name';
+
+  @override
+  String get pleaseEnterEventName => 'Enter an event name';
+
+  @override
+  String get deletePlannedEventTitle => 'Delete planned event?';
+
+  @override
+  String get deletePlannedEventMessage =>
+      'This event will be removed from the calendar.';
+
+  @override
   String get categories => 'Categories';
 
   @override

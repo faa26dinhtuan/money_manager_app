@@ -10,6 +10,7 @@ import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/models/goal.dart';
+import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
@@ -27,6 +28,7 @@ class AppStore extends ChangeNotifier {
   static const _goalsKey = 'goals';
   static const _debtsKey = 'debts';
   static const _recurringsKey = 'recurrings';
+  static const _plannedEventsKey = 'plannedEvents';
   static const _onboardedKey = 'onboarded';
   static const _themeModeKey = 'themeMode';
   static const _currencyKey = 'currency';
@@ -43,6 +45,7 @@ class AppStore extends ChangeNotifier {
   final List<Goal> _goals = [];
   final List<Debt> _debts = [];
   final List<RecurringTransaction> _recurrings = [];
+  final List<PlannedEvent> _plannedEvents = [];
   bool _onboarded = false;
   ThemeMode _themeMode = ThemeMode.system;
   AppCurrency _currency = AppCurrency.vnd;
@@ -81,6 +84,20 @@ class AppStore extends ChangeNotifier {
           ..addAll(recurrings);
       } catch (_) {
         _recurrings.clear();
+      }
+    }
+    final rawPlannedEvents = _prefs.getString(_plannedEventsKey);
+    if (rawPlannedEvents != null) {
+      try {
+        _plannedEvents
+          ..clear()
+          ..addAll(
+            (jsonDecode(rawPlannedEvents) as List).map(
+              (e) => PlannedEvent.fromJson(e as Map<String, dynamic>),
+            ),
+          );
+      } catch (_) {
+        _plannedEvents.clear();
       }
     }
     final rawCategories = _prefs.getString(_categoriesKey);
@@ -192,6 +209,10 @@ class AppStore extends ChangeNotifier {
     await _prefs.setString(
       _recurringsKey,
       jsonEncode(_recurrings.map((r) => r.toJson()).toList()),
+    );
+    await _prefs.setString(
+      _plannedEventsKey,
+      jsonEncode(_plannedEvents.map((e) => e.toJson()).toList()),
     );
   }
 
@@ -368,6 +389,36 @@ class AppStore extends ChangeNotifier {
 
   void removeTransaction(String id) {
     _transactions.removeWhere((t) => t.id == id);
+    notifyListeners();
+    _save();
+  }
+
+  List<PlannedEvent> get plannedEvents => List.unmodifiable(
+    _plannedEvents.where((event) {
+      if (event.currencyCode != _currency.code) return false;
+      final selected = selectedWalletId;
+      return selected == null || event.walletId == null || event.walletId == selected;
+    }),
+  );
+
+  List<PlannedEvent> get allPlannedEvents => List.unmodifiable(_plannedEvents);
+
+  void addPlannedEvent(PlannedEvent event) {
+    _plannedEvents.add(event);
+    notifyListeners();
+    _save();
+  }
+
+  void updatePlannedEvent(PlannedEvent updated) {
+    final index = _plannedEvents.indexWhere((event) => event.id == updated.id);
+    if (index == -1) return;
+    _plannedEvents[index] = updated;
+    notifyListeners();
+    _save();
+  }
+
+  void removePlannedEvent(String id) {
+    _plannedEvents.removeWhere((event) => event.id == id);
     notifyListeners();
     _save();
   }
@@ -799,6 +850,14 @@ class AppStore extends ChangeNotifier {
       if (!sourceWalletIds.contains(r.walletId)) continue;
       _recurrings[i] = r.copyWith(amount: conv(r.amount));
     }
+    for (var i = 0; i < _plannedEvents.length; i++) {
+      final event = _plannedEvents[i];
+      if (!sourceWalletIds.contains(event.walletId)) continue;
+      _plannedEvents[i] = event.copyWith(
+        amount: conv(event.amount),
+        currencyCode: to.code,
+      );
+    }
     _currency = to;
     AppCurrency.current = to;
     _prefs.setString(_currencyKey, to.code);
@@ -815,6 +874,7 @@ class AppStore extends ChangeNotifier {
       goals: List.of(_goals),
       debts: List.of(_debts),
       recurrings: List.of(_recurrings),
+      plannedEvents: List.of(_plannedEvents),
       currency: _currency.code,
     );
   }
@@ -841,6 +901,9 @@ class AppStore extends ChangeNotifier {
     _recurrings
       ..clear()
       ..addAll(data.recurrings);
+    _plannedEvents
+      ..clear()
+      ..addAll(data.plannedEvents);
     if (data.currency != null) {
       _currency = AppCurrency.byCode(data.currency);
       AppCurrency.current = _currency;

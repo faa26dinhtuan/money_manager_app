@@ -5,6 +5,7 @@ import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/models/goal.dart';
+import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
@@ -18,6 +19,7 @@ class BackupData {
     required this.goals,
     required this.debts,
     required this.recurrings,
+    this.plannedEvents = const [],
     this.exportedAt,
     this.currency,
   });
@@ -33,6 +35,7 @@ class BackupData {
   final List<Goal> goals;
   final List<Debt> debts;
   final List<RecurringTransaction> recurrings;
+  final List<PlannedEvent> plannedEvents;
   final DateTime? exportedAt;
   final String? currency;
 
@@ -48,6 +51,7 @@ class BackupData {
       'goals': goals.map((e) => e.toJson()).toList(),
       'debts': debts.map((e) => e.toJson()).toList(),
       'recurrings': recurrings.map((e) => e.toJson()).toList(),
+      'plannedEvents': plannedEvents.map((e) => e.toJson()).toList(),
       if (currency != null) 'currency': currency,
     });
     return _prefix + base64Encode(gzip.encode(utf8.encode(json)));
@@ -92,6 +96,7 @@ class BackupData {
         goals: read('goals', (item) => Goal.fromJson(withCurrency(item))),
         debts: read('debts', (item) => Debt.fromJson(withCurrency(item))),
         recurrings: read('recurrings', RecurringTransaction.fromJson),
+        plannedEvents: read('plannedEvents', PlannedEvent.fromJson),
         exportedAt: exported == null ? null : DateTime.tryParse(exported),
         currency: currencyCode,
       );

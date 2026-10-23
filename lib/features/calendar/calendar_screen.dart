@@ -10,12 +10,15 @@ import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/confirm_delete_dialog.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
+import 'package:money_manager_app/features/calendar/planned_event_form_sheet.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -53,6 +56,42 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
+  Future<void> _editPlannedEvent({PlannedEvent? event, DateTime? date}) async {
+    final result = await showModalBottomSheet<PlannedEvent>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: context.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => PlannedEventFormSheet(
+        initialDate: date ?? _selectedDay,
+        event: event,
+      ),
+    );
+    if (result == null) return;
+    if (event == null) {
+      _store.addPlannedEvent(result);
+    } else {
+      _store.updatePlannedEvent(result);
+    }
+    setState(() {
+      _selectedDay = DateTime(result.date.year, result.date.month, result.date.day);
+      _month = DateTime(result.date.year, result.date.month);
+    });
+  }
+
+  Future<void> _deletePlannedEvent(PlannedEvent event) async {
+    final l = context.l10n;
+    final confirmed = await confirmDelete(
+      context,
+      title: l.deletePlannedEventTitle,
+      message: l.deletePlannedEventMessage,
+    );
+    if (confirmed) _store.removePlannedEvent(event.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -71,11 +110,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
           monthRange,
           walletId: walletId,
         );
+        final plannedEvents = _store.plannedEvents
+            .where((event) => monthRange.contains(event.date))
+            .toList();
+        final selectedEvents = plannedEvents
+            .where((event) => isSameDay(event.date, _selectedDay))
+            .toList();
         final selectedTransactions = [...expenses, ...incomes]
           ..removeWhere((t) => !isSameDay(t.date, _selectedDay))
           ..sort((a, b) => b.date.compareTo(a.date));
         final dailyExpenses = <DateTime, double>{};
         final dailyIncomes = <DateTime, double>{};
+        final plannedDays = <DateTime>{};
+        for (final event in plannedEvents) {
+          plannedDays.add(DateTime(event.date.year, event.date.month, event.date.day));
+        }
         for (final t in expenses) {
           final day = DateTime(t.date.year, t.date.month, t.date.day);
           dailyExpenses.update(day, (sum) => sum + t.amount, ifAbsent: () => t.amount);
@@ -127,6 +176,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _CalendarFilters(
                 visibleTypes: _visibleTypes,
                 onToggle: _toggleType,
+                onCreate: () => _editPlannedEvent(date: _selectedDay),
               ),
               const SizedBox(height: 8),
               _CalendarGrid(
@@ -134,6 +184,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 selectedDay: _selectedDay,
                 expenses: dailyExpenses,
                 incomes: dailyIncomes,
+                plannedDays: plannedDays,
                 visibleTypes: _visibleTypes,
                 onSelect: (day) {
                   HapticFeedback.selectionClick();
@@ -141,17 +192,41 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 },
               ),
               const SizedBox(height: 18),
-              Text(
-                DateFormat.yMMMMd(Localizations.localeOf(context).toLanguageTag())
-                    .format(_selectedDay),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      DateFormat.yMMMMd(Localizations.localeOf(context).toLanguageTag())
+                          .format(_selectedDay),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton.filledTonal(
+                    tooltip: l.addPlannedEvent,
+                    onPressed: () => _editPlannedEvent(date: _selectedDay),
+                    icon: const AppIcon(AppIcons.add, size: 20),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
-              if (selectedTransactions.isEmpty)
+              if (selectedEvents.isNotEmpty) ...[
+                Text(l.plannedEvents, style: const TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                for (final event in selectedEvents)
+                  _PlannedEventRow(
+                    event: event,
+                    onEdit: () => _editPlannedEvent(event: event),
+                    onDelete: () => _deletePlannedEvent(event),
+                  ),
+                const SizedBox(height: 10),
+              ]
+              else if (selectedTransactions.isEmpty)
                 _EmptyDay(message: l.noTransactionsInRange)
-              else
+              else ...[
+                Text(l.transactions, style: const TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
                 for (final transaction in selectedTransactions)
                   _TransactionRow(
                     transaction: transaction,
@@ -163,6 +238,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                     ),
                   ),
+              ],
+              if (selectedEvents.isNotEmpty && selectedTransactions.isNotEmpty) ...[
+                Text(l.transactions, style: const TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                for (final transaction in selectedTransactions)
+                  _TransactionRow(
+                    transaction: transaction,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => AddTransactionScreen(transaction: transaction),
+                      ),
+                    ),
+                  ),
+              ],
             ],
           ),
         );
@@ -255,6 +344,7 @@ class _CalendarGrid extends StatelessWidget {
     required this.selectedDay,
     required this.expenses,
     required this.incomes,
+    required this.plannedDays,
     required this.visibleTypes,
     required this.onSelect,
   });
@@ -263,6 +353,7 @@ class _CalendarGrid extends StatelessWidget {
   final DateTime selectedDay;
   final Map<DateTime, double> expenses;
   final Map<DateTime, double> incomes;
+  final Set<DateTime> plannedDays;
   final Set<TxType> visibleTypes;
   final ValueChanged<DateTime> onSelect;
 
@@ -319,6 +410,7 @@ class _CalendarGrid extends StatelessWidget {
             final day = DateTime(month.year, month.month, dayNumber);
             final expense = expenses[day];
             final income = incomes[day];
+            final hasPlannedEvent = plannedDays.contains(day);
             final selected = isSameDay(day, selectedDay);
             final today = isSameDay(day, DateTime.now());
             return Padding(
@@ -357,6 +449,18 @@ class _CalendarGrid extends StatelessWidget {
                           _DayAmount(amount: income, color: context.positiveColor),
                         if (visibleTypes.contains(TxType.expense) && expense != null)
                           _DayAmount(amount: expense, color: context.negativeColor),
+                        if (hasPlannedEvent)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: const BoxDecoration(
+                                color: AppTheme.accent,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -399,11 +503,77 @@ class _DayAmount extends StatelessWidget {
   }
 }
 
+class _PlannedEventRow extends StatelessWidget {
+  const _PlannedEventRow({
+    required this.event,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final PlannedEvent event;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final isExpense = event.type == TxType.expense;
+    final color = isExpense ? context.negativeColor : context.positiveColor;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: context.surfaceColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppTheme.accent.withValues(alpha: 0.55)),
+      ),
+      child: ListTile(
+        onTap: onEdit,
+        leading: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppTheme.accent.withValues(alpha: 0.16),
+            shape: BoxShape.circle,
+          ),
+          child: const AppIcon(AppIcons.calendar, color: AppTheme.primary, size: 20),
+        ),
+        title: Text(event.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+        subtitle: Text(
+          event.note.isEmpty ? context.l10n.plannedEvent : event.note,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${isExpense ? '−' : '+'}${formatMoney(event.amount, AppCurrency.byCode(event.currencyCode))}',
+              style: TextStyle(color: color, fontWeight: FontWeight.w700),
+            ),
+            PopupMenuButton<String>(
+              onSelected: (value) => value == 'edit' ? onEdit() : onDelete(),
+              itemBuilder: (context) => [
+                PopupMenuItem(value: 'edit', child: Text(context.l10n.edit)),
+                PopupMenuItem(value: 'delete', child: Text(context.l10n.delete)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CalendarFilters extends StatelessWidget {
-  const _CalendarFilters({required this.visibleTypes, required this.onToggle});
+  const _CalendarFilters({
+    required this.visibleTypes,
+    required this.onToggle,
+    required this.onCreate,
+  });
 
   final Set<TxType> visibleTypes;
   final ValueChanged<TxType> onToggle;
+  final VoidCallback onCreate;
 
   @override
   Widget build(BuildContext context) {
@@ -411,6 +581,16 @@ class _CalendarFilters extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        TextButton.icon(
+          onPressed: onCreate,
+          style: TextButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+          icon: const AppIcon(AppIcons.add, size: 18),
+          label: Text(l.addPlannedEvent, maxLines: 1),
+        ),
+        const Spacer(),
         FilterChip(
           label: Text(l.incomeSummary),
           selected: visibleTypes.contains(TxType.income),

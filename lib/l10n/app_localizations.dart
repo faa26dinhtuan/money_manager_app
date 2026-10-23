@@ -134,6 +134,54 @@ abstract class AppLocalizations {
   /// **'Tháng sau'**
   String get nextMonth;
 
+  /// No description provided for @plannedEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện dự kiến'**
+  String get plannedEvent;
+
+  /// No description provided for @plannedEvents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện dự kiến'**
+  String get plannedEvents;
+
+  /// No description provided for @addPlannedEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo sự kiện'**
+  String get addPlannedEvent;
+
+  /// No description provided for @editPlannedEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa sự kiện'**
+  String get editPlannedEvent;
+
+  /// No description provided for @plannedEventName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên sự kiện'**
+  String get plannedEventName;
+
+  /// No description provided for @pleaseEnterEventName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vui lòng nhập tên sự kiện'**
+  String get pleaseEnterEventName;
+
+  /// No description provided for @deletePlannedEventTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa sự kiện dự kiến?'**
+  String get deletePlannedEventTitle;
+
+  /// No description provided for @deletePlannedEventMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện này sẽ bị xóa khỏi lịch.'**
+  String get deletePlannedEventMessage;
+
   /// No description provided for @categories.
   ///
   /// In vi, this message translates to:

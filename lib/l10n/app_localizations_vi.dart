@@ -28,6 +28,30 @@ class AppLocalizationsVi extends AppLocalizations {
   String get nextMonth => 'Tháng sau';
 
   @override
+  String get plannedEvent => 'Sự kiện dự kiến';
+
+  @override
+  String get plannedEvents => 'Sự kiện dự kiến';
+
+  @override
+  String get addPlannedEvent => 'Tạo sự kiện';
+
+  @override
+  String get editPlannedEvent => 'Sửa sự kiện';
+
+  @override
+  String get plannedEventName => 'Tên sự kiện';
+
+  @override
+  String get pleaseEnterEventName => 'Vui lòng nhập tên sự kiện';
+
+  @override
+  String get deletePlannedEventTitle => 'Xóa sự kiện dự kiến?';
+
+  @override
+  String get deletePlannedEventMessage => 'Sự kiện này sẽ bị xóa khỏi lịch.';
+
+  @override
   String get categories => 'Danh mục';
 
   @override
