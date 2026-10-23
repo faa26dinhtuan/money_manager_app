@@ -3,6 +3,7 @@ import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/widgets/welcome_icon_tile.dart';
+import 'package:money_manager_app/core/widgets/welcome_backdrop.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key, required this.next});
@@ -75,8 +76,7 @@ class _IntroScreenState extends State<IntroScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.primaryDeep,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
+      body: WelcomeBackdrop(
         child: SafeArea(
         child: Column(
           children: [
@@ -157,13 +157,8 @@ class _PageContent extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          WelcomeIconTile(
-            icon: page.icon,
-            size: 160,
-            iconSize: 84,
-            radius: 44,
-          ),
-          const SizedBox(height: 40),
+          _IntroArtwork(icon: page.icon),
+          const SizedBox(height: 34),
           Text(
             page.title,
             textAlign: TextAlign.center,
@@ -185,6 +180,95 @@ class _PageContent extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _IntroArtwork extends StatelessWidget {
+  const _IntroArtwork({required this.icon});
+
+  final AppIconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 250,
+      height: 230,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 194,
+            height: 194,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.23),
+                  Colors.white.withValues(alpha: 0.02),
+                ],
+              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+            ),
+          ),
+          Positioned(
+            top: 4,
+            right: 12,
+            child: _FloatingIcon(icon: AppIcons.trendingUp, size: 48),
+          ),
+          Positioned(
+            bottom: 6,
+            left: 8,
+            child: _FloatingIcon(icon: AppIcons.exchange, size: 42),
+          ),
+          Positioned(
+            top: 50,
+            left: 4,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: const BoxDecoration(
+                color: AppTheme.accent,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          WelcomeIconTile(
+            icon: icon,
+            size: 142,
+            iconSize: 76,
+            radius: 42,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FloatingIcon extends StatelessWidget {
+  const _FloatingIcon({required this.icon, required this.size});
+
+  final AppIconData icon;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryDeep.withValues(alpha: 0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: AppIcon(icon, color: Colors.white, size: size * 0.46),
     );
   }
 }
