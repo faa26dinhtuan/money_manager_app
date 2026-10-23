@@ -19,7 +19,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactions => 'Sổ giao dịch';
 
   @override
+  String get calendar => 'Lịch';
+
+  @override
+  String get previousMonth => 'Tháng trước';
+
+  @override
+  String get nextMonth => 'Tháng sau';
+
+  @override
   String get categories => 'Danh mục';
+
+  @override
+  String get manageCategories => 'Quản lý danh mục';
 
   @override
   String get wallet => 'Ví tiền';
@@ -41,6 +53,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get cancel => 'Hủy';
+
+  @override
+  String get no => 'Không';
 
   @override
   String get done => 'Xong';
@@ -762,7 +777,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get currencyDefaultNotice =>
-      'Mỗi ví và khoản mục giữ tiền tệ riêng. Thêm ví mới để dùng tiền tệ khác, hoặc sao lưu rồi quy đổi dữ liệu hiện tại.';
+      'Chọn tiền tệ mặc định để hiển thị và nhập số tiền. Việc này không quy đổi số dư trong ví.';
 
   @override
   String get currencyConverter => 'Đổi tiền tệ';
@@ -852,6 +867,45 @@ class AppLocalizationsVi extends AppLocalizations {
   String get convertAll => 'Quy đổi tất cả';
 
   @override
+  String get selectWalletsToConvert =>
+      'Chọn ví muốn quy đổi sang loại tiền mới';
+
+  @override
+  String get convertSelectedWallets => 'Quy đổi ví đã chọn';
+
+  @override
+  String get convertWallets => 'Quy đổi ví';
+
+  @override
+  String get walletConversionSubtitle =>
+      'Chọn một hoặc nhiều ví cùng loại tiền tệ để quy đổi.';
+
+  @override
+  String get filterCurrencies => 'Lọc ví theo tiền tệ';
+
+  @override
+  String get showAllCurrencies => 'Hiện tất cả tiền tệ';
+
+  @override
+  String get walletsMustShareCurrency =>
+      'Có thể chọn nhiều ví, nhưng các ví phải cùng loại tiền tệ.';
+
+  @override
+  String get selectTargetCurrency => 'Chọn tiền tệ muốn quy đổi sang';
+
+  @override
+  String get changeDefaultCurrency => 'Chuyển sang tiền tệ này';
+
+  @override
+  String askAddWalletForCurrency(String currency) {
+    return 'Bạn có muốn tạo ví mới cho $currency không?';
+  }
+
+  @override
+  String get currencyConvertLinkedNotice =>
+      'Nếu mục tiêu hoặc khoản nợ liên kết nhiều ví, các ví đó cũng sẽ được quy đổi cùng để giữ dữ liệu nhất quán.';
+
+  @override
   String get backupSavedConfirmation => 'Tôi đã lưu bản sao lưu ở nơi an toàn';
 
   @override
@@ -936,6 +990,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get selectAll => 'Chọn tất cả';
+
+  @override
+  String get deleteSelectedTitle => 'Xóa các mục đã chọn?';
+
+  @override
+  String deleteSelectedMessage(int count) {
+    return 'Bạn có chắc muốn xóa $count mục đã chọn không? Thao tác này không thể hoàn tác.';
+  }
 
   @override
   String get exportCsvTitle => 'Xuất ra file CSV';
@@ -1068,7 +1130,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get currencyConvertWarning =>
-      'Nên sao lưu dữ liệu trước khi quy đổi. Số tiền sẽ được làm tròn theo đơn vị tiền mới.';
+      'Giao dịch, mục tiêu, khoản nợ và định kỳ gắn với ví được chọn sẽ được quy đổi. Ngân sách không gắn với ví sẽ giữ nguyên tiền tệ.';
 
   @override
   String get manageWallets => 'Ví tiền';

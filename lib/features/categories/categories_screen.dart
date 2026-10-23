@@ -4,14 +4,15 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
-import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/categories/create_category_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
-  const CategoriesScreen({super.key});
+  const CategoriesScreen({super.key, this.initialType = TxType.expense});
+
+  final TxType initialType;
 
   @override
   State<CategoriesScreen> createState() => _CategoriesScreenState();
@@ -19,7 +20,7 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
   final _store = AppStore.instance;
-  TxType _type = TxType.expense;
+  late TxType _type = widget.initialType;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         return Scaffold(
           appBar: AppBar(
             title: Text(l.categories),
-            actions: const [SettingsButton()],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: Padding(

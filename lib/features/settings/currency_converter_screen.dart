@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
-import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
@@ -8,6 +7,8 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/money_field.dart';
+import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/features/settings/currency_switch_dialog.dart';
 
@@ -25,9 +26,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   late AppCurrency _to = AppCurrency.current.code == 'USD'
       ? AppCurrency.vnd
       : AppCurrency.usd;
-  late final _amountCtrl = TextEditingController(
-    text: _from.quickAmounts[1].toString(),
-  );
+  late final _amountCtrl = MoneyController(currency: _from)
+    ..amount = _from.quickAmounts[1].toDouble();
 
   @override
   void initState() {
@@ -41,13 +41,6 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   void dispose() {
     _amountCtrl.dispose();
     super.dispose();
-  }
-
-  double _parse(String text) {
-    var t = text.replaceAll(RegExp(r'\s'), '');
-    final separators = RegExp(r'[.,]').allMatches(t).length;
-    t = separators > 1 ? t.replaceAll(RegExp(r'[.,]'), '') : t.replaceAll(',', '.');
-    return double.tryParse(t) ?? 0;
   }
 
   Future<AppCurrency?> _pick(AppCurrency selected) {
@@ -80,11 +73,100 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     );
   }
 
+  Future<AppCurrency?> _pickTargetCurrency(AppCurrency from) {
+    final options = AppCurrency.all
+        .where((currency) => currency.code != from.code)
+        .toList();
+    var selected = options.firstWhere(
+      (currency) => currency.code == _to.code,
+      orElse: () => options.first,
+    );
+    final l = context.l10n;
+    return showDialog<AppCurrency>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(l.selectTargetCurrency),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${l.fromCurrency}: ${from.localizedName(context)} (${from.code})'),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<AppCurrency>(
+                initialValue: selected,
+                decoration: InputDecoration(labelText: l.toCurrency),
+                items: [
+                  for (final currency in options)
+                    DropdownMenuItem(
+                      value: currency,
+                      child: Text('${currency.localizedName(context)} (${currency.code})'),
+                    ),
+                ],
+                onChanged: (currency) {
+                  if (currency != null) setDialogState(() => selected = currency);
+                },
+              ),
+              const SizedBox(height: 12),
+              Text(formatRateLine(from, selected, _rates.rate(from, selected))),
+              const SizedBox(height: 4),
+              Text(
+                _rates.updatedAt == null
+                    ? l.defaultRatesWarning
+                    : l.lastUpdated(formatUpdatedAt(_rates.updatedAt!)),
+                style: TextStyle(color: context.textSecondary, fontSize: 12),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(selected),
+              child: Text(l.convertSelectedWallets),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _convertWallets() async {
+    final walletIds = await showWalletConversionDialog(context);
+    if (walletIds == null || walletIds.isEmpty || !mounted) return;
+    final source = AppStore.instance.walletById(walletIds.first);
+    if (source == null) return;
+    final from = AppCurrency.byCode(source.currencyCode);
+    if (walletIds.any(
+      (id) => AppStore.instance.walletById(id)?.currencyCode != from.code,
+    )) return;
+    await _rates.ensureLoaded();
+    if (!mounted) return;
+    final to = await _pickTargetCurrency(from);
+    if (to == null || !mounted) return;
+    await AppStore.instance.convertCurrency(
+      from,
+      to,
+      _rates.rate(from, to),
+      walletIds: walletIds,
+    );
+  }
+
   void _swap() {
     setState(() {
       final tmp = _from;
       _from = _to;
       _to = tmp;
+      _amountCtrl.useCurrency(_from);
+    });
+  }
+
+  void _setFromCurrency(AppCurrency currency) {
+    setState(() {
+      _from = currency;
+      _amountCtrl.useCurrency(currency);
     });
   }
 
@@ -139,7 +221,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       body: ListenableBuilder(
         listenable: _rates,
         builder: (context, _) {
-          final amount = _parse(_amountCtrl.text);
+          final amount = _amountCtrl.amount;
           final rate = _rates.rate(_from, _to);
           final updated = _rates.updatedAt;
           return ListView(
@@ -155,14 +237,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      TextField(
+                      MoneyField(
                         controller: _amountCtrl,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-                        ],
+                        title: l.amount,
                         onChanged: (_) => setState(() {}),
                         style: const TextStyle(
                           fontSize: 24,
@@ -178,7 +255,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                       _currencyTile(
                         l.fromCurrency,
                         _from,
-                        (c) => setState(() => _from = c),
+                        _setFromCurrency,
                       ),
                       const Divider(height: 1),
                       Align(
@@ -255,6 +332,39 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         )
                       : const AppIcon(AppIcons.refresh),
                   label: Text(l.refreshRates),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                color: context.surfaceColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.convertWallets,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l.walletConversionSubtitle,
+                        style: TextStyle(color: context.textSecondary),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.tonalIcon(
+                          onPressed: _convertWallets,
+                          icon: const AppIcon(AppIcons.exchange),
+                          label: Text(l.convertWallets),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

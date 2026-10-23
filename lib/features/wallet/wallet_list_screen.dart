@@ -7,12 +7,29 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/wallet/wallet_form_screen.dart';
 
-class WalletListScreen extends StatelessWidget {
+class WalletListScreen extends StatefulWidget {
   const WalletListScreen({super.key});
+
+  @override
+  State<WalletListScreen> createState() => _WalletListScreenState();
+}
+
+class _WalletListScreenState extends State<WalletListScreen> {
+  final Set<String> _selected = {};
+  bool _selecting = false;
+
+  Future<void> _deleteSelected(BuildContext context) async {
+    if (!await confirmBulkDelete(context, _selected.length) || !mounted) return;
+    for (final id in _selected.toList()) {
+      AppStore.instance.removeWallet(id);
+    }
+    setState(() { _selected.clear(); _selecting = false; });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +39,51 @@ class WalletListScreen extends StatelessWidget {
       listenable: store,
       builder: (context, _) {
         return Scaffold(
-          appBar: AppBar(title: Text(l.myWallets)),
+          appBar: AppBar(
+            title: Text(l.myWallets),
+            actions: [
+              IconButton(
+                tooltip: l.selectAll,
+                icon: Icon(_selecting ? Icons.close : Icons.checklist),
+                onPressed: () => setState(() {
+                  _selecting = !_selecting;
+                  _selected.clear();
+                }),
+              ),
+            ],
+          ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
+              if (_selecting)
+                BulkSelectionControls(
+                  count: store.wallets.length,
+                  selectedCount: _selected.length,
+                  onSelectAll: () => setState(() {
+                    if (_selected.length == store.wallets.length) {
+                      _selected.clear();
+                    } else {
+                      _selected.addAll(store.wallets.map((w) => w.id));
+                    }
+                  }),
+                  onDelete: () => _deleteSelected(context),
+                ),
               for (final w in store.wallets)
-                _WalletTile(
-                  wallet: w,
-                  balance: store.walletBalance(w.id),
-                  transactionCount: store.transactionCountOfWallet(w.id),
+                BulkSelectableItem(
+                  selecting: _selecting,
+                  selected: _selected.contains(w.id),
+                  onChanged: (_) => setState(() {
+                    _selected.contains(w.id) ? _selected.remove(w.id) : _selected.add(w.id);
+                  }),
+                  child: _WalletTile(
+                    wallet: w,
+                    balance: store.walletBalance(w.id),
+                    transactionCount: store.transactionCountOfWallet(w.id),
+                  ),
                 ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _selecting ? null : FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
             label: Text(l.addWallet),

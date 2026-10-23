@@ -6,6 +6,7 @@ import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
+import 'package:money_manager_app/core/widgets/date_range_dialog.dart';
 import 'package:money_manager_app/core/widgets/app_card.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/donut_chart.dart';
@@ -30,15 +31,38 @@ class _OverviewScreenState extends State<OverviewScreen> {
   TxType _type = TxType.expense;
   Period _period = Period.month;
   DateTime _anchor = DateTime.now();
+  DateRange? _customRange;
+
+  Future<void> _pickRange() async {
+    final current = _customRange;
+    final picked = await showAppDateRangePicker(
+      context,
+      initial: current == null
+          ? null
+          : DateTimeRange(
+              start: current.start,
+              end: current.end.subtract(const Duration(days: 1)),
+            ),
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _customRange = DateRange(
+        DateTime(picked.start.year, picked.start.month, picked.start.day),
+        DateTime(picked.end.year, picked.end.month, picked.end.day + 1),
+      );
+      _period = Period.custom;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _store,
       builder: (context, _) {
+        final range = DateRange.of(_period, _anchor, _customRange);
         final items = _store.query(
           _type,
-          DateRange.of(_period, _anchor),
+          range,
           walletId: _store.selectedWalletId,
         );
 
@@ -80,10 +104,19 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             PeriodBar(
                               period: _period,
                               anchor: _anchor,
-                              onPeriodChanged: (p) => setState(() {
-                                _period = p;
-                                _anchor = DateTime.now();
-                              }),
+                              periods: Period.values,
+                              customRange: _customRange,
+                              onLabelTap: _pickRange,
+                              onPeriodChanged: (p) {
+                                if (p == Period.custom) {
+                                  _pickRange();
+                                  return;
+                                }
+                                setState(() {
+                                  _period = p;
+                                  _anchor = DateTime.now();
+                                });
+                              },
                               onShift: (d) => setState(() {
                                 _anchor = DateRange.shift(_period, _anchor, d);
                               }),
@@ -141,11 +174,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             builder: (_) => CategoryTransactionsScreen(
                               categoryId: e.key,
                               type: _type,
-                              range: DateRange.of(_period, _anchor),
+                              range: range,
                               rangeLabel: localizedDateRangeLabel(
                                 context,
                                 _period,
                                 _anchor,
+                                _customRange,
                               ),
                             ),
                           ),

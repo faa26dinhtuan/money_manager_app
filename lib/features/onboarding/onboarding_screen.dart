@@ -9,6 +9,7 @@ import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/welcome_icon_tile.dart';
+import 'package:money_manager_app/core/widgets/welcome_backdrop.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -106,8 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.primaryDeep,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
+      body: WelcomeBackdrop(
         child: SafeArea(
         bottom: false,
         child: Column(

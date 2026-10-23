@@ -19,7 +19,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactions => 'Transactions';
 
   @override
+  String get calendar => 'Calendar';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
   String get categories => 'Categories';
+
+  @override
+  String get manageCategories => 'Manage categories';
 
   @override
   String get wallet => 'Wallet';
@@ -41,6 +53,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get no => 'No';
 
   @override
   String get done => 'Done';
@@ -762,14 +777,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyDefaultNotice =>
-      'Each wallet and item keeps its own currency. Add a wallet for another currency, or back up before converting existing data.';
+      'Choose the default currency for display and entering amounts. This does not convert wallet balances.';
 
   @override
   String get currencyConverter => 'Currency converter';
 
   @override
   String get currencyConverterSubtitle =>
-      'Convert rates and convert existing data';
+      'Convert amounts and wallets using exchange rates';
 
   @override
   String get theme => 'Theme';
@@ -849,6 +864,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get convertAll => 'Convert all';
+
+  @override
+  String get selectWalletsToConvert =>
+      'Select wallets to convert to the new currency';
+
+  @override
+  String get convertSelectedWallets => 'Convert selected wallets';
+
+  @override
+  String get convertWallets => 'Convert wallets';
+
+  @override
+  String get walletConversionSubtitle =>
+      'Select one or more wallets with the same currency to convert.';
+
+  @override
+  String get filterCurrencies => 'Filter wallets by currency';
+
+  @override
+  String get showAllCurrencies => 'Show all currencies';
+
+  @override
+  String get walletsMustShareCurrency =>
+      'You can select multiple wallets, but they must use the same currency.';
+
+  @override
+  String get selectTargetCurrency => 'Choose the currency to convert to';
+
+  @override
+  String get changeDefaultCurrency => 'Use this currency';
+
+  @override
+  String askAddWalletForCurrency(String currency) {
+    return 'Do you want to add a new wallet for $currency?';
+  }
+
+  @override
+  String get currencyConvertLinkedNotice =>
+      'If a goal or debt is linked to multiple wallets, those wallets will be converted together to keep the data consistent.';
 
   @override
   String get backupSavedConfirmation => 'I saved the backup somewhere safe';
@@ -935,6 +989,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectAll => 'Select all';
+
+  @override
+  String get deleteSelectedTitle => 'Delete selected items?';
+
+  @override
+  String deleteSelectedMessage(int count) {
+    return 'Delete $count selected items? This action cannot be undone.';
+  }
 
   @override
   String get exportCsvTitle => 'Export to CSV file';
@@ -1067,7 +1129,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyConvertWarning =>
-      'Back up your data before converting. Amounts will be rounded to the new currency\'s minor unit.';
+      'Transactions, goals, debts, and recurring items linked to selected wallets will be converted. Budgets are not linked to wallets and will keep their currency.';
 
   @override
   String get manageWallets => 'Wallets';

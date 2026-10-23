@@ -7,11 +7,10 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/app_info.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
-import 'package:money_manager_app/data/services/exchange_rates.dart';
 import 'package:money_manager_app/features/settings/backup_screen.dart';
 import 'package:money_manager_app/features/settings/currency_converter_screen.dart';
-import 'package:money_manager_app/features/settings/currency_switch_dialog.dart';
 import 'package:money_manager_app/features/settings/export_screen.dart';
+import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_form_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -91,60 +90,37 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _pickCurrency(BuildContext context) {
+  Future<void> _pickCurrency(BuildContext context) async {
     final store = AppStore.instance;
-    final l = context.l10n;
-    return showDialog<void>(
+    final action = await showDialog<_DefaultCurrencyAction>(
       context: context,
-      builder: (ctx) => SimpleDialog(
-        title: Text(l.currencyDefault),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-            child: Text(
-              l.currencyDefaultNotice,
-              style: TextStyle(color: ctx.textSecondary),
-            ),
+      builder: (_) => _DefaultCurrencyDialog(initialCurrency: store.currency),
+    );
+    if (action == null || !context.mounted) return;
+    store.setCurrency(action.currency);
+    store.selectWallet(null);
+    final l = context.l10n;
+    final addWallet = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l.addWallet),
+        content: Text(l.askAddWalletForCurrency(action.currency.label)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l.no),
           ),
-          for (final currency in AppCurrency.all)
-            ListTile(
-              title: Text(currency.localizedName(context)),
-              subtitle: Text(currency.label),
-              trailing: store.currency.code == currency.code
-                  ? const AppIcon(AppIcons.check, color: AppTheme.primary)
-                  : null,
-              onTap: () async {
-                Navigator.of(ctx).pop();
-                final from = store.currency;
-                if (currency.code == from.code) return;
-                final choice = await showCurrencySwitchDialog(
-                  context,
-                  from,
-                  currency,
-                  hasExistingWallets: store.wallets.any(
-                    (wallet) => wallet.currencyCode == currency.code,
-                  ),
-                );
-                if (choice == null) return;
-                if (choice == CurrencySwitchChoice.convert) {
-                  await ExchangeRates.instance.ensureLoaded();
-                  await store.convertCurrency(
-                    currency,
-                    ExchangeRates.instance.rate(from, currency),
-                  );
-                } else if (choice == CurrencySwitchChoice.existingWallets) {
-                  store.setCurrency(currency);
-                  store.selectWallet(null);
-                } else if (choice == CurrencySwitchChoice.newWallet && context.mounted) {
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => WalletFormScreen(initialCurrency: currency),
-                    ),
-                  );
-                }
-              },
-            ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l.addWallet),
+          ),
         ],
+      ),
+    );
+    if (addWallet != true || !context.mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WalletFormScreen(initialCurrency: action.currency),
       ),
     );
   }
@@ -170,6 +146,14 @@ class SettingsScreen extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => const CurrencyConverterScreen(),
               ),
+            ),
+          ),
+          (
+            AppIcons.categories,
+            l.categories,
+            l.manageCategories,
+            () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CategoriesScreen()),
             ),
           ),
           (
@@ -239,6 +223,75 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _DefaultCurrencyAction {
+  const _DefaultCurrencyAction(this.currency);
+
+  final AppCurrency currency;
+}
+
+class _DefaultCurrencyDialog extends StatefulWidget {
+  const _DefaultCurrencyDialog({required this.initialCurrency});
+
+  final AppCurrency initialCurrency;
+
+  @override
+  State<_DefaultCurrencyDialog> createState() => _DefaultCurrencyDialogState();
+}
+
+class _DefaultCurrencyDialogState extends State<_DefaultCurrencyDialog> {
+  late AppCurrency _currency = widget.initialCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return AlertDialog(
+      title: Text(l.currencyDefault),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l.currencyDefaultNotice,
+              style: TextStyle(color: context.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<AppCurrency>(
+              initialValue: _currency,
+              decoration: InputDecoration(labelText: l.currencyCodeLabel),
+              items: [
+                for (final currency in AppCurrency.all)
+                  DropdownMenuItem(
+                    value: currency,
+                    child: Text(
+                      '${currency.localizedName(context)} (${currency.code})',
+                    ),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _currency = value);
+              },
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(
+                _DefaultCurrencyAction(_currency),
+              ),
+              child: Text(l.changeDefaultCurrency),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.cancel),
+        ),
+      ],
     );
   }
 }

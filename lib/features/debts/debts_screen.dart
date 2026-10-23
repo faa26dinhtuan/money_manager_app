@@ -9,6 +9,7 @@ import 'package:money_manager_app/core/utils/debt_status.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/budget_progress_bar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/debts/debt_detail_screen.dart';
@@ -23,6 +24,8 @@ class DebtsScreen extends StatefulWidget {
 
 class _DebtsScreenState extends State<DebtsScreen> {
   final _store = AppStore.instance;
+  final Set<String> _selected = {};
+  bool _selecting = false;
   DebtType _type = DebtType.lend;
   bool _showSettled = false;
 
@@ -45,6 +48,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => DebtFormScreen(initialType: _type)),
     );
+  }
+
+  Future<void> _deleteSelected() async {
+    if (!await confirmBulkDelete(context, _selected.length) || !mounted) return;
+    for (final id in _selected.toList()) { _store.removeDebt(id); }
+    setState(() { _selected.clear(); _selecting = false; });
   }
 
   @override
@@ -81,7 +90,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
             .length;
 
         return Scaffold(
-          appBar: AppBar(title: Text(l.debts)),
+          appBar: AppBar(title: Text(l.debts), actions: [
+            IconButton(tooltip: l.selectAll, icon: Icon(_selecting ? Icons.close : Icons.checklist), onPressed: () => setState(() { _selecting = !_selecting; _selected.clear(); })),
+          ]),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
@@ -105,7 +116,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     ),
                   ],
                   selected: {_type},
-                  onSelectionChanged: (s) => setState(() => _type = s.first),
+                  onSelectionChanged: (s) => setState(() {
+                    _type = s.first;
+                    _selected.clear();
+                  }),
                 ),
               ),
               const SizedBox(height: 12),
@@ -115,12 +129,18 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   ChoiceChip(
                     label: Text(l.openDebtsCount(open.length)),
                     selected: !_showSettled,
-                    onSelected: (_) => setState(() => _showSettled = false),
+                    onSelected: (_) => setState(() {
+                      _showSettled = false;
+                      _selected.clear();
+                    }),
                   ),
                   ChoiceChip(
                     label: Text(l.settledDebtsCount(settled.length)),
                     selected: _showSettled,
-                    onSelected: (_) => setState(() => _showSettled = true),
+                    onSelected: (_) => setState(() {
+                      _showSettled = true;
+                      _selected.clear();
+                    }),
                   ),
                 ],
               ),
@@ -144,11 +164,18 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     ],
                   ),
                 ),
+              if (_selecting && items.isNotEmpty)
+                BulkSelectionControls(count: items.length, selectedCount: _selected.length, onSelectAll: () => setState(() { if (_selected.length == items.length) { _selected.clear(); } else { _selected.addAll(items.map((d) => d.id)); } }), onDelete: _deleteSelected),
               for (final d in items)
-                _DebtTile(debt: d, onTap: () => _openDetail(d)),
+                BulkSelectableItem(
+                  selecting: _selecting,
+                  selected: _selected.contains(d.id),
+                  onChanged: (_) => setState(() { _selected.contains(d.id) ? _selected.remove(d.id) : _selected.add(d.id); }),
+                  child: _DebtTile(debt: d, onTap: () => _openDetail(d)),
+                ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _selecting ? null : FloatingActionButton.extended(
             shape: const StadiumBorder(),
             icon: const AppIcon(AppIcons.add),
             label: Text(l.addDebt),

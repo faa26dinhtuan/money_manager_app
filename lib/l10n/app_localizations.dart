@@ -116,11 +116,35 @@ abstract class AppLocalizations {
   /// **'Sổ giao dịch'**
   String get transactions;
 
+  /// No description provided for @calendar.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch'**
+  String get calendar;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng trước'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng sau'**
+  String get nextMonth;
+
   /// No description provided for @categories.
   ///
   /// In vi, this message translates to:
   /// **'Danh mục'**
   String get categories;
+
+  /// No description provided for @manageCategories.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quản lý danh mục'**
+  String get manageCategories;
 
   /// No description provided for @wallet.
   ///
@@ -163,6 +187,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Hủy'**
   String get cancel;
+
+  /// No description provided for @no.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không'**
+  String get no;
 
   /// No description provided for @done.
   ///
@@ -1451,7 +1481,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencyDefaultNotice.
   ///
   /// In vi, this message translates to:
-  /// **'Mỗi ví và khoản mục giữ tiền tệ riêng. Thêm ví mới để dùng tiền tệ khác, hoặc sao lưu rồi quy đổi dữ liệu hiện tại.'**
+  /// **'Chọn tiền tệ mặc định để hiển thị và nhập số tiền. Việc này không quy đổi số dư trong ví.'**
   String get currencyDefaultNotice;
 
   /// No description provided for @currencyConverter.
@@ -1609,6 +1639,72 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Quy đổi tất cả'**
   String get convertAll;
+
+  /// No description provided for @selectWalletsToConvert.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ví muốn quy đổi sang loại tiền mới'**
+  String get selectWalletsToConvert;
+
+  /// No description provided for @convertSelectedWallets.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quy đổi ví đã chọn'**
+  String get convertSelectedWallets;
+
+  /// No description provided for @convertWallets.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quy đổi ví'**
+  String get convertWallets;
+
+  /// No description provided for @walletConversionSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn một hoặc nhiều ví cùng loại tiền tệ để quy đổi.'**
+  String get walletConversionSubtitle;
+
+  /// No description provided for @filterCurrencies.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lọc ví theo tiền tệ'**
+  String get filterCurrencies;
+
+  /// No description provided for @showAllCurrencies.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện tất cả tiền tệ'**
+  String get showAllCurrencies;
+
+  /// No description provided for @walletsMustShareCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có thể chọn nhiều ví, nhưng các ví phải cùng loại tiền tệ.'**
+  String get walletsMustShareCurrency;
+
+  /// No description provided for @selectTargetCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn tiền tệ muốn quy đổi sang'**
+  String get selectTargetCurrency;
+
+  /// No description provided for @changeDefaultCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển sang tiền tệ này'**
+  String get changeDefaultCurrency;
+
+  /// No description provided for @askAddWalletForCurrency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có muốn tạo ví mới cho {currency} không?'**
+  String askAddWalletForCurrency(String currency);
+
+  /// No description provided for @currencyConvertLinkedNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nếu mục tiêu hoặc khoản nợ liên kết nhiều ví, các ví đó cũng sẽ được quy đổi cùng để giữ dữ liệu nhất quán.'**
+  String get currencyConvertLinkedNotice;
 
   /// No description provided for @backupSavedConfirmation.
   ///
@@ -1771,6 +1867,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chọn tất cả'**
   String get selectAll;
+
+  /// No description provided for @deleteSelectedTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa các mục đã chọn?'**
+  String get deleteSelectedTitle;
+
+  /// No description provided for @deleteSelectedMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có chắc muốn xóa {count} mục đã chọn không? Thao tác này không thể hoàn tác.'**
+  String deleteSelectedMessage(int count);
 
   /// No description provided for @exportCsvTitle.
   ///
@@ -1997,7 +2105,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencyConvertWarning.
   ///
   /// In vi, this message translates to:
-  /// **'Nên sao lưu dữ liệu trước khi quy đổi. Số tiền sẽ được làm tròn theo đơn vị tiền mới.'**
+  /// **'Giao dịch, mục tiêu, khoản nợ và định kỳ gắn với ví được chọn sẽ được quy đổi. Ngân sách không gắn với ví sẽ giữ nguyên tiền tệ.'**
   String get currencyConvertWarning;
 
   /// No description provided for @manageWallets.
