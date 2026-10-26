@@ -805,5 +805,7 @@
   "dateFormat": "Định dạng ngày",
   "dateFormatDayMonthYear": "Ngày / tháng / năm",
   "dateFormatMonthDayYear": "Tháng / ngày / năm",
-  "dateFormatYearMonthDay": "Năm - tháng - ngày"
+  "dateFormatYearMonthDay": "Năm - tháng - ngày",
+  "showWalletBalances": "Hiện số dư các ví",
+  "hideWalletBalances": "Ẩn số dư các ví"
 }

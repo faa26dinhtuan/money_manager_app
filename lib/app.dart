@@ -81,9 +81,8 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       localization: context.l10n,
     );
     if (count > 0 && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showApp(context.l10n.autoAddedRecurring(count));
+      ScaffoldMessenger.of(context)
+          .showApp(context.l10n.autoAddedRecurring(count));
     }
   }
 

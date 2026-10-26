@@ -5,6 +5,7 @@ import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
+import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/core/widgets/bulk_selection.dart';
@@ -22,6 +23,7 @@ class WalletListScreen extends StatefulWidget {
 class _WalletListScreenState extends State<WalletListScreen> {
   final Set<String> _selected = {};
   bool _selecting = false;
+  bool _showAllBalances = false;
 
   Future<void> _deleteSelected(BuildContext context) async {
     if (!await confirmBulkDelete(context, _selected.length) || !mounted) return;
@@ -48,6 +50,7 @@ class _WalletListScreenState extends State<WalletListScreen> {
                 onPressed: () => setState(() {
                   _selecting = !_selecting;
                   _selected.clear();
+                  _showAllBalances = !store.hideBalancesByDefault;
                 }),
               ),
             ],
@@ -67,11 +70,25 @@ class _WalletListScreenState extends State<WalletListScreen> {
                     }
                   }),
                   onDelete: () => _deleteSelected(context),
+                  trailingAction: IconButton(
+                    tooltip: _showAllBalances
+                        ? l.hideWalletBalances
+                        : l.showWalletBalances,
+                    onPressed: () => setState(
+                      () => _showAllBalances = !_showAllBalances,
+                    ),
+                    icon: Icon(
+                      _showAllBalances
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                  ),
                 ),
               for (final w in store.wallets)
                 BulkSelectableItem(
                   selecting: _selecting,
                   selected: _selected.contains(w.id),
+                  allowChildInteraction: true,
                   onChanged: (_) => setState(() {
                     _selected.contains(w.id) ? _selected.remove(w.id) : _selected.add(w.id);
                   }),
@@ -79,6 +96,8 @@ class _WalletListScreenState extends State<WalletListScreen> {
                     wallet: w,
                     balance: store.walletBalance(w.id),
                     transactionCount: store.transactionCountOfWallet(w.id),
+                    showBalance: _selecting && _showAllBalances,
+                    selectionMode: _selecting,
                   ),
                 ),
             ],
@@ -102,11 +121,15 @@ class _WalletTile extends StatelessWidget {
     required this.wallet,
     required this.balance,
     required this.transactionCount,
+    required this.showBalance,
+    required this.selectionMode,
   });
 
   final Wallet wallet;
   final double balance;
   final int transactionCount;
+  final bool showBalance;
+  final bool selectionMode;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +140,7 @@ class _WalletTile extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => Navigator.of(context).push(
+        onTap: selectionMode ? null : () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => WalletFormScreen(wallet: wallet),
           ),
@@ -148,14 +171,23 @@ class _WalletTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              SensitiveBalance(
-                amount: balance,
-                currency: AppCurrency.byCode(wallet.currencyCode),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,
+              if (showBalance)
+                Text(
+                  formatMoney(balance, AppCurrency.byCode(wallet.currencyCode)),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,
+                  ),
+                )
+              else
+                SensitiveBalance(
+                  amount: balance,
+                  currency: AppCurrency.byCode(wallet.currencyCode),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: balance < 0 ? Colors.red.shade400 : AppTheme.primary,
+                  ),
                 ),
-              ),
             ],
           ),
         ),

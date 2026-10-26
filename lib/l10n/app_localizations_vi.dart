@@ -1487,4 +1487,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dateFormatYearMonthDay => 'Năm - tháng - ngày';
+
+  @override
+  String get showWalletBalances => 'Hiện số dư các ví';
+
+  @override
+  String get hideWalletBalances => 'Ẩn số dư các ví';
 }

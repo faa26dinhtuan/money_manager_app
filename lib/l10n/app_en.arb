@@ -480,5 +480,7 @@
   "dateFormat": "Date format",
   "dateFormatDayMonthYear": "Day / month / year",
   "dateFormatMonthDayYear": "Month / day / year",
-  "dateFormatYearMonthDay": "Year - month - day"
+  "dateFormatYearMonthDay": "Year - month - day",
+  "showWalletBalances": "Show wallet balances",
+  "hideWalletBalances": "Hide wallet balances"
 }

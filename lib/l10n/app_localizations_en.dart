@@ -1489,4 +1489,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateFormatYearMonthDay => 'Year - month - day';
+
+  @override
+  String get showWalletBalances => 'Show wallet balances';
+
+  @override
+  String get hideWalletBalances => 'Hide wallet balances';
 }

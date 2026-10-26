@@ -2797,6 +2797,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Năm - tháng - ngày'**
   String get dateFormatYearMonthDay;
+
+  /// No description provided for @showWalletBalances.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện số dư các ví'**
+  String get showWalletBalances;
+
+  /// No description provided for @hideWalletBalances.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn số dư các ví'**
+  String get hideWalletBalances;
 }
 
 class _AppLocalizationsDelegate
