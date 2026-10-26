@@ -1495,4 +1495,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hideWalletBalances => 'Hide wallet balances';
+
+  @override
+  String get undoLastWalletConversion => 'Undo last wallet conversion';
+
+  @override
+  String get walletConversionUndone => 'Wallet conversion undone';
 }

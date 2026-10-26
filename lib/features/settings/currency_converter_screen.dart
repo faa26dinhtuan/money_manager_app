@@ -152,6 +152,16 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       _rates.rate(from, to),
       walletIds: walletIds,
     );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _undoLastWalletConversion() async {
+    final restored = await AppStore.instance.undoLastCurrencyConversion();
+    if (!mounted) return;
+    if (restored) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showApp(context.l10n.walletConversionUndone);
+    }
   }
 
   void _swap() {
@@ -363,6 +373,17 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                           label: Text(l.convertWallets),
                         ),
                       ),
+                      if (AppStore.instance.canUndoCurrencyConversion) ...[
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _undoLastWalletConversion,
+                            icon: const Icon(Icons.undo),
+                            label: Text(l.undoLastWalletConversion),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

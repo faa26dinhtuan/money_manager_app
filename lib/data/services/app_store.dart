@@ -36,6 +36,7 @@ class AppStore extends ChangeNotifier {
   static const _localeKey = 'locale';
   static const _hideBalancesKey = 'hideBalancesByDefault';
   static const _dateFormatKey = 'dateFormat';
+  static const _currencyConversionUndoKey = 'currencyConversionUndo';
 
 
   late final SharedPreferences _prefs;
@@ -55,6 +56,7 @@ class AppStore extends ChangeNotifier {
   String? _selectedWalletId;
   bool _hideBalancesByDefault = true;
   String _dateFormat = 'dd/MM/yyyy';
+  bool _canUndoCurrencyConversion = false;
 
   bool get onboarded => _onboarded;
 
@@ -64,6 +66,8 @@ class AppStore extends ChangeNotifier {
 
   String get dateFormat => _dateFormat;
 
+  bool get canUndoCurrencyConversion => _canUndoCurrencyConversion;
+
 
   AppCurrency get currency => _currency;
 
@@ -71,6 +75,8 @@ class AppStore extends ChangeNotifier {
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
+    _canUndoCurrencyConversion =
+        _prefs.getString(_currencyConversionUndoKey) != null;
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
     _hideBalancesByDefault = _prefs.getBool(_hideBalancesKey) ?? true;
     _dateFormat = _prefs.getString(_dateFormatKey) ?? 'dd/MM/yyyy';
@@ -195,6 +201,8 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> _save() async {
+    _canUndoCurrencyConversion = false;
+    await _prefs.remove(_currencyConversionUndoKey);
     await _prefs.setString(
       _categoriesKey,
       jsonEncode(_categories.map((c) => c.toJson()).toList()),
@@ -1001,6 +1009,8 @@ class AppStore extends ChangeNotifier {
   }
 
   void setCurrency(AppCurrency currency) {
+    _canUndoCurrencyConversion = false;
+    _prefs.remove(_currencyConversionUndoKey);
     _currency = currency;
     AppCurrency.current = currency;
     _prefs.setString(_currencyKey, currency.code);
@@ -1013,6 +1023,7 @@ class AppStore extends ChangeNotifier {
     double factor, {
     required Set<String> walletIds,
   }) async {
+    final backupBeforeConversion = createBackup().encode();
     final fromCode = from.code;
     final sourceWalletIds = walletIds
         .where((id) => walletById(id)?.currencyCode == fromCode)
@@ -1140,6 +1151,26 @@ class AppStore extends ChangeNotifier {
     _prefs.setString(_currencyKey, to.code);
     notifyListeners();
     await _save();
+    await _prefs.setString(
+      _currencyConversionUndoKey,
+      backupBeforeConversion,
+    );
+    _canUndoCurrencyConversion = true;
+    notifyListeners();
+  }
+
+  Future<bool> undoLastCurrencyConversion() async {
+    final raw = _prefs.getString(_currencyConversionUndoKey);
+    if (raw == null) return false;
+    _canUndoCurrencyConversion = false;
+    try {
+      await restoreBackup(BackupData.parse(raw));
+      return true;
+    } catch (_) {
+      await _prefs.remove(_currencyConversionUndoKey);
+      notifyListeners();
+      return false;
+    }
   }
 
   BackupData createBackup() {

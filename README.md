@@ -10,7 +10,3 @@ thêm dialog hướng dẫn tính năng trực tiếp cho lần đầu sử dụ
 
 đồng bộ vị trí nút cài đặt
 
-icon động loading
-
-
-

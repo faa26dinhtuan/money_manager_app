@@ -482,5 +482,7 @@
   "dateFormatMonthDayYear": "Month / day / year",
   "dateFormatYearMonthDay": "Year - month - day",
   "showWalletBalances": "Show wallet balances",
-  "hideWalletBalances": "Hide wallet balances"
+  "hideWalletBalances": "Hide wallet balances",
+  "undoLastWalletConversion": "Undo last wallet conversion",
+  "walletConversionUndone": "Wallet conversion undone"
 }

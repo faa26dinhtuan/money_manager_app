@@ -1493,4 +1493,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get hideWalletBalances => 'Ẩn số dư các ví';
+
+  @override
+  String get undoLastWalletConversion => 'Hoàn tác lần quy đổi ví gần nhất';
+
+  @override
+  String get walletConversionUndone => 'Đã hoàn tác quy đổi ví';
 }

@@ -2809,6 +2809,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Ẩn số dư các ví'**
   String get hideWalletBalances;
+
+  /// No description provided for @undoLastWalletConversion.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hoàn tác lần quy đổi ví gần nhất'**
+  String get undoLastWalletConversion;
+
+  /// No description provided for @walletConversionUndone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hoàn tác quy đổi ví'**
+  String get walletConversionUndone;
 }
 
 class _AppLocalizationsDelegate

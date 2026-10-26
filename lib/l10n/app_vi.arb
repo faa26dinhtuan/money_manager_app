@@ -807,5 +807,7 @@
   "dateFormatMonthDayYear": "Tháng / ngày / năm",
   "dateFormatYearMonthDay": "Năm - tháng - ngày",
   "showWalletBalances": "Hiện số dư các ví",
-  "hideWalletBalances": "Ẩn số dư các ví"
+  "hideWalletBalances": "Ẩn số dư các ví",
+  "undoLastWalletConversion": "Hoàn tác lần quy đổi ví gần nhất",
+  "walletConversionUndone": "Đã hoàn tác quy đổi ví"
 }
