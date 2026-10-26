@@ -12,6 +12,8 @@ class SensitiveBalance extends StatefulWidget {
     this.style,
     this.maxLines = 1,
     this.textAlign,
+    this.forceToggle = false,
+    this.onVisibilityChanged,
   });
 
   final double amount;
@@ -19,6 +21,8 @@ class SensitiveBalance extends StatefulWidget {
   final TextStyle? style;
   final int maxLines;
   final TextAlign? textAlign;
+  final bool forceToggle;
+  final VoidCallback? onVisibilityChanged;
 
   @override
   State<SensitiveBalance> createState() => _SensitiveBalanceState();
@@ -32,6 +36,7 @@ class _SensitiveBalanceState extends State<SensitiveBalance> {
   @override
   void initState() {
     super.initState();
+    _revealed = !_store.hideBalancesByDefault;
     _store.addListener(_onStoreChanged);
   }
 
@@ -52,13 +57,19 @@ class _SensitiveBalanceState extends State<SensitiveBalance> {
 
   @override
   Widget build(BuildContext context) {
-    final hidden = _store.hideBalancesByDefault && !_revealed;
+    final hidden = widget.forceToggle
+        ? !_revealed
+        : _store.hideBalancesByDefault && !_revealed;
+    void toggle() {
+      setState(() => _revealed = !_revealed);
+      widget.onVisibilityChanged?.call();
+    }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
-          onTap: _store.hideBalancesByDefault
-              ? () => setState(() => _revealed = !_revealed)
+          onTap: widget.forceToggle || _store.hideBalancesByDefault
+              ? toggle
               : null,
           child: Text(
             hidden ? '***' : formatMoney(widget.amount, widget.currency),
@@ -68,13 +79,13 @@ class _SensitiveBalanceState extends State<SensitiveBalance> {
             style: widget.style,
           ),
         ),
-        if (_store.hideBalancesByDefault)
+        if (widget.forceToggle || _store.hideBalancesByDefault)
           IconButton(
             tooltip: hidden ? context.l10n.showBalance : context.l10n.hideBalance,
             visualDensity: VisualDensity.compact,
             constraints: const BoxConstraints.tightFor(width: 30, height: 30),
             padding: EdgeInsets.zero,
-            onPressed: () => setState(() => _revealed = !_revealed),
+            onPressed: toggle,
             icon: Icon(
               hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined,
               size: 17,

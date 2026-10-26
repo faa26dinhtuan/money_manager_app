@@ -17,6 +17,7 @@ class DonutChart extends StatefulWidget {
     this.center,
     this.showLabels = false,
     this.interactive = false,
+    this.onInteraction,
   });
 
   final List<DonutSlice> slices;
@@ -25,6 +26,7 @@ class DonutChart extends StatefulWidget {
   final Widget? center;
   final bool showLabels;
   final bool interactive;
+  final VoidCallback? onInteraction;
 
   @override
   State<DonutChart> createState() => _DonutChartState();
@@ -103,7 +105,10 @@ class _DonutChartState extends State<DonutChart> {
                   final next = !event.isInterestedForInteractions || index == null
                       ? -1
                       : index;
-                  if (next != _touched) setState(() => _touched = next);
+                  if (next != _touched) {
+                    setState(() => _touched = next);
+                    if (next >= 0) widget.onInteraction?.call();
+                  }
                 },
               ),
             ),

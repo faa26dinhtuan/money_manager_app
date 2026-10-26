@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
+import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -26,7 +27,9 @@ import 'package:money_manager_app/features/transactions/category_transactions_sc
 import 'package:money_manager_app/features/overview/overview_guide_dialog.dart';
 
 class OverviewScreen extends StatefulWidget {
-  const OverviewScreen({super.key});
+  const OverviewScreen({super.key, required this.guideController});
+
+  final OverviewGuideController guideController;
 
   @override
   State<OverviewScreen> createState() => _OverviewScreenState();
@@ -38,16 +41,32 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Period _period = Period.month;
   DateTime _anchor = DateTime.now();
   DateRange? _customRange;
+  late final _guideController = widget.guideController;
+  bool _guideSampleWalletSelected = true;
+  bool _guideChartSelected = false;
+
+  double get _guidePeriodFactor => switch (_period) {
+    Period.day => 0.04,
+    Period.week => 0.25,
+    Period.month => 1,
+    Period.year => 12,
+    Period.custom => 1,
+  };
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _showOverviewGuide());
+    _guideController.addListener(_onGuideChanged);
   }
 
-  Future<void> _showOverviewGuide() async {
-    if (!mounted) return;
-    await showOverviewGuideDialog(context);
+  @override
+  void dispose() {
+    _guideController.removeListener(_onGuideChanged);
+    super.dispose();
+  }
+
+  void _onGuideChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _pickRange() async {
@@ -69,6 +88,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
       );
       _period = Period.custom;
     });
+    _guideController.markInteraction(3);
   }
 
   Future<void> _confirmEventTransaction(PlannedEvent event) async {
@@ -141,9 +161,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
       builder: (context, _) {
         final range = DateRange.of(_period, _anchor, _customRange);
         final todayRange = DateRange.of(Period.day, DateTime.now());
-        final todayEvents = _store
-            .plannedEventsInRange(todayRange, includeAllWallets: true)
-            .toList();
+        final todayEvents = _guideController.active
+            ? <PlannedEvent>[]
+            : _store
+                  .plannedEventsInRange(todayRange, includeAllWallets: true)
+                  .toList();
         final items = _store.query(
           _type,
           range,
@@ -151,8 +173,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
         );
 
         final totals = <String, double>{};
-        for (final t in items) {
-          totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
+        if (_guideController.active) {
+          totals[
+            _type == TxType.expense ? 'guide_expense' : 'guide_income'
+          ] = (_type == TxType.expense ? 850000 : 4500000) *
+              _guidePeriodFactor;
+        } else {
+          for (final t in items) {
+            totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
+          }
         }
         final entries = totals.entries.toList()
           ..sort((a, b) => b.value.compareTo(a.value));
@@ -162,7 +191,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
           for (final e in entries)
             DonutSlice(
               e.value,
-              _store.categoryById(e.key)?.color ?? Colors.grey,
+              _guideController.active
+                  ? AppTheme.primary
+                  : _store.categoryById(e.key)?.color ?? Colors.grey,
             ),
         ];
 
@@ -172,9 +203,26 @@ class _OverviewScreenState extends State<OverviewScreen> {
             body: Column(
               children: [
                 _Header(
-                  balance: _store.selectedBalance,
+                  balance: _guideController.active
+                      ? (_guideSampleWalletSelected ? 4200000 : 6250000)
+                      : _store.selectedBalance,
                   type: _type,
-                  onTypeChanged: (t) => setState(() => _type = t),
+                  guideMode: _guideController.active,
+                  sampleWalletSelected: _guideSampleWalletSelected,
+                  onSampleWalletChanged: (selected) => setState(
+                    () => _guideSampleWalletSelected = selected,
+                  ),
+                  onWalletInteraction: () =>
+                      _guideController.markInteraction(0),
+                  onBalanceVisibilityChanged: () =>
+                      _guideController.markInteraction(1),
+                  onTypeChanged: (t) {
+                    setState(() {
+                      _type = t;
+                      _guideChartSelected = false;
+                    });
+                    _guideController.markInteraction(2);
+                  },
                 ),
                 Expanded(
                   child: ListView(
@@ -210,10 +258,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                   _period = p;
                                   _anchor = DateTime.now();
                                 });
+                                _guideController.markInteraction(3);
                               },
-                              onShift: (d) => setState(() {
-                                _anchor = DateRange.shift(_period, _anchor, d);
-                              }),
+                              onShift: (d) {
+                                setState(() {
+                                  _anchor = DateRange.shift(_period, _anchor, d);
+                                });
+                                _guideController.markInteraction(3);
+                              },
                             ),
                             const SizedBox(height: 12),
                             DonutChart(
@@ -223,20 +275,36 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               thickness: 40,
                               showLabels: true,
                               interactive: true,
+                              onInteraction: () {
+                                if (_guideController.active) {
+                                  setState(() => _guideChartSelected = true);
+                                }
+                              },
                               center: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    _type == TxType.expense
-                                        ? context.l10n.spent
-                                        : context.l10n.received,
+                                    _guideController.active && _guideChartSelected
+                                        ? _type == TxType.expense
+                                              ? context.l10n.overviewGuideSampleExpenseCategory
+                                              : context.l10n.overviewGuideSampleIncomeCategory
+                                        : _type == TxType.expense
+                                              ? context.l10n.spent
+                                              : context.l10n.received,
                                     style: TextStyle(
                                       color: context.textTertiary,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    formatMoney(total),
+                                    formatMoney(
+                                      _guideController.active && _guideChartSelected
+                                          ? (_type == TxType.expense
+                                                    ? 850000
+                                                    : 4500000) *
+                                                _guidePeriodFactor
+                                          : total,
+                                    ),
                                     style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
@@ -266,25 +334,44 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               ? OverviewGuideTargets.transactions
                               : null,
                           category: _store.categoryById(e.key),
+                          displayName: _guideController.active
+                              ? _type == TxType.expense
+                                    ? context.l10n.overviewGuideSampleExpenseCategory
+                                    : context.l10n.overviewGuideSampleIncomeCategory
+                              : null,
+                          displayIcon: _guideController.active
+                              ? _type == TxType.expense
+                                    ? AppIcons.restaurant
+                                    : AppIcons.received
+                              : null,
+                          displayColor: _guideController.active
+                              ? AppTheme.primary
+                              : null,
                           amount: e.value,
                           percent: total == 0
                               ? 0
                               : e.value / total * 100,
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => CategoryTransactionsScreen(
-                                categoryId: e.key,
-                                type: _type,
-                                range: range,
-                                rangeLabel: localizedDateRangeLabel(
-                                  context,
-                                  _period,
-                                  _anchor,
-                                  _customRange,
+                          onTap: () {
+                            if (_guideController.active) {
+                              _openGuideCategoryTransactions(e.key, range);
+                              return;
+                            }
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => CategoryTransactionsScreen(
+                                  categoryId: e.key,
+                                  type: _type,
+                                  range: range,
+                                  rangeLabel: localizedDateRangeLabel(
+                                    context,
+                                    _period,
+                                    _anchor,
+                                    _customRange,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                     ],
                   ),
@@ -295,6 +382,41 @@ class _OverviewScreenState extends State<OverviewScreen> {
         );
       },
     );
+  }
+
+  Future<void> _openGuideCategoryTransactions(
+    String categoryId,
+    DateRange range,
+  ) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CategoryTransactionsScreen(
+          categoryId: categoryId,
+          type: _type,
+          range: range,
+          rangeLabel: localizedDateRangeLabel(
+            context,
+            _period,
+            _anchor,
+            _customRange,
+          ),
+          guideMode: true,
+          guideCategoryName: _type == TxType.expense
+              ? context.l10n.overviewGuideSampleExpenseCategory
+              : context.l10n.overviewGuideSampleIncomeCategory,
+          guideTransactionName: _type == TxType.expense
+              ? context.l10n.overviewGuideSampleExpenseTransaction
+              : context.l10n.overviewGuideSampleIncomeTransaction,
+          guideIcon: _type == TxType.expense
+              ? AppIcons.restaurant
+              : AppIcons.received,
+          guideColor: AppTheme.primary,
+          guideAmount: (_type == TxType.expense ? 850000 : 4500000) *
+              _guidePeriodFactor,
+        ),
+      ),
+    );
+    if (mounted) _guideController.markInteraction(4);
   }
 }
 
@@ -576,11 +698,21 @@ class _Header extends StatelessWidget {
     required this.balance,
     required this.type,
     required this.onTypeChanged,
+    required this.guideMode,
+    required this.sampleWalletSelected,
+    required this.onSampleWalletChanged,
+    required this.onWalletInteraction,
+    required this.onBalanceVisibilityChanged,
   });
 
   final double balance;
   final TxType type;
   final ValueChanged<TxType> onTypeChanged;
+  final bool guideMode;
+  final bool sampleWalletSelected;
+  final ValueChanged<bool> onSampleWalletChanged;
+  final VoidCallback onWalletInteraction;
+  final VoidCallback onBalanceVisibilityChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -599,6 +731,12 @@ class _Header extends StatelessWidget {
                       child: WalletSelector(
                         key: OverviewGuideTargets.wallet,
                         onPrimary: true,
+                        demoWalletName: guideMode
+                            ? context.l10n.overviewGuideSampleWallet
+                            : null,
+                        demoWalletSelected: sampleWalletSelected,
+                        onDemoWalletChanged: onSampleWalletChanged,
+                        onDemoInteraction: onWalletInteraction,
                       ),
                     ),
                   ),
@@ -617,6 +755,10 @@ class _Header extends StatelessWidget {
             SensitiveBalance(
               key: OverviewGuideTargets.balance,
               amount: balance,
+              forceToggle: guideMode,
+              onVisibilityChanged: guideMode
+                  ? onBalanceVisibilityChanged
+                  : null,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 30,
@@ -648,16 +790,22 @@ class _CategoryRow extends StatelessWidget {
     required this.amount,
     required this.percent,
     required this.onTap,
+    this.displayName,
+    this.displayIcon,
+    this.displayColor,
   });
 
   final Category? category;
   final double amount;
   final double percent;
   final VoidCallback onTap;
+  final String? displayName;
+  final AppIconData? displayIcon;
+  final Color? displayColor;
 
   @override
   Widget build(BuildContext context) {
-    final color = category?.color ?? Colors.grey;
+    final color = displayColor ?? category?.color ?? Colors.grey;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -670,14 +818,16 @@ class _CategoryRow extends StatelessWidget {
             Row(
               children: [
                 CategoryIcon(
-                  icon: category?.icon ?? AppIcons.help,
+                  icon: displayIcon ?? category?.icon ?? AppIcons.help,
                   color: color,
                   size: 38,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    category?.localizedName(context) ?? context.l10n.other,
+                    displayName ??
+                        category?.localizedName(context) ??
+                        context.l10n.other,
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),

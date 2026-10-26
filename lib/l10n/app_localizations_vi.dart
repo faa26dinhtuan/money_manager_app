@@ -1514,6 +1514,25 @@ class AppLocalizationsVi extends AppLocalizations {
       'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.';
 
   @override
+  String get overviewGuideDemoInstruction =>
+      'Ví và giao dịch mẫu trong phần làm quen chỉ để minh họa, không làm thay đổi dữ liệu thật.';
+
+  @override
+  String get overviewGuideSampleWallet => 'Ví mẫu';
+
+  @override
+  String get overviewGuideSampleExpenseCategory => 'Ăn uống';
+
+  @override
+  String get overviewGuideSampleIncomeCategory => 'Lương';
+
+  @override
+  String get overviewGuideSampleExpenseTransaction => 'Bữa trưa';
+
+  @override
+  String get overviewGuideSampleIncomeTransaction => 'Lương tháng';
+
+  @override
   String get overviewGuideWalletTitle => 'Chọn ví cần xem';
 
   @override
@@ -1546,14 +1565,21 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get overviewGuideChartDescription =>
-      'Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.';
+      'Chạm vào một phần biểu đồ để làm nổi bật mục tương ứng.';
 
   @override
   String get overviewGuideTransactionsTitle => 'Xem danh sách theo danh mục';
 
   @override
   String get overviewGuideTransactionsDescription =>
-      'Các dòng bên dưới biểu đồ cho biết số tiền theo từng danh mục. Chạm vào một dòng để xem các giao dịch thuộc danh mục đó.';
+      'Chạm vào một danh mục để xem tổng tiền và các giao dịch thuộc danh mục đó.';
+
+  @override
+  String get overviewGuideNavigationTitle => 'Chuyển đến các mục khác';
+
+  @override
+  String get overviewGuideNavigationDescription =>
+      'Thanh dưới giúp bạn mở nhanh Tổng quan, Sổ giao dịch, Lịch và Ví tiền. Nút cộng dùng để thêm giao dịch.';
 
   @override
   String get overviewGuideSettingsTitle => 'Mở cài đặt';
@@ -1567,5 +1593,5 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get overviewGuideAddDescription =>
-      'Nút dấu cộng ở giữa thanh điều hướng giúp ghi nhanh một khoản thu hoặc chi.';
+      'Nút dấu cộng là lối tắt để bắt đầu ghi một khoản thu hoặc chi.';
 }

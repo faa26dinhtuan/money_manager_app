@@ -56,18 +56,33 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+  late final _overviewGuideController = OverviewGuideController();
+  late final List<Widget> _screens = [
+    OverviewScreen(guideController: _overviewGuideController),
+    const TransactionsScreen(),
+    const CalendarScreen(),
+    const WalletScreen(),
+  ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _overviewGuideController.addListener(_onOverviewGuideChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) => _runRecurring());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _overviewGuideController
+      ..removeListener(_onOverviewGuideChanged)
+      ..dispose();
     super.dispose();
+  }
+
+  void _onOverviewGuideChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -87,34 +102,40 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     }
   }
 
-  static const List<Widget> _screens = [
-    OverviewScreen(),
-    TransactionsScreen(),
-    CalendarScreen(),
-    WalletScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Stack(
+      children: [
+        Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
       floatingActionButtonLocation: const AddNavButtonLocation(),
       floatingActionButton: AddNavButton(
         key: OverviewGuideTargets.addTransaction,
         onPressed: () {
           HapticFeedback.lightImpact();
+          if (_overviewGuideController.active &&
+              _overviewGuideController.step == 6) {
+            _overviewGuideController.markInteraction(6);
+          }
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
           );
         },
       ),
       bottomNavigationBar: CustomBottomNav(
+        key: OverviewGuideTargets.navigation,
         currentIndex: _currentIndex,
         onTap: (index) {
           if (index != _currentIndex) HapticFeedback.selectionClick();
           setState(() => _currentIndex = index);
         },
       ),
+        ),
+        if (_overviewGuideController.active)
+          Positioned.fill(
+            child: OverviewGuideOverlay(controller: _overviewGuideController),
+          ),
+      ],
     );
   }
 }

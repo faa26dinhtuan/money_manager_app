@@ -1516,6 +1516,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'See your balance, income, expenses, and category breakdown at a glance.';
 
   @override
+  String get overviewGuideDemoInstruction =>
+      'The sample wallet and transactions in this walkthrough are illustrative and won\'t change your real data.';
+
+  @override
+  String get overviewGuideSampleWallet => 'Sample wallet';
+
+  @override
+  String get overviewGuideSampleExpenseCategory => 'Food & dining';
+
+  @override
+  String get overviewGuideSampleIncomeCategory => 'Salary';
+
+  @override
+  String get overviewGuideSampleExpenseTransaction => 'Lunch';
+
+  @override
+  String get overviewGuideSampleIncomeTransaction => 'Monthly salary';
+
+  @override
   String get overviewGuideWalletTitle => 'Choose a wallet';
 
   @override
@@ -1548,14 +1567,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideChartDescription =>
-      'The chart shows how money is distributed by category. Tap a category to view its transactions.';
+      'Tap a chart section to highlight the corresponding category.';
 
   @override
   String get overviewGuideTransactionsTitle => 'Review categories';
 
   @override
   String get overviewGuideTransactionsDescription =>
-      'The rows below the chart show the amount for each category. Tap a row to see the transactions in that category.';
+      'Tap a category to view its total and the transactions in that category.';
+
+  @override
+  String get overviewGuideNavigationTitle => 'Move between sections';
+
+  @override
+  String get overviewGuideNavigationDescription =>
+      'Use the bottom bar to open Overview, Transactions, Calendar, and Wallets. The plus button starts a new transaction.';
 
   @override
   String get overviewGuideSettingsTitle => 'Open Settings';
@@ -1569,5 +1595,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideAddDescription =>
-      'The plus button in the middle of the navigation bar quickly records income or an expense.';
+      'The plus button is a shortcut for starting an income or expense entry.';
 }

@@ -2846,6 +2846,42 @@ abstract class AppLocalizations {
   /// **'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.'**
   String get overviewGuideIntro;
 
+  /// No description provided for @overviewGuideDemoInstruction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví và giao dịch mẫu trong phần làm quen chỉ để minh họa, không làm thay đổi dữ liệu thật.'**
+  String get overviewGuideDemoInstruction;
+
+  /// No description provided for @overviewGuideSampleWallet.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví mẫu'**
+  String get overviewGuideSampleWallet;
+
+  /// No description provided for @overviewGuideSampleExpenseCategory.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ăn uống'**
+  String get overviewGuideSampleExpenseCategory;
+
+  /// No description provided for @overviewGuideSampleIncomeCategory.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lương'**
+  String get overviewGuideSampleIncomeCategory;
+
+  /// No description provided for @overviewGuideSampleExpenseTransaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bữa trưa'**
+  String get overviewGuideSampleExpenseTransaction;
+
+  /// No description provided for @overviewGuideSampleIncomeTransaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lương tháng'**
+  String get overviewGuideSampleIncomeTransaction;
+
   /// No description provided for @overviewGuideWalletTitle.
   ///
   /// In vi, this message translates to:
@@ -2903,7 +2939,7 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideChartDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.'**
+  /// **'Chạm vào một phần biểu đồ để làm nổi bật mục tương ứng.'**
   String get overviewGuideChartDescription;
 
   /// No description provided for @overviewGuideTransactionsTitle.
@@ -2915,8 +2951,20 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideTransactionsDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Các dòng bên dưới biểu đồ cho biết số tiền theo từng danh mục. Chạm vào một dòng để xem các giao dịch thuộc danh mục đó.'**
+  /// **'Chạm vào một danh mục để xem tổng tiền và các giao dịch thuộc danh mục đó.'**
   String get overviewGuideTransactionsDescription;
+
+  /// No description provided for @overviewGuideNavigationTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển đến các mục khác'**
+  String get overviewGuideNavigationTitle;
+
+  /// No description provided for @overviewGuideNavigationDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thanh dưới giúp bạn mở nhanh Tổng quan, Sổ giao dịch, Lịch và Ví tiền. Nút cộng dùng để thêm giao dịch.'**
+  String get overviewGuideNavigationDescription;
 
   /// No description provided for @overviewGuideSettingsTitle.
   ///
@@ -2939,7 +2987,7 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideAddDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Nút dấu cộng ở giữa thanh điều hướng giúp ghi nhanh một khoản thu hoặc chi.'**
+  /// **'Nút dấu cộng là lối tắt để bắt đầu ghi một khoản thu hoặc chi.'**
   String get overviewGuideAddDescription;
 }
 

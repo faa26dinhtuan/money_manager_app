@@ -15,86 +15,107 @@ class OverviewGuideTargets {
   static final period = GlobalKey();
   static final chart = GlobalKey();
   static final transactions = GlobalKey();
+  static final navigation = GlobalKey();
   static final settings = GlobalKey();
   static final addTransaction = GlobalKey();
 }
 
-Future<void> showOverviewGuideDialog(BuildContext context) {
-  final l = context.l10n;
-  return showGeneralDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    barrierLabel: l.skipGuide,
-    barrierColor: Colors.transparent,
-    transitionDuration: const Duration(milliseconds: 180),
-    pageBuilder: (context, _, _) => const _OverviewGuideOverlay(),
-    transitionBuilder: (context, animation, _, child) => FadeTransition(
-      opacity: animation,
-      child: child,
-    ),
-  );
+class OverviewGuideController extends ChangeNotifier {
+  bool active = true;
+  bool started = false;
+  bool interacted = false;
+  int step = 0;
+
+  void start() {
+    started = true;
+    notifyListeners();
+  }
+
+  void markInteraction(int targetStep) {
+    if (!active || !started || step != targetStep || interacted) return;
+    interacted = true;
+    notifyListeners();
+  }
+
+  void next() {
+    if (!active || !started || (step < 5 && !interacted)) return;
+    if (step == 6) {
+      active = false;
+    } else {
+      step++;
+      interacted = false;
+    }
+    notifyListeners();
+  }
+
+  void skip() {
+    active = false;
+    notifyListeners();
+  }
 }
 
-class _OverviewGuideOverlay extends StatefulWidget {
-  const _OverviewGuideOverlay();
+class OverviewGuideOverlay extends StatefulWidget {
+  const OverviewGuideOverlay({super.key, required this.controller});
+
+  final OverviewGuideController controller;
 
   @override
-  State<_OverviewGuideOverlay> createState() => _OverviewGuideOverlayState();
+  State<OverviewGuideOverlay> createState() => _OverviewGuideOverlayState();
 }
 
-class _OverviewGuideOverlayState extends State<_OverviewGuideOverlay> {
-  int _index = 0;
-  int _measureAttempts = 0;
-  bool _started = false;
-  Rect? _targetRect;
+class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
+  List<Rect> _targetRects = [];
+  int _lastStep = -1;
+  bool _lastStarted = false;
 
   List<_OverviewGuideStep> _steps(BuildContext context) {
     final l = context.l10n;
     return [
       _OverviewGuideStep(
-        target: OverviewGuideTargets.wallet,
+        targets: [OverviewGuideTargets.wallet],
         icon: AppIcons.wallet,
         title: l.overviewGuideWalletTitle,
         description: l.overviewGuideWalletDescription,
       ),
       _OverviewGuideStep(
-        target: OverviewGuideTargets.balance,
+        targets: [OverviewGuideTargets.balance],
         materialIcon: Icons.visibility_outlined,
         title: l.overviewGuideBalanceTitle,
         description: l.overviewGuideBalanceDescription,
       ),
       _OverviewGuideStep(
-        target: OverviewGuideTargets.type,
+        targets: [OverviewGuideTargets.type, OverviewGuideTargets.chart],
         icon: AppIcons.transactions,
         title: l.overviewGuideTypeTitle,
         description: l.overviewGuideTypeDescription,
       ),
       _OverviewGuideStep(
-        target: OverviewGuideTargets.period,
+        targets: [
+          OverviewGuideTargets.period,
+          OverviewGuideTargets.chart,
+          OverviewGuideTargets.transactions,
+        ],
         icon: AppIcons.calendar,
         title: l.overviewGuidePeriodTitle,
         description: l.overviewGuidePeriodDescription,
       ),
       _OverviewGuideStep(
-        target: OverviewGuideTargets.chart,
-        materialIcon: Icons.pie_chart_outline,
-        title: l.overviewGuideChartTitle,
-        description: l.overviewGuideChartDescription,
-      ),
-      _OverviewGuideStep(
-        target: OverviewGuideTargets.transactions,
+        targets: [OverviewGuideTargets.transactions],
         icon: AppIcons.transactions,
         title: l.overviewGuideTransactionsTitle,
         description: l.overviewGuideTransactionsDescription,
       ),
       _OverviewGuideStep(
-        target: OverviewGuideTargets.settings,
-        icon: AppIcons.settings,
-        title: l.overviewGuideSettingsTitle,
-        description: l.overviewGuideSettingsDescription,
+        targets: [
+          OverviewGuideTargets.navigation,
+          OverviewGuideTargets.addTransaction,
+        ],
+        materialIcon: Icons.dashboard_outlined,
+        title: l.overviewGuideNavigationTitle,
+        description: l.overviewGuideNavigationDescription,
       ),
       _OverviewGuideStep(
-        target: OverviewGuideTargets.addTransaction,
+        targets: [OverviewGuideTargets.addTransaction],
         icon: AppIcons.add,
         title: l.overviewGuideAddTitle,
         description: l.overviewGuideAddDescription,
@@ -102,145 +123,194 @@ class _OverviewGuideOverlayState extends State<_OverviewGuideOverlay> {
     ];
   }
 
-  void _startSteps() {
-    setState(() => _started = true);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focusCurrentTarget());
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant OverviewGuideOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (!mounted) return;
+    final controller = widget.controller;
+    final shouldRefocus = controller.started &&
+        (controller.step != _lastStep || !_lastStarted);
+    _lastStep = controller.step;
+    _lastStarted = controller.started;
+    setState(() {});
+    if (controller.started) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (shouldRefocus) {
+          _focusCurrentTarget();
+        } else {
+          _measureTarget();
+        }
+      });
+    }
   }
 
   Future<void> _focusCurrentTarget() async {
-    if (!mounted) return;
-    final targetContext = _steps(context)[_index].target.currentContext;
+    if (!mounted || !widget.controller.active || !widget.controller.started) return;
+    final targetContext =
+        _steps(context)[widget.controller.step].targets.last.currentContext;
     if (targetContext == null) {
       _measureTarget();
       return;
     }
     await Scrollable.ensureVisible(
       targetContext,
-      duration: const Duration(milliseconds: 240),
+      duration: const Duration(milliseconds: 220),
       alignment: 0.35,
     );
     if (mounted) _measureTarget();
   }
 
-  Rect? _rectFor(GlobalKey key) {
-    final renderObject = key.currentContext?.findRenderObject();
-    if (renderObject is! RenderBox || !renderObject.hasSize) return null;
-    final rect = renderObject.localToGlobal(Offset.zero) & renderObject.size;
-    return rect.intersect(Offset.zero & MediaQuery.sizeOf(context));
-  }
-
   void _measureTarget() {
     if (!mounted) return;
-    final rect = _rectFor(_steps(context)[_index].target);
-    if (rect == null || rect.isEmpty) {
-      if (_measureAttempts < 4) {
-        _measureAttempts++;
-        WidgetsBinding.instance.addPostFrameCallback((_) => _measureTarget());
-      }
+    final overlayObject = context.findRenderObject();
+    if (overlayObject is! RenderBox || !overlayObject.hasSize) {
       return;
     }
-    _measureAttempts = 0;
-    setState(() => _targetRect = rect);
-  }
-
-  void _nextStep() {
-    final steps = _steps(context);
-    if (_index == steps.length - 1) {
-      Navigator.of(context).pop();
+    final origin = overlayObject.localToGlobal(Offset.zero);
+    final next = <Rect>[];
+    for (final key in _steps(context)[widget.controller.step].targets) {
+      final object = key.currentContext?.findRenderObject();
+      if (object is! RenderBox || !object.hasSize) continue;
+      final global = object.localToGlobal(Offset.zero) & object.size;
+      final rect = global.shift(-origin).intersect(Offset.zero & overlayObject.size);
+      if (!rect.isEmpty) next.add(rect);
+    }
+    if (next.length == _targetRects.length &&
+        List.generate(next.length, (index) => next[index] == _targetRects[index])
+            .every((matches) => matches)) {
       return;
     }
-    setState(() {
-      _index++;
-      _measureAttempts = 0;
-      _targetRect = null;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focusCurrentTarget());
+    setState(() => _targetRects = next);
   }
 
   double _bubbleTop(Size size, EdgeInsets padding, Rect target) {
-    const bubbleHeight = 230.0;
+    const bubbleHeight = 190.0;
     final topLimit = padding.top + 12;
-    final bottomLimit = size.height -
-        padding.bottom -
-        CustomBottomNav.barHeight -
-        CustomBottomNav.protrusion -
-        12;
-    final maximum = math.max(topLimit, bottomLimit - bubbleHeight);
+    final maximum = math.max(topLimit, size.height - bubbleHeight - 16);
     final preferred = target.center.dy < size.height * 0.5
-        ? target.bottom + 22
-        : target.top - bubbleHeight - 22;
+        ? target.bottom + 20
+        : target.top - bubbleHeight - 20;
     return preferred.clamp(topLimit, maximum).toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
-    final steps = _steps(context);
-    final step = steps[_index];
-    final target = _targetRect;
-    final media = MediaQuery.of(context);
-
-    return Material(
-      type: MaterialType.transparency,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final size = Size(constraints.maxWidth, constraints.maxHeight);
-          final safeTarget = target ?? Rect.fromCenter(
-            center: Offset(size.width / 2, size.height / 2),
-            width: 64,
-            height: 64,
-          );
-          final top = _bubbleTop(size, media.padding, safeTarget);
-          final bubbleRect = Rect.fromLTWH(
-            16,
-            top,
-            size.width - 32,
-            math
-                .min(230.0, size.height - top - media.padding.bottom - 12)
-                .toDouble(),
-          );
-
-          return Stack(
-            children: [
-              if (_started) ...[
+    return AnimatedBuilder(
+      animation: widget.controller,
+      builder: (context, _) {
+        if (!widget.controller.active) return const SizedBox.shrink();
+        final l = context.l10n;
+        final steps = _steps(context);
+        final step = steps[widget.controller.step];
+        final media = MediaQuery.of(context);
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final size = Size(constraints.maxWidth, constraints.maxHeight);
+            final targets = widget.controller.started ? _targetRects : <Rect>[];
+            final anchor = targets.isNotEmpty ? targets.first : Rect.fromCenter(
+              center: Offset(size.width / 2, size.height / 2),
+              width: 64,
+              height: 64,
+            );
+            final bottomAnchoredStep = widget.controller.step == 2 ||
+                widget.controller.step == 3;
+            final top = bottomAnchoredStep
+                ? math.max(
+                    media.padding.top + 12,
+                    size.height - media.padding.bottom - 202.0,
+                  ).toDouble()
+                : _bubbleTop(size, media.padding, anchor);
+            final bubble = Rect.fromLTWH(
+              16,
+              top,
+              size.width - 32,
+              math.min(190.0, size.height - top - 12).toDouble(),
+            );
+            return Stack(
+              children: [
                 Positioned.fill(
-                  child: CustomPaint(
-                    painter: _SpotlightPainter(
-                      target: target,
-                      bubble: bubbleRect,
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      painter: _OverviewSpotlightPainter(
+                        targets: targets,
+                        bubble: bubble,
+                      ),
                     ),
                   ),
                 ),
-                Positioned(
-                  left: 16,
-                  right: 16,
-                  top: top,
-                  child: _OverviewGuideCallout(
-                    step: step,
-                    index: _index,
-                    count: steps.length,
-                    onNext: _nextStep,
-                    onSkip: () => Navigator.of(context).pop(),
+                if (widget.controller.started && widget.controller.step >= 5)
+                  const Positioned.fill(
+                    child: AbsorbPointer(child: SizedBox.expand()),
                   ),
-                ),
-              ] else
-                Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: media.padding.bottom +
-                      CustomBottomNav.barHeight +
-                      CustomBottomNav.protrusion +
-                      12,
-                  child: _OverviewGuideIntro(
-                    onStart: _startSteps,
-                    onSkip: () => Navigator.of(context).pop(),
+                if (!widget.controller.started)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: media.padding.bottom +
+                        CustomBottomNav.barHeight +
+                        CustomBottomNav.protrusion +
+                        12,
+                    child: _OverviewGuideIntro(
+                      onStart: widget.controller.start,
+                      onSkip: widget.controller.skip,
+                    ),
+                  )
+                else
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    top: top,
+                    child: _OverviewGuideCallout(
+                      step: step,
+                      index: widget.controller.step,
+                      count: steps.length,
+                      interacted: widget.controller.interacted,
+                      onNext: widget.controller.next,
+                      onSkip: widget.controller.skip,
+                    ),
                   ),
-                ),
-            ],
-          );
-        },
-      ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
+}
+
+class _OverviewGuideStep {
+  const _OverviewGuideStep({
+    required this.targets,
+    required this.title,
+    required this.description,
+    this.icon,
+    this.materialIcon,
+  });
+
+  final List<GlobalKey> targets;
+  final AppIconData? icon;
+  final IconData? materialIcon;
+  final String title;
+  final String description;
 }
 
 class _OverviewGuideIntro extends StatelessWidget {
@@ -252,65 +322,35 @@ class _OverviewGuideIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.32)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.24),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.overviewGuideTitle,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
-            Text(l.overviewGuideIntro),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Spacer(),
-                TextButton(onPressed: onSkip, child: Text(l.skipGuide)),
-                const SizedBox(width: 4),
-                FilledButton(onPressed: onStart, child: Text(l.continueText)),
-              ],
-            ),
-          ],
-        ),
+    return _GuideCard(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.overviewGuideTitle,
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          Text(l.overviewGuideIntro),
+          const SizedBox(height: 6),
+          Text(l.overviewGuideDemoInstruction),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Spacer(),
+              TextButton(onPressed: onSkip, child: Text(l.skipGuide)),
+              const SizedBox(width: 4),
+              FilledButton(onPressed: onStart, child: Text(l.continueText)),
+            ],
+          ),
+        ],
       ),
     );
   }
-}
-
-class _OverviewGuideStep {
-  const _OverviewGuideStep({
-    required this.target,
-    required this.title,
-    required this.description,
-    this.icon,
-    this.materialIcon,
-  });
-
-  final GlobalKey target;
-  final AppIconData? icon;
-  final IconData? materialIcon;
-  final String title;
-  final String description;
 }
 
 class _OverviewGuideCallout extends StatelessWidget {
@@ -318,6 +358,7 @@ class _OverviewGuideCallout extends StatelessWidget {
     required this.step,
     required this.index,
     required this.count,
+    required this.interacted,
     required this.onNext,
     required this.onSkip,
   });
@@ -325,14 +366,85 @@ class _OverviewGuideCallout extends StatelessWidget {
   final _OverviewGuideStep step;
   final int index;
   final int count;
+  final bool interacted;
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    final isLast = index == count - 1;
+    return _GuideCard(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: step.materialIcon != null
+                      ? Icon(step.materialIcon, color: AppTheme.primary, size: 22)
+                      : AppIcon(step.icon!, color: AppTheme.primary, size: 22),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  step.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(step.description),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              for (var i = 0; i < count; i++)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  margin: const EdgeInsets.only(right: 4),
+                  width: i == index ? 14 : 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: i == index
+                        ? AppTheme.primary
+                        : AppTheme.primary.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              const Spacer(),
+              TextButton(onPressed: onSkip, child: Text(l.skipGuide)),
+              const SizedBox(width: 4),
+              FilledButton(
+                onPressed: interacted ? onNext : null,
+                child: Text(index == count - 1 ? l.done : l.continueText),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
 
+class _GuideCard extends StatelessWidget {
+  const _GuideCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -349,126 +461,65 @@ class _OverviewGuideCallout extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Center(
-                    child: step.materialIcon != null
-                        ? Icon(step.materialIcon, color: AppTheme.primary, size: 22)
-                        : AppIcon(step.icon!, color: AppTheme.primary, size: 22),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    step.title,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              step.description,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                for (var i = 0; i < count; i++)
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    margin: const EdgeInsets.only(right: 4),
-                    width: i == index ? 14 : 5,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: i == index
-                          ? AppTheme.primary
-                          : AppTheme.primary.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                const Spacer(),
-                TextButton(onPressed: onSkip, child: Text(l.skipGuide)),
-                const SizedBox(width: 4),
-                FilledButton(
-                  onPressed: onNext,
-                  child: Text(isLast ? l.done : l.continueText),
-                ),
-              ],
-            ),
-          ],
-        ),
+        child: child,
       ),
     );
   }
 }
 
-class _SpotlightPainter extends CustomPainter {
-  const _SpotlightPainter({required this.target, required this.bubble});
+class _OverviewSpotlightPainter extends CustomPainter {
+  const _OverviewSpotlightPainter({required this.targets, required this.bubble});
 
-  final Rect? target;
+  final List<Rect> targets;
   final Rect bubble;
 
   @override
   void paint(Canvas canvas, Size size) {
     final bounds = Offset.zero & size;
     canvas.saveLayer(bounds, Paint());
-    canvas.drawRect(
-      bounds,
-      Paint()..color = Colors.black.withValues(alpha: 0.76),
-    );
-    final targetRect = target;
-    if (targetRect != null && !targetRect.isEmpty) {
-      final spotlight = RRect.fromRectAndRadius(
-        targetRect.inflate(8),
-        const Radius.circular(18),
+    canvas.drawRect(bounds, Paint()..color = Colors.black.withValues(alpha: 0.76));
+    for (final targetRect in targets) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          targetRect.inflate(8),
+          const Radius.circular(18),
+        ),
+        Paint()..blendMode = BlendMode.clear,
       );
-      canvas.drawRRect(spotlight, Paint()..blendMode = BlendMode.clear);
     }
     canvas.restore();
-    if (targetRect == null || targetRect.isEmpty) return;
-
-    final spotlightRect = targetRect.inflate(8);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(spotlightRect, const Radius.circular(18)),
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
-    );
-    final placeBelow = bubble.top >= spotlightRect.bottom;
-    final start = Offset(
-      spotlightRect.center.dx,
-      placeBelow ? spotlightRect.bottom : spotlightRect.top,
-    );
-    final end = Offset(
-      start.dx.clamp(bubble.left + 24, bubble.right - 24).toDouble(),
-      placeBelow ? bubble.top : bubble.bottom,
-    );
-    canvas.drawLine(
-      start,
-      end,
-      Paint()
-        ..color = Colors.white
-        ..strokeWidth = 2,
-    );
-    canvas.drawCircle(start, 3, Paint()..color = Colors.white);
+    if (targets.isEmpty) return;
+    for (var index = 0; index < targets.length; index++) {
+      final spotlight = targets[index].inflate(8);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(spotlight, const Radius.circular(18)),
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+      if (index > 0) continue;
+      final below = bubble.top >= spotlight.bottom;
+      final start = Offset(
+        spotlight.center.dx,
+        below ? spotlight.bottom : spotlight.top,
+      );
+      final end = Offset(
+        start.dx.clamp(bubble.left + 24, bubble.right - 24).toDouble(),
+        below ? bubble.top : bubble.bottom,
+      );
+      canvas.drawLine(
+        start,
+        end,
+        Paint()
+          ..color = Colors.white
+          ..strokeWidth = 2,
+      );
+      canvas.drawCircle(start, 3, Paint()..color = Colors.white);
+    }
   }
 
   @override
-  bool shouldRepaint(_SpotlightPainter oldDelegate) =>
-      oldDelegate.target != target || oldDelegate.bubble != bubble;
+  bool shouldRepaint(_OverviewSpotlightPainter oldDelegate) =>
+      oldDelegate.targets != targets || oldDelegate.bubble != bubble;
 }
