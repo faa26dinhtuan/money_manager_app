@@ -1501,4 +1501,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walletConversionUndone => 'Wallet conversion undone';
+
+  @override
+  String get skipWalletSetup => 'Skip for now';
+
+  @override
+  String get skipGuide => 'Skip guide';
+
+  @override
+  String get overviewGuideTitle => 'Getting to know Overview';
+
+  @override
+  String get overviewGuideWalletTitle => 'Choose a wallet';
+
+  @override
+  String get overviewGuideWalletDescription =>
+      'Tap the wallet selector to view all wallets or focus on one wallet.';
+
+  @override
+  String get overviewGuideBalanceTitle => 'View your balance';
+
+  @override
+  String get overviewGuideBalanceDescription =>
+      'Tap the balance to reveal or hide it temporarily, based on your privacy setting.';
+
+  @override
+  String get overviewGuideTypeTitle => 'Switch between income and expenses';
+
+  @override
+  String get overviewGuideTypeDescription =>
+      'Choose the income or expense tab to see its matching chart and categories.';
+
+  @override
+  String get overviewGuidePeriodTitle => 'Choose a time period';
+
+  @override
+  String get overviewGuidePeriodDescription =>
+      'Switch between day, week, month, year, or a custom period to review that range.';
+
+  @override
+  String get overviewGuideChartTitle => 'Explore the chart and categories';
+
+  @override
+  String get overviewGuideChartDescription =>
+      'The chart shows how money is distributed by category. Tap a category to view its transactions.';
+
+  @override
+  String get overviewGuideSettingsTitle => 'Open Settings';
+
+  @override
+  String get overviewGuideSettingsDescription =>
+      'Manage currency, date format, appearance, language, and backups.';
+
+  @override
+  String get overviewGuideAddTitle => 'Add a transaction';
+
+  @override
+  String get overviewGuideAddDescription =>
+      'The plus button in the middle of the navigation bar quickly records income or an expense.';
 }

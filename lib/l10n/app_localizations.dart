@@ -2821,6 +2821,108 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đã hoàn tác quy đổi ví'**
   String get walletConversionUndone;
+
+  /// No description provided for @skipWalletSetup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ qua, tạo ví sau'**
+  String get skipWalletSetup;
+
+  /// No description provided for @skipGuide.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ qua hướng dẫn'**
+  String get skipGuide;
+
+  /// No description provided for @overviewGuideTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Làm quen với Tổng quan'**
+  String get overviewGuideTitle;
+
+  /// No description provided for @overviewGuideWalletTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ví cần xem'**
+  String get overviewGuideWalletTitle;
+
+  /// No description provided for @overviewGuideWalletDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào bộ chọn ví để xem tổng quan của tất cả ví hoặc một ví riêng.'**
+  String get overviewGuideWalletDescription;
+
+  /// No description provided for @overviewGuideBalanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem số dư'**
+  String get overviewGuideBalanceTitle;
+
+  /// No description provided for @overviewGuideBalanceDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào số dư để hiện hoặc ẩn tạm thời theo cài đặt bảo mật.'**
+  String get overviewGuideBalanceDescription;
+
+  /// No description provided for @overviewGuideTypeTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển giữa thu và chi'**
+  String get overviewGuideTypeTitle;
+
+  /// No description provided for @overviewGuideTypeDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn tab thu hoặc chi để xem biểu đồ và danh mục tương ứng.'**
+  String get overviewGuideTypeDescription;
+
+  /// No description provided for @overviewGuidePeriodTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn khoảng thời gian'**
+  String get overviewGuidePeriodTitle;
+
+  /// No description provided for @overviewGuidePeriodDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi ngày, tuần, tháng, năm hoặc kỳ tùy chỉnh để xem dữ liệu trong khoảng đó.'**
+  String get overviewGuidePeriodDescription;
+
+  /// No description provided for @overviewGuideChartTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem biểu đồ và danh mục'**
+  String get overviewGuideChartTitle;
+
+  /// No description provided for @overviewGuideChartDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.'**
+  String get overviewGuideChartDescription;
+
+  /// No description provided for @overviewGuideSettingsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở cài đặt'**
+  String get overviewGuideSettingsTitle;
+
+  /// No description provided for @overviewGuideSettingsDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.'**
+  String get overviewGuideSettingsDescription;
+
+  /// No description provided for @overviewGuideAddTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm giao dịch'**
+  String get overviewGuideAddTitle;
+
+  /// No description provided for @overviewGuideAddDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nút dấu cộng ở giữa thanh điều hướng giúp ghi nhanh một khoản thu hoặc chi.'**
+  String get overviewGuideAddDescription;
 }
 
 class _AppLocalizationsDelegate

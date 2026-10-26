@@ -484,5 +484,22 @@
   "showWalletBalances": "Show wallet balances",
   "hideWalletBalances": "Hide wallet balances",
   "undoLastWalletConversion": "Undo last wallet conversion",
-  "walletConversionUndone": "Wallet conversion undone"
+  "walletConversionUndone": "Wallet conversion undone",
+  "skipWalletSetup": "Skip for now",
+  "skipGuide": "Skip guide",
+  "overviewGuideTitle": "Getting to know Overview",
+  "overviewGuideWalletTitle": "Choose a wallet",
+  "overviewGuideWalletDescription": "Tap the wallet selector to view all wallets or focus on one wallet.",
+  "overviewGuideBalanceTitle": "View your balance",
+  "overviewGuideBalanceDescription": "Tap the balance to reveal or hide it temporarily, based on your privacy setting.",
+  "overviewGuideTypeTitle": "Switch between income and expenses",
+  "overviewGuideTypeDescription": "Choose the income or expense tab to see its matching chart and categories.",
+  "overviewGuidePeriodTitle": "Choose a time period",
+  "overviewGuidePeriodDescription": "Switch between day, week, month, year, or a custom period to review that range.",
+  "overviewGuideChartTitle": "Explore the chart and categories",
+  "overviewGuideChartDescription": "The chart shows how money is distributed by category. Tap a category to view its transactions.",
+  "overviewGuideSettingsTitle": "Open Settings",
+  "overviewGuideSettingsDescription": "Manage currency, date format, appearance, language, and backups.",
+  "overviewGuideAddTitle": "Add a transaction",
+  "overviewGuideAddDescription": "The plus button in the middle of the navigation bar quickly records income or an expense."
 }

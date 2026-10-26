@@ -23,6 +23,7 @@ import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 import 'package:money_manager_app/features/transactions/category_transactions_screen.dart';
+import 'package:money_manager_app/features/overview/overview_guide_dialog.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -37,6 +38,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Period _period = Period.month;
   DateTime _anchor = DateTime.now();
   DateRange? _customRange;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showOverviewGuide());
+  }
+
+  Future<void> _showOverviewGuide() async {
+    if (!mounted || _store.overviewGuideShown) return;
+    _store.markOverviewGuideShown();
+    await showOverviewGuideDialog(context);
+  }
 
   Future<void> _pickRange() async {
     final current = _customRange;

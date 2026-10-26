@@ -96,6 +96,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  void _skipWalletSetup() {
+    _finish(null);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -288,6 +292,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
+                    ),
+                    TextButton(
+                      onPressed: _skipWalletSetup,
+                      child: Text(l.skipWalletSetup),
                     ),
                     const SizedBox(height: 12),
                   ],

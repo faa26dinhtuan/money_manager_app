@@ -30,6 +30,7 @@ class AppStore extends ChangeNotifier {
   static const _recurringsKey = 'recurrings';
   static const _plannedEventsKey = 'plannedEvents';
   static const _onboardedKey = 'onboarded';
+  static const _overviewGuideShownKey = 'overviewGuideShown';
   static const _themeModeKey = 'themeMode';
   static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
@@ -50,6 +51,7 @@ class AppStore extends ChangeNotifier {
   final List<RecurringTransaction> _recurrings = [];
   final List<PlannedEvent> _plannedEvents = [];
   bool _onboarded = false;
+  bool _overviewGuideShown = false;
   ThemeMode _themeMode = ThemeMode.system;
   AppCurrency _currency = AppCurrency.vnd;
   Locale? _locale;
@@ -59,6 +61,8 @@ class AppStore extends ChangeNotifier {
   bool _canUndoCurrencyConversion = false;
 
   bool get onboarded => _onboarded;
+
+  bool get overviewGuideShown => _overviewGuideShown;
 
   ThemeMode get themeMode => _themeMode;
 
@@ -78,6 +82,7 @@ class AppStore extends ChangeNotifier {
     _canUndoCurrencyConversion =
         _prefs.getString(_currencyConversionUndoKey) != null;
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
+    _overviewGuideShown = _prefs.getBool(_overviewGuideShownKey) ?? false;
     _hideBalancesByDefault = _prefs.getBool(_hideBalancesKey) ?? true;
     _dateFormat = _prefs.getString(_dateFormatKey) ?? 'dd/MM/yyyy';
     _themeMode =
@@ -1227,6 +1232,11 @@ class AppStore extends ChangeNotifier {
     _prefs.setBool(_onboardedKey, true);
     notifyListeners();
     _save();
+  }
+
+  void markOverviewGuideShown() {
+    _overviewGuideShown = true;
+    _prefs.setBool(_overviewGuideShownKey, true);
   }
 
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();

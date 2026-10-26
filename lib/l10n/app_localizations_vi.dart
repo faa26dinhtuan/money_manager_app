@@ -1499,4 +1499,62 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get walletConversionUndone => 'Đã hoàn tác quy đổi ví';
+
+  @override
+  String get skipWalletSetup => 'Bỏ qua, tạo ví sau';
+
+  @override
+  String get skipGuide => 'Bỏ qua hướng dẫn';
+
+  @override
+  String get overviewGuideTitle => 'Làm quen với Tổng quan';
+
+  @override
+  String get overviewGuideWalletTitle => 'Chọn ví cần xem';
+
+  @override
+  String get overviewGuideWalletDescription =>
+      'Chạm vào bộ chọn ví để xem tổng quan của tất cả ví hoặc một ví riêng.';
+
+  @override
+  String get overviewGuideBalanceTitle => 'Xem số dư';
+
+  @override
+  String get overviewGuideBalanceDescription =>
+      'Chạm vào số dư để hiện hoặc ẩn tạm thời theo cài đặt bảo mật.';
+
+  @override
+  String get overviewGuideTypeTitle => 'Chuyển giữa thu và chi';
+
+  @override
+  String get overviewGuideTypeDescription =>
+      'Chọn tab thu hoặc chi để xem biểu đồ và danh mục tương ứng.';
+
+  @override
+  String get overviewGuidePeriodTitle => 'Chọn khoảng thời gian';
+
+  @override
+  String get overviewGuidePeriodDescription =>
+      'Đổi ngày, tuần, tháng, năm hoặc kỳ tùy chỉnh để xem dữ liệu trong khoảng đó.';
+
+  @override
+  String get overviewGuideChartTitle => 'Xem biểu đồ và danh mục';
+
+  @override
+  String get overviewGuideChartDescription =>
+      'Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.';
+
+  @override
+  String get overviewGuideSettingsTitle => 'Mở cài đặt';
+
+  @override
+  String get overviewGuideSettingsDescription =>
+      'Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.';
+
+  @override
+  String get overviewGuideAddTitle => 'Thêm giao dịch';
+
+  @override
+  String get overviewGuideAddDescription =>
+      'Nút dấu cộng ở giữa thanh điều hướng giúp ghi nhanh một khoản thu hoặc chi.';
 }

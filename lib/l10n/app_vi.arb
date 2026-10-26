@@ -809,5 +809,22 @@
   "showWalletBalances": "Hiện số dư các ví",
   "hideWalletBalances": "Ẩn số dư các ví",
   "undoLastWalletConversion": "Hoàn tác lần quy đổi ví gần nhất",
-  "walletConversionUndone": "Đã hoàn tác quy đổi ví"
+  "walletConversionUndone": "Đã hoàn tác quy đổi ví",
+  "skipWalletSetup": "Bỏ qua, tạo ví sau",
+  "skipGuide": "Bỏ qua hướng dẫn",
+  "overviewGuideTitle": "Làm quen với Tổng quan",
+  "overviewGuideWalletTitle": "Chọn ví cần xem",
+  "overviewGuideWalletDescription": "Chạm vào bộ chọn ví để xem tổng quan của tất cả ví hoặc một ví riêng.",
+  "overviewGuideBalanceTitle": "Xem số dư",
+  "overviewGuideBalanceDescription": "Chạm vào số dư để hiện hoặc ẩn tạm thời theo cài đặt bảo mật.",
+  "overviewGuideTypeTitle": "Chuyển giữa thu và chi",
+  "overviewGuideTypeDescription": "Chọn tab thu hoặc chi để xem biểu đồ và danh mục tương ứng.",
+  "overviewGuidePeriodTitle": "Chọn khoảng thời gian",
+  "overviewGuidePeriodDescription": "Đổi ngày, tuần, tháng, năm hoặc kỳ tùy chỉnh để xem dữ liệu trong khoảng đó.",
+  "overviewGuideChartTitle": "Xem biểu đồ và danh mục",
+  "overviewGuideChartDescription": "Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.",
+  "overviewGuideSettingsTitle": "Mở cài đặt",
+  "overviewGuideSettingsDescription": "Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.",
+  "overviewGuideAddTitle": "Thêm giao dịch",
+  "overviewGuideAddDescription": "Nút dấu cộng ở giữa thanh điều hướng giúp ghi nhanh một khoản thu hoặc chi."
 }
