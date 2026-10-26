@@ -1512,6 +1512,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overviewGuideTitle => 'Getting to know Overview';
 
   @override
+  String get overviewGuideIntro =>
+      'See your balance, income, expenses, and category breakdown at a glance.';
+
+  @override
   String get overviewGuideWalletTitle => 'Choose a wallet';
 
   @override
@@ -1545,6 +1549,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get overviewGuideChartDescription =>
       'The chart shows how money is distributed by category. Tap a category to view its transactions.';
+
+  @override
+  String get overviewGuideTransactionsTitle => 'Review categories';
+
+  @override
+  String get overviewGuideTransactionsDescription =>
+      'The rows below the chart show the amount for each category. Tap a row to see the transactions in that category.';
 
   @override
   String get overviewGuideSettingsTitle => 'Open Settings';

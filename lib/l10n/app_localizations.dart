@@ -2840,6 +2840,12 @@ abstract class AppLocalizations {
   /// **'Làm quen với Tổng quan'**
   String get overviewGuideTitle;
 
+  /// No description provided for @overviewGuideIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.'**
+  String get overviewGuideIntro;
+
   /// No description provided for @overviewGuideWalletTitle.
   ///
   /// In vi, this message translates to:
@@ -2899,6 +2905,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.'**
   String get overviewGuideChartDescription;
+
+  /// No description provided for @overviewGuideTransactionsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem danh sách theo danh mục'**
+  String get overviewGuideTransactionsTitle;
+
+  /// No description provided for @overviewGuideTransactionsDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các dòng bên dưới biểu đồ cho biết số tiền theo từng danh mục. Chạm vào một dòng để xem các giao dịch thuộc danh mục đó.'**
+  String get overviewGuideTransactionsDescription;
 
   /// No description provided for @overviewGuideSettingsTitle.
   ///

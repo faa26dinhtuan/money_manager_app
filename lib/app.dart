@@ -12,6 +12,7 @@ import 'package:money_manager_app/features/intro/intro_screen.dart';
 import 'package:money_manager_app/features/calendar/calendar_screen.dart';
 import 'package:money_manager_app/features/onboarding/onboarding_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
+import 'package:money_manager_app/features/overview/overview_guide_dialog.dart';
 import 'package:money_manager_app/features/splash/splash_screen.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
@@ -99,6 +100,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       body: IndexedStack(index: _currentIndex, children: _screens),
       floatingActionButtonLocation: const AddNavButtonLocation(),
       floatingActionButton: AddNavButton(
+        key: OverviewGuideTargets.addTransaction,
         onPressed: () {
           HapticFeedback.lightImpact();
           Navigator.of(context).push(

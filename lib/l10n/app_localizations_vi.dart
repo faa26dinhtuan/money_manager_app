@@ -1510,6 +1510,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get overviewGuideTitle => 'Làm quen với Tổng quan';
 
   @override
+  String get overviewGuideIntro =>
+      'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.';
+
+  @override
   String get overviewGuideWalletTitle => 'Chọn ví cần xem';
 
   @override
@@ -1543,6 +1547,13 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get overviewGuideChartDescription =>
       'Biểu đồ cho biết khoản tiền phân bổ theo danh mục. Chạm một danh mục để xem các giao dịch liên quan.';
+
+  @override
+  String get overviewGuideTransactionsTitle => 'Xem danh sách theo danh mục';
+
+  @override
+  String get overviewGuideTransactionsDescription =>
+      'Các dòng bên dưới biểu đồ cho biết số tiền theo từng danh mục. Chạm vào một dòng để xem các giao dịch thuộc danh mục đó.';
 
   @override
   String get overviewGuideSettingsTitle => 'Mở cài đặt';

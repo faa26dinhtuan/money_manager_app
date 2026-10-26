@@ -46,8 +46,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Future<void> _showOverviewGuide() async {
-    if (!mounted || _store.overviewGuideShown) return;
-    _store.markOverviewGuideShown();
+    if (!mounted) return;
     await showOverviewGuideDialog(context);
   }
 
@@ -79,13 +78,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
         .where((wallet) => wallet.currencyCode == event.currencyCode)
         .toList();
     if (categories.isEmpty || wallets.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.eventTransactionNeedsSetup)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l.eventTransactionNeedsSetup)));
       return;
     }
     final preferredWalletId = event.walletId ?? _store.selectedWalletId;
-    final initialWalletId = wallets.any((wallet) => wallet.id == preferredWalletId)
+    final initialWalletId =
+        wallets.any((wallet) => wallet.id == preferredWalletId)
         ? preferredWalletId!
         : wallets.first.id;
     final input = await showDialog<_EventTransactionInput>(
@@ -97,7 +96,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
       ),
     );
     if (!mounted || input == null) return;
-    final projectedBalance = _store.walletBalance(input.walletId) -
+    final projectedBalance =
+        _store.walletBalance(input.walletId) -
         (event.type == TxType.expense ? input.amount : -input.amount);
     if (projectedBalance < 0) {
       final confirmed = await showDialog<bool>(
@@ -133,6 +133,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -168,34 +169,33 @@ class _OverviewScreenState extends State<OverviewScreen> {
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light,
           child: Scaffold(
-          body: Column(
-            children: [
-              _Header(
-                balance: _store.selectedBalance,
-                type: _type,
-                onTypeChanged: (t) => setState(() => _type = t),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-                  children: [
-                    if (todayEvents.isNotEmpty) ...[
-                      _TodayEventsCard(
-                        events: todayEvents,
-                        onRecord: _confirmEventTransaction,
-                        isRecorded: (event) => _store.hasPlannedEventTransaction(
-                          event,
-                          event.date,
+            body: Column(
+              children: [
+                _Header(
+                  balance: _store.selectedBalance,
+                  type: _type,
+                  onTypeChanged: (t) => setState(() => _type = t),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                    children: [
+                      if (todayEvents.isNotEmpty) ...[
+                        _TodayEventsCard(
+                          events: todayEvents,
+                          onRecord: _confirmEventTransaction,
+                          isRecorded: (event) => _store
+                              .hasPlannedEventTransaction(event, event.date),
                         ),
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-                    AppCard(
-                      padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
-                      radius: 24,
-                      child: Column(
+                        const SizedBox(height: 14),
+                      ],
+                      AppCard(
+                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 20),
+                        radius: 24,
+                        child: Column(
                           children: [
                             PeriodBar(
+                              key: OverviewGuideTargets.period,
                               period: _period,
                               anchor: _anchor,
                               periods: Period.values,
@@ -217,6 +217,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             ),
                             const SizedBox(height: 12),
                             DonutChart(
+                              key: OverviewGuideTargets.chart,
                               slices: slices,
                               size: 240,
                               thickness: 40,
@@ -246,44 +247,50 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             ),
                           ],
                         ),
-                    ),
-                    const SizedBox(height: 14),
-                    if (entries.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Center(
-                          child: Text(
-                            context.l10n.noTransactionsInRange,
-                            style: TextStyle(color: context.textSecondary),
+                      ),
+                      const SizedBox(height: 14),
+                      if (entries.isEmpty)
+                        Padding(
+                          key: OverviewGuideTargets.transactions,
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: Text(
+                              context.l10n.noTransactionsInRange,
+                              style: TextStyle(color: context.textSecondary),
+                            ),
                           ),
                         ),
-                      ),
-                    for (final e in entries)
-                      _CategoryRow(
-                        category: _store.categoryById(e.key),
-                        amount: e.value,
-                        percent: total == 0 ? 0 : e.value / total * 100,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => CategoryTransactionsScreen(
-                              categoryId: e.key,
-                              type: _type,
-                              range: range,
-                              rangeLabel: localizedDateRangeLabel(
-                                context,
-                                _period,
-                                _anchor,
-                                _customRange,
+                      for (final e in entries)
+                        _CategoryRow(
+                          key: identical(e, entries.first)
+                              ? OverviewGuideTargets.transactions
+                              : null,
+                          category: _store.categoryById(e.key),
+                          amount: e.value,
+                          percent: total == 0
+                              ? 0
+                              : e.value / total * 100,
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => CategoryTransactionsScreen(
+                                categoryId: e.key,
+                                type: _type,
+                                range: range,
+                                rangeLabel: localizedDateRangeLabel(
+                                  context,
+                                  _period,
+                                  _anchor,
+                                  _customRange,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           ),
         );
       },
@@ -408,18 +415,19 @@ class _RecordEventTransactionDialogState
           onPressed: _amountController.amount <= 0
               ? null
               : () => Navigator.of(context).pop(
-                    _EventTransactionInput(
-                      categoryId: _categoryId,
-                      walletId: _walletId,
-                      amount: _amountController.amount,
-                    ),
+                  _EventTransactionInput(
+                    categoryId: _categoryId,
+                    walletId: _walletId,
+                    amount: _amountController.amount,
                   ),
+                ),
           child: Text(l.recordEventTransaction),
         ),
       ],
     );
   }
 }
+
 class _TodayEventsCard extends StatelessWidget {
   const _TodayEventsCard({
     required this.events,
@@ -441,9 +449,8 @@ class _TodayEventsCard extends StatelessWidget {
         children: [
           Text(
             context.l10n.todayEvents,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           for (var index = 0; index < events.length; index++) ...[
@@ -523,7 +530,10 @@ class _TodayEventReminder extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  formatMoney(event.amount, AppCurrency.byCode(event.currencyCode)),
+                  formatMoney(
+                    event.amount,
+                    AppCurrency.byCode(event.currencyCode),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.end,
@@ -536,7 +546,10 @@ class _TodayEventReminder extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.end,
-                    style: TextStyle(color: context.textSecondary, fontSize: 10),
+                    style: TextStyle(
+                      color: context.textSecondary,
+                      fontSize: 10,
+                    ),
                   )
                 else
                   TextButton.icon(
@@ -557,6 +570,7 @@ class _TodayEventReminder extends StatelessWidget {
     );
   }
 }
+
 class _Header extends StatelessWidget {
   const _Header({
     required this.balance,
@@ -575,17 +589,23 @@ class _Header extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            const SizedBox(
+            SizedBox(
               height: 56,
               child: Row(
                 children: [
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: WalletSelector(onPrimary: true),
+                      child: WalletSelector(
+                        key: OverviewGuideTargets.wallet,
+                        onPrimary: true,
+                      ),
                     ),
                   ),
-                  SettingsButton(color: Colors.white),
+                  SettingsButton(
+                    key: OverviewGuideTargets.settings,
+                    color: Colors.white,
+                  ),
                 ],
               ),
             ),
@@ -595,6 +615,7 @@ class _Header extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             SensitiveBalance(
+              key: OverviewGuideTargets.balance,
               amount: balance,
               style: const TextStyle(
                 color: Colors.white,
@@ -606,6 +627,7 @@ class _Header extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TypeTabs(
+                key: OverviewGuideTargets.type,
                 type: type,
                 onChanged: onTypeChanged,
                 onPrimary: true,
@@ -621,6 +643,7 @@ class _Header extends StatelessWidget {
 
 class _CategoryRow extends StatelessWidget {
   const _CategoryRow({
+    super.key,
     required this.category,
     required this.amount,
     required this.percent,
