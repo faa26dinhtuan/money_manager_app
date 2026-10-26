@@ -35,12 +35,12 @@ class WalletScreen extends StatelessWidget {
                   child: SafeArea(
                     bottom: false,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 12, 24),
+                      padding: const EdgeInsets.fromLTRB(12, 0, 0, 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            height: 48,
+                            height: 56,
                             child: Row(
                               children: [
                                 Expanded(

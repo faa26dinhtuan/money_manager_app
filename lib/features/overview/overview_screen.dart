@@ -563,7 +563,7 @@ class _Header extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(
-              height: 48,
+              height: 56,
               child: Row(
                 children: [
                   Expanded(
@@ -572,10 +572,7 @@ class _Header extends StatelessWidget {
                       child: WalletSelector(onPrimary: true),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 4),
-                    child: SettingsButton(color: Colors.white),
-                  ),
+                  SettingsButton(color: Colors.white),
                 ],
               ),
             ),
