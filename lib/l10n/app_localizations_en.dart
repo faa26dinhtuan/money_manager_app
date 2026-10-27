@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Money Manager';
+  String get appName => 'Pocketwise';
 
   @override
   String get overview => 'Overview';
@@ -26,6 +26,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nextMonth => 'Next month';
+
+  @override
+  String get plannedEvent => 'Planned event';
+
+  @override
+  String get plannedEvents => 'Planned events';
+
+  @override
+  String get addPlannedEvent => 'Add event';
+
+  @override
+  String get editPlannedEvent => 'Edit event';
+
+  @override
+  String get plannedEventName => 'Event name';
+
+  @override
+  String get pleaseEnterEventName => 'Enter an event name';
+
+  @override
+  String get deletePlannedEventTitle => 'Delete planned event?';
+
+  @override
+  String get deletePlannedEventMessage =>
+      'This event will be removed from the calendar.';
+
+  @override
+  String get repeatEvent => 'Repeat event';
+
+  @override
+  String get repeatFrequency => 'Repeat frequency';
+
+  @override
+  String get deleteThisOccurrence => 'Delete this day only';
+
+  @override
+  String get deleteEventSeries => 'Delete all repetitions';
+
+  @override
+  String get deleteRecurringEventWarning =>
+      'Choose which event occurrences to delete.';
+
+  @override
+  String get pleaseSelectWallet => 'Select a wallet';
+
+  @override
+  String get stopRecurringEventTitle => 'Stop repeating this event?';
+
+  @override
+  String get stopRecurringEventMessage =>
+      'The linked recurring transaction will be deleted. Transactions already created will be kept.';
 
   @override
   String get categories => 'Categories';
@@ -1313,4 +1364,277 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seedDebtBorrowNote => 'Borrowed to buy a bicycle';
+
+  @override
+  String get dayEvents => 'Events for this day';
+
+  @override
+  String get noTransactionsOnDate => 'No transactions on this day';
+
+  @override
+  String get noEventsOnDate => 'No events on this day';
+
+  @override
+  String get pastEvent => 'Past event';
+
+  @override
+  String get todayEvent => 'Event today';
+
+  @override
+  String get todayEvents => 'Today\'s events';
+
+  @override
+  String get recordEventTransaction => 'Record transaction';
+
+  @override
+  String get confirmEventTransactionTitle => 'Record this transaction?';
+
+  @override
+  String get confirmEventTransactionMessage =>
+      'This planned amount will be added to your ledger and wallet balance.';
+
+  @override
+  String get eventTransactionNeedsSetup =>
+      'Set up a matching category and a wallet in this currency before recording.';
+
+  @override
+  String get eventTransactionAlreadyRecorded =>
+      'A transaction for this event is already in your ledger.';
+
+  @override
+  String get plannedExpense => 'Planned expense';
+
+  @override
+  String get plannedIncome => 'Planned income';
+
+  @override
+  String get selectItemsToDelete => 'Select items to delete';
+
+  @override
+  String get deleteEventTransactionsTitle => 'Delete related transactions?';
+
+  @override
+  String get deleteEventTransactionsMessage =>
+      'Do you want to delete transactions recorded from this event?';
+
+  @override
+  String get keepEventTransactions => 'Keep transactions';
+
+  @override
+  String get deleteEventTransactions => 'Delete transactions';
+
+  @override
+  String get actualAmount => 'Actual amount';
+
+  @override
+  String get linkEventToRecurring => 'Link to a recurring transaction';
+
+  @override
+  String get autoRecordLinkedRecurring => 'Automatically record when due';
+
+  @override
+  String get eventAmountOptional => 'Optional';
+
+  @override
+  String get eventReminderToggle => 'Remind me';
+
+  @override
+  String get reminderTime => 'Reminder time';
+
+  @override
+  String get eventReminderPermissionDenied =>
+      'Notification permission is off. Enable it in your device settings.';
+
+  @override
+  String get eventReminderNotificationTitle => 'Event reminder';
+
+  @override
+  String get eventReminderChannel => 'Event reminders';
+
+  @override
+  String get eventReminderChannelDescription =>
+      'Notifications for scheduled events';
+
+  @override
+  String get negativeWalletBalanceTitle => 'Insufficient wallet balance';
+
+  @override
+  String get negativeWalletBalanceMessage =>
+      'This wallet does not have enough money for this expense. Continuing will make its balance negative.';
+
+  @override
+  String get recordAnyway => 'Record anyway';
+
+  @override
+  String get hideBalanceByDefault => 'Hide balances by default';
+
+  @override
+  String get hideBalanceDescription =>
+      'Tap a balance to reveal it temporarily.';
+
+  @override
+  String get showBalance => 'Show balance';
+
+  @override
+  String get hideBalance => 'Hide balance';
+
+  @override
+  String get dateFormat => 'Date format';
+
+  @override
+  String get dateFormatDayMonthYear => 'Day / month / year';
+
+  @override
+  String get dateFormatMonthDayYear => 'Month / day / year';
+
+  @override
+  String get dateFormatYearMonthDay => 'Year - month - day';
+
+  @override
+  String get showWalletBalances => 'Show wallet balances';
+
+  @override
+  String get hideWalletBalances => 'Hide wallet balances';
+
+  @override
+  String get undoLastWalletConversion => 'Undo last wallet conversion';
+
+  @override
+  String get walletConversionUndone => 'Wallet conversion undone';
+
+  @override
+  String get skipWalletSetup => 'Skip for now';
+
+  @override
+  String get skipGuide => 'Skip guide';
+
+  @override
+  String get showMeGuide => 'Show me the guide';
+
+  @override
+  String get maybeLater => 'Maybe later';
+
+  @override
+  String get overviewGuideTitle => 'Getting to know Overview';
+
+  @override
+  String get overviewGuideIntro =>
+      'See your balance, income, expenses, and category breakdown at a glance.';
+
+  @override
+  String get overviewGuideDemoInstruction =>
+      'The sample wallet and transactions in this walkthrough are illustrative and won\'t change your real data.';
+
+  @override
+  String get overviewGuideSampleWallet => 'Sample wallet';
+
+  @override
+  String get overviewGuideSampleExpenseCategory => 'Food & dining';
+
+  @override
+  String get overviewGuideSampleIncomeCategory => 'Salary';
+
+  @override
+  String get overviewGuideSampleExpenseTransaction => 'Lunch';
+
+  @override
+  String get overviewGuideSampleIncomeTransaction => 'Monthly salary';
+
+  @override
+  String get overviewGuideWalletTitle => 'Choose a wallet';
+
+  @override
+  String get overviewGuideWalletDescription =>
+      'Tap the wallet selector to view all wallets or focus on one wallet.';
+
+  @override
+  String get overviewGuideBalanceTitle => 'View your balance';
+
+  @override
+  String get overviewGuideBalanceDescription =>
+      'Tap the balance to reveal or hide it temporarily, based on your privacy setting.';
+
+  @override
+  String get overviewGuideTypeTitle => 'Switch between income and expenses';
+
+  @override
+  String get overviewGuideTypeDescription =>
+      'Choose the income or expense tab to see its matching chart and categories.';
+
+  @override
+  String get overviewGuidePeriodTitle => 'Choose a time period';
+
+  @override
+  String get overviewGuidePeriodDescription =>
+      'Switch between day, week, month, year, or a custom period to review that range.';
+
+  @override
+  String get overviewGuideChartTitle => 'Explore the chart and categories';
+
+  @override
+  String get overviewGuideChartDescription =>
+      'Tap a chart section to highlight the corresponding category.';
+
+  @override
+  String get overviewGuideTransactionsTitle => 'Review categories';
+
+  @override
+  String get overviewGuideTransactionsDescription =>
+      'Tap a category to view its total and the transactions in that category.';
+
+  @override
+  String get overviewGuideNavigationTitle => 'Move between sections';
+
+  @override
+  String get overviewGuideNavigationDescription =>
+      'The navigation bar has Overview, Transactions, Calendar, and Wallet for switching sections. The plus button adds a transaction.';
+
+  @override
+  String get overviewGuideSettingsTitle => 'Open Settings';
+
+  @override
+  String get overviewGuideSettingsDescription =>
+      'Manage currency, date format, appearance, language, and backups.';
+
+  @override
+  String get overviewGuideAddTitle => 'Add a transaction';
+
+  @override
+  String get overviewGuideAddDescription =>
+      'Tap the plus button to open the form for adding income or an expense.';
+
+  @override
+  String get overviewGuideAddScreenDescription =>
+      'Enter an amount, choose a wallet and category, add a date and note, then save the transaction.';
+
+  @override
+  String get overviewGuideTransactionsScreenDescription =>
+      'Tap Transactions to review, search, and filter income and expenses by date.';
+
+  @override
+  String get overviewGuideCalendarScreenDescription =>
+      'Tap Calendar to review daily income and expenses and see planned events.';
+
+  @override
+  String get overviewGuideWalletScreenDescription =>
+      'Wallet tracks balances and opens wallet, budget, goal, debt, and recurring transaction management.';
+
+  @override
+  String get overviewGuideWalletNavigationDescription =>
+      'Open Wallet to review balances and manage your wallets.';
+
+  @override
+  String get overviewGuideClosing =>
+      'You’ve seen the main sections. Start tracking your income, expenses, and financial goals whenever you’re ready.';
+
+  @override
+  String get overviewGuideFinish => 'Start using the app';
+
+  @override
+  String get overviewGuideTransactionsPageDescription =>
+      'Tap a transaction to view its details, edit it, or delete it when needed.';
+
+  @override
+  String get overviewGuideCalendarPageDescription =>
+      'Add an event for an upcoming day to remember an expected income or expense and find it on the calendar.';
 }

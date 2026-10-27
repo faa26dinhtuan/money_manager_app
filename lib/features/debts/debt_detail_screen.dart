@@ -29,7 +29,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
   Debt? _last;
 
   Future<void> _openPayment(Debt debt) async {
-    final payment = await showDialog<DebtPayment>(
+    final payment = await showAdaptiveDialog<DebtPayment>(
       context: context,
       builder: (_) => DebtPaymentDialog(debt: debt),
     );

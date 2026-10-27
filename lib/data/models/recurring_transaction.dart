@@ -15,6 +15,7 @@ class RecurringTransaction {
     this.endDate,
     this.note = '',
     this.active = true,
+    this.skippedDates = const [],
   });
 
   final String id;
@@ -28,6 +29,7 @@ class RecurringTransaction {
   final DateTime? endDate;
   final String note;
   final bool active;
+  final List<DateTime> skippedDates;
 
   static DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -38,6 +40,12 @@ class RecurringTransaction {
 
   bool isDue(DateTime today) =>
       active && !isFinished && !nextDate.isAfter(today);
+
+  bool isSkipped(DateTime date) => skippedDates.any(
+    (skipped) => skipped.year == date.year &&
+        skipped.month == date.month &&
+        skipped.day == date.day,
+  );
 
   double get monthlyAmount {
     switch (frequency) {
@@ -86,6 +94,7 @@ class RecurringTransaction {
     bool clearEndDate = false,
     String? note,
     bool? active,
+    List<DateTime>? skippedDates,
   }) {
     return RecurringTransaction(
       id: id,
@@ -99,6 +108,7 @@ class RecurringTransaction {
       endDate: clearEndDate ? null : (endDate ?? this.endDate),
       note: note ?? this.note,
       active: active ?? this.active,
+      skippedDates: skippedDates ?? this.skippedDates,
     );
   }
 
@@ -116,6 +126,9 @@ class RecurringTransaction {
       endDate: rawEnd == null ? null : DateTime.parse(rawEnd),
       note: json['note'] as String? ?? '',
       active: json['active'] as bool? ?? true,
+      skippedDates: (json['skippedDates'] as List? ?? const [])
+          .map((value) => DateTime.parse(value as String))
+          .toList(),
     );
   }
 
@@ -132,6 +145,7 @@ class RecurringTransaction {
       'endDate': endDate?.toIso8601String(),
       'note': note,
       'active': active,
+      'skippedDates': skippedDates.map((date) => date.toIso8601String()).toList(),
     };
   }
 }

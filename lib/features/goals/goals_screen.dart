@@ -68,7 +68,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
         return Scaffold(
           appBar: AppBar(title: Text(l.goals), actions: [
-            IconButton(tooltip: l.selectAll, icon: Icon(_selecting ? Icons.close : Icons.checklist), onPressed: () => setState(() { _selecting = !_selecting; _selected.clear(); })),
+            IconButton(tooltip: _selecting ? l.cancel : l.selectItemsToDelete, icon: Icon(_selecting ? Icons.close : Icons.checklist), onPressed: () => setState(() { _selecting = !_selecting; _selected.clear(); })),
           ]),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),

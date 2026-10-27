@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -10,12 +11,17 @@ import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/confirm_delete_dialog.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
 import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/planned_event.dart';
+import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/data/services/event_reminder_service.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
+import 'package:money_manager_app/features/calendar/planned_event_form_sheet.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -53,6 +59,218 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
+  Future<void> _editPlannedEvent({
+    PlannedEvent? event,
+    DateTime? date,
+    bool allowDateChange = true,
+  }) async {
+    final l = context.l10n;
+    final result = await showModalBottomSheet<PlannedEventFormResult>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: context.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => PlannedEventFormSheet(
+        initialDate: date ?? _selectedDay,
+        allowDateChange: allowDateChange,
+        event: event,
+      ),
+    );
+    if (!mounted || result == null) return;
+    var savedEvent = result.event;
+    final oldRecurringId = event?.recurringId;
+    final oldRecurring = oldRecurringId == null
+        ? null
+        : _store.recurringById(oldRecurringId);
+    if (result.linkToRecurring &&
+        result.categoryId != null &&
+        result.walletId != null &&
+        savedEvent.frequency != null) {
+      final recurringId = oldRecurring?.id ?? _store.newId();
+      final start = RecurringTransaction.dateOnly(savedEvent.date);
+      final scheduleChanged = oldRecurring == null ||
+          oldRecurring.frequency != savedEvent.frequency ||
+          !isSameDay(oldRecurring.startDate, start);
+      var nextDate = scheduleChanged
+          ? start
+          : oldRecurring.nextDate;
+      final shouldCatchUp = result.autoRecord &&
+          (scheduleChanged || !oldRecurring.active);
+      if (shouldCatchUp) {
+        final today = RecurringTransaction.dateOnly(DateTime.now());
+        while (nextDate.isBefore(today)) {
+          final seed = RecurringTransaction(
+            id: recurringId,
+            type: savedEvent.type,
+            categoryId: result.categoryId!,
+            walletId: result.walletId!,
+            amount: savedEvent.amount,
+            frequency: savedEvent.frequency!,
+            startDate: start,
+            nextDate: nextDate,
+          );
+          nextDate = seed.advance(nextDate);
+        }
+      }
+      final recurring = RecurringTransaction(
+        id: recurringId,
+        type: savedEvent.type,
+        categoryId: result.categoryId!,
+        walletId: result.walletId!,
+        amount: savedEvent.amount,
+        frequency: savedEvent.frequency!,
+        startDate: start,
+        nextDate: nextDate,
+        note: savedEvent.note.isEmpty
+            ? savedEvent.title
+            : '${savedEvent.title}\n${savedEvent.note}',
+        active: result.autoRecord,
+        skippedDates: oldRecurring?.skippedDates ?? const [],
+      );
+      if (oldRecurring == null) {
+        _store.addRecurring(recurring);
+      } else {
+        _store.updateRecurring(recurring);
+      }
+      savedEvent = savedEvent.copyWith(recurringId: recurringId);
+    } else if (oldRecurringId != null) {
+      _store.removeRecurring(oldRecurringId, preservePlannedEvent: true);
+      savedEvent = savedEvent.copyWith(clearRecurringId: true);
+    }
+    if (event == null) {
+      _store.addPlannedEvent(savedEvent);
+    } else {
+      _store.updatePlannedEvent(savedEvent);
+    }
+    await EventReminderService.instance.sync(
+      _store.allPlannedEvents,
+      localization: l,
+    );
+    setState(() {
+      _selectedDay = DateTime(
+        savedEvent.date.year,
+        savedEvent.date.month,
+        savedEvent.date.day,
+      );
+      _month = DateTime(savedEvent.date.year, savedEvent.date.month);
+    });
+  }
+
+  Future<bool?> _confirmDeleteEventTransactions(
+    PlannedEvent event, {
+    DateTime? occurrenceDate,
+  }) async {
+    final transactions = _store.plannedEventTransactions(
+      event.id,
+      occurrenceDate: occurrenceDate,
+    );
+    if (transactions.isEmpty) return false;
+    final l = context.l10n;
+    return showAdaptiveDialog<bool>(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: Text(l.deleteEventTransactionsTitle),
+        content: Text(l.deleteEventTransactionsMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(null),
+            child: Text(l.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l.keepEventTransactions),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: context.negativeColor),
+            child: Text(l.deleteEventTransactions),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deletePlannedEvent(PlannedEvent event) async {
+    final l = context.l10n;
+    if (event.frequency != null) {
+      final deleteAll = await showAdaptiveDialog<bool>(
+        context: context,
+        builder: (dialogContext) => CupertinoAlertDialog(
+          title: Text(l.deletePlannedEventTitle),
+          content: Text(l.deleteRecurringEventWarning),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(null),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l.deleteThisOccurrence),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: context.negativeColor),
+              child: Text(l.deleteEventSeries),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || deleteAll == null) return;
+      final removeTransactions = await _confirmDeleteEventTransactions(
+        event,
+        occurrenceDate: deleteAll ? null : event.date,
+      );
+      if (!mounted || removeTransactions == null) return;
+      if (removeTransactions) {
+        _store.removePlannedEventTransactions(
+          event.id,
+          occurrenceDate: deleteAll ? null : event.date,
+        );
+      }
+      if (deleteAll) {
+        final recurringId = event.recurringId;
+        if (recurringId != null) {
+          _store.removeRecurring(recurringId, preservePlannedEvent: true);
+        }
+        _store.removePlannedEvent(event.id);
+      } else {
+        _store.skipPlannedEventOccurrence(event.id, event.date);
+        final recurringId = event.recurringId;
+        if (recurringId != null) {
+          _store.skipRecurringOccurrence(recurringId, event.date);
+        }
+      }
+      await EventReminderService.instance.sync(
+        _store.allPlannedEvents,
+        localization: l,
+      );
+      return;
+    }
+    final confirmed = await confirmDelete(
+      context,
+      title: l.deletePlannedEventTitle,
+      message: l.deletePlannedEventMessage,
+    );
+    if (!mounted || !confirmed) return;
+    final removeTransactions = await _confirmDeleteEventTransactions(event);
+    if (!mounted || removeTransactions == null) return;
+    if (removeTransactions) {
+      _store.removePlannedEventTransactions(event.id);
+    }
+    final recurringId = event.recurringId;
+    if (recurringId != null) {
+      _store.removeRecurring(recurringId, preservePlannedEvent: true);
+    }
+    _store.removePlannedEvent(event.id);
+    await EventReminderService.instance.sync(
+      _store.allPlannedEvents,
+      localization: l,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -71,11 +289,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
           monthRange,
           walletId: walletId,
         );
+        final plannedEvents = _store.plannedEventsInRange(monthRange);
+        final selectedEvents = plannedEvents
+            .where((event) => isSameDay(event.date, _selectedDay))
+            .toList();
         final selectedTransactions = [...expenses, ...incomes]
           ..removeWhere((t) => !isSameDay(t.date, _selectedDay))
           ..sort((a, b) => b.date.compareTo(a.date));
         final dailyExpenses = <DateTime, double>{};
         final dailyIncomes = <DateTime, double>{};
+        final plannedDays = <DateTime>{};
+        for (final event in plannedEvents) {
+          plannedDays.add(DateTime(event.date.year, event.date.month, event.date.day));
+        }
         for (final t in expenses) {
           final day = DateTime(t.date.year, t.date.month, t.date.day);
           dailyExpenses.update(day, (sum) => sum + t.amount, ifAbsent: () => t.amount);
@@ -127,6 +353,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _CalendarFilters(
                 visibleTypes: _visibleTypes,
                 onToggle: _toggleType,
+                onCreate: () => _editPlannedEvent(date: _selectedDay),
               ),
               const SizedBox(height: 8),
               _CalendarGrid(
@@ -134,6 +361,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 selectedDay: _selectedDay,
                 expenses: dailyExpenses,
                 incomes: dailyIncomes,
+                plannedDays: plannedDays,
                 visibleTypes: _visibleTypes,
                 onSelect: (day) {
                   HapticFeedback.selectionClick();
@@ -141,27 +369,53 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 },
               ),
               const SizedBox(height: 18),
-              Text(
-                DateFormat.yMMMMd(Localizations.localeOf(context).toLanguageTag())
-                    .format(_selectedDay),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      DateFormat.yMMMMd(Localizations.localeOf(context).toLanguageTag())
+                          .format(_selectedDay),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton.filledTonal(
+                    tooltip: l.addPlannedEvent,
+                    onPressed: () => _editPlannedEvent(
+                      date: _selectedDay,
+                      allowDateChange: false,
+                    ),
+                    icon: const AppIcon(AppIcons.add, size: 20),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
+              Text(l.transactions, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
               if (selectedTransactions.isEmpty)
-                _EmptyDay(message: l.noTransactionsInRange)
+                _EmptyDay(message: l.noTransactionsOnDate)
               else
                 for (final transaction in selectedTransactions)
                   _TransactionRow(
                     transaction: transaction,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => AddTransactionScreen(
-                          transaction: transaction,
-                        ),
+                        builder: (_) => AddTransactionScreen(transaction: transaction),
                       ),
                     ),
+                  ),
+              const SizedBox(height: 14),
+              Text(l.dayEvents, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              if (selectedEvents.isEmpty)
+                _EmptyDay(message: l.noEventsOnDate)
+              else
+                for (final event in selectedEvents)
+                  _PlannedEventRow(
+                    event: event,
+                    onEdit: () => _editPlannedEvent(event: event),
+                    onDelete: () => _deletePlannedEvent(event),
                   ),
             ],
           ),
@@ -228,19 +482,19 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      decoration: context.cardDecoration(radius: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: context.cardDecoration(radius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: TextStyle(color: context.textSecondary, fontSize: 12)),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
               formatMoney(amount),
-              style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 17),
+              style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 15),
             ),
           ),
         ],
@@ -255,6 +509,7 @@ class _CalendarGrid extends StatelessWidget {
     required this.selectedDay,
     required this.expenses,
     required this.incomes,
+    required this.plannedDays,
     required this.visibleTypes,
     required this.onSelect,
   });
@@ -263,6 +518,7 @@ class _CalendarGrid extends StatelessWidget {
   final DateTime selectedDay;
   final Map<DateTime, double> expenses;
   final Map<DateTime, double> incomes;
+  final Set<DateTime> plannedDays;
   final Set<TxType> visibleTypes;
   final ValueChanged<DateTime> onSelect;
 
@@ -309,7 +565,7 @@ class _CalendarGrid extends StatelessWidget {
           itemCount: count,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
-            mainAxisExtent: 66,
+            mainAxisExtent: 80,
           ),
           itemBuilder: (context, index) {
             final dayNumber = index - firstOffset + 1;
@@ -319,6 +575,7 @@ class _CalendarGrid extends StatelessWidget {
             final day = DateTime(month.year, month.month, dayNumber);
             final expense = expenses[day];
             final income = incomes[day];
+            final hasPlannedEvent = plannedDays.contains(day);
             final selected = isSameDay(day, selectedDay);
             final today = isSameDay(day, DateTime.now());
             return Padding(
@@ -357,6 +614,18 @@ class _CalendarGrid extends StatelessWidget {
                           _DayAmount(amount: income, color: context.positiveColor),
                         if (visibleTypes.contains(TxType.expense) && expense != null)
                           _DayAmount(amount: expense, color: context.negativeColor),
+                        if (hasPlannedEvent)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: const BoxDecoration(
+                                color: AppTheme.accent,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -399,11 +668,122 @@ class _DayAmount extends StatelessWidget {
   }
 }
 
+class _PlannedEventRow extends StatelessWidget {
+  const _PlannedEventRow({
+    required this.event,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final PlannedEvent event;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final isExpense = event.type == TxType.expense;
+    final color = isExpense ? context.negativeColor : context.positiveColor;
+    final eventDay = DateTime(event.date.year, event.date.month, event.date.day);
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final isPast = eventDay.isBefore(todayDate);
+    final isToday = eventDay.isAtSameMomentAs(todayDate);
+    final status = isPast
+        ? context.l10n.pastEvent
+        : isToday
+        ? context.l10n.todayEvent
+        : context.l10n.plannedEvent;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: context.surfaceColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppTheme.accent.withValues(alpha: 0.55)),
+      ),
+      child: ListTile(
+        onTap: onEdit,
+        leading: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppTheme.accent.withValues(alpha: 0.16),
+            shape: BoxShape.circle,
+          ),
+          child: const AppIcon(AppIcons.calendar, color: AppTheme.primary, size: 20),
+        ),
+        title: Text(event.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(status),
+            if (event.note.isNotEmpty || event.frequency != null)
+              Text(
+                [
+                  if (event.note.isNotEmpty) event.note,
+                  if (event.frequency != null) event.frequency!.localizedLabel(context),
+                ].join(' · '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+          if (event.amount > 0)
+            Text(
+              '${isExpense ? '−' : '+'}${formatMoney(event.amount, AppCurrency.byCode(event.currencyCode))}',
+              style: TextStyle(color: color, fontWeight: FontWeight.w700),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => showCupertinoModalPopup<void>(
+                context: context,
+                builder: (sheetContext) => CupertinoActionSheet(
+                  actions: [
+                    CupertinoActionSheetAction(
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop();
+                        onEdit();
+                      },
+                      child: Text(context.l10n.edit),
+                    ),
+                    CupertinoActionSheetAction(
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop();
+                        onDelete();
+                      },
+                      child: Text(context.l10n.delete),
+                    ),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                    child: Text(context.l10n.cancel),
+                  ),
+                ),
+              ),
+              child: const Icon(Icons.more_horiz),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CalendarFilters extends StatelessWidget {
-  const _CalendarFilters({required this.visibleTypes, required this.onToggle});
+  const _CalendarFilters({
+    required this.visibleTypes,
+    required this.onToggle,
+    required this.onCreate,
+  });
 
   final Set<TxType> visibleTypes;
   final ValueChanged<TxType> onToggle;
+  final VoidCallback onCreate;
 
   @override
   Widget build(BuildContext context) {
@@ -411,6 +791,16 @@ class _CalendarFilters extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        TextButton.icon(
+          onPressed: onCreate,
+          style: TextButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+          icon: const AppIcon(AppIcons.add, size: 18),
+          label: Text(l.addPlannedEvent, maxLines: 1),
+        ),
+        const Spacer(),
         FilterChip(
           label: Text(l.incomeSummary),
           selected: visibleTypes.contains(TxType.income),

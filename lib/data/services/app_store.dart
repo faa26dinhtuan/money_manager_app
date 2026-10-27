@@ -10,6 +10,7 @@ import 'package:money_manager_app/data/models/budget.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/debt.dart';
 import 'package:money_manager_app/data/models/goal.dart';
+import 'package:money_manager_app/data/models/planned_event.dart';
 import 'package:money_manager_app/data/models/recurring_transaction.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
@@ -27,11 +28,16 @@ class AppStore extends ChangeNotifier {
   static const _goalsKey = 'goals';
   static const _debtsKey = 'debts';
   static const _recurringsKey = 'recurrings';
+  static const _plannedEventsKey = 'plannedEvents';
   static const _onboardedKey = 'onboarded';
+  static const _overviewGuideShownKey = 'overviewGuideShown';
   static const _themeModeKey = 'themeMode';
   static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
   static const _localeKey = 'locale';
+  static const _hideBalancesKey = 'hideBalancesByDefault';
+  static const _dateFormatKey = 'dateFormat';
+  static const _currencyConversionUndoKey = 'currencyConversionUndo';
 
 
   late final SharedPreferences _prefs;
@@ -43,15 +49,29 @@ class AppStore extends ChangeNotifier {
   final List<Goal> _goals = [];
   final List<Debt> _debts = [];
   final List<RecurringTransaction> _recurrings = [];
+  final List<PlannedEvent> _plannedEvents = [];
   bool _onboarded = false;
+  bool _overviewGuideShown = false;
   ThemeMode _themeMode = ThemeMode.system;
   AppCurrency _currency = AppCurrency.vnd;
   Locale? _locale;
   String? _selectedWalletId;
+  bool _hideBalancesByDefault = true;
+  String _dateFormat = 'dd/MM/yyyy';
+  bool _canUndoCurrencyConversion = false;
 
   bool get onboarded => _onboarded;
 
+  bool get overviewGuideShown => _overviewGuideShown;
+
   ThemeMode get themeMode => _themeMode;
+
+  bool get hideBalancesByDefault => _hideBalancesByDefault;
+
+  String get dateFormat => _dateFormat;
+
+  bool get canUndoCurrencyConversion => _canUndoCurrencyConversion;
+
 
   AppCurrency get currency => _currency;
 
@@ -59,7 +79,12 @@ class AppStore extends ChangeNotifier {
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
+    _canUndoCurrencyConversion =
+        _prefs.getString(_currencyConversionUndoKey) != null;
     _onboarded = _prefs.getBool(_onboardedKey) ?? false;
+    _overviewGuideShown = _prefs.getBool(_overviewGuideShownKey) ?? false;
+    _hideBalancesByDefault = _prefs.getBool(_hideBalancesKey) ?? true;
+    _dateFormat = _prefs.getString(_dateFormatKey) ?? 'dd/MM/yyyy';
     _themeMode =
         ThemeMode.values.asNameMap()[_prefs.getString(_themeModeKey)] ??
         ThemeMode.system;
@@ -83,6 +108,21 @@ class AppStore extends ChangeNotifier {
         _recurrings.clear();
       }
     }
+    final rawPlannedEvents = _prefs.getString(_plannedEventsKey);
+    if (rawPlannedEvents != null) {
+      try {
+        _plannedEvents
+          ..clear()
+          ..addAll(
+            (jsonDecode(rawPlannedEvents) as List).map(
+              (e) => PlannedEvent.fromJson(e as Map<String, dynamic>),
+            ),
+          );
+      } catch (_) {
+        _plannedEvents.clear();
+      }
+    }
+    final eventsMigrated = _detachEventsFromRecurringPayments();
     final rawCategories = _prefs.getString(_categoriesKey);
     final rawTransactions = _prefs.getString(_transactionsKey);
     final rawWallets = _prefs.getString(_walletsKey);
@@ -145,6 +185,7 @@ class AppStore extends ChangeNotifier {
             rawGoals == null ||
             rawDebts == null ||
             missingCurrencyCode(rawWallets) ||
+            eventsMigrated ||
             missingCurrencyCode(rawBudgets) ||
             missingCurrencyCode(rawGoals) ||
             missingCurrencyCode(rawDebts)) {
@@ -165,6 +206,8 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> _save() async {
+    _canUndoCurrencyConversion = false;
+    await _prefs.remove(_currencyConversionUndoKey);
     await _prefs.setString(
       _categoriesKey,
       jsonEncode(_categories.map((c) => c.toJson()).toList()),
@@ -192,6 +235,10 @@ class AppStore extends ChangeNotifier {
     await _prefs.setString(
       _recurringsKey,
       jsonEncode(_recurrings.map((r) => r.toJson()).toList()),
+    );
+    await _prefs.setString(
+      _plannedEventsKey,
+      jsonEncode(_plannedEvents.map((e) => e.toJson()).toList()),
     );
   }
 
@@ -326,6 +373,7 @@ class AppStore extends ChangeNotifier {
     _wallets.removeWhere((w) => w.id == id);
     _transactions.removeWhere((t) => t.walletId == id);
     _recurrings.removeWhere((r) => r.walletId == id);
+    _plannedEvents.removeWhere((event) => event.walletId == id);
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
       if (g.entries.any((e) => e.walletId == id)) {
@@ -358,6 +406,71 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  bool hasPlannedEventTransaction(PlannedEvent event, DateTime date) {
+    final key = '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    return _transactions.any((transaction) {
+      if (transaction.id == 'event_$key') return true;
+      final transactionDate = transaction.date;
+      final sameDate = transactionDate.year == date.year &&
+          transactionDate.month == date.month &&
+          transactionDate.day == date.day;
+      final sameEvent = transaction.id.startsWith('rec_') &&
+          transaction.type == event.type &&
+          transaction.amount == event.amount &&
+          (event.walletId == null || transaction.walletId == event.walletId) &&
+          (transaction.note == event.title || transaction.note.startsWith('${event.title}\n'));
+      return sameDate && sameEvent;
+    });
+  }
+
+  bool recordPlannedEventTransaction({
+    required PlannedEvent event,
+    required DateTime date,
+    required String categoryId,
+    required String walletId,
+    double? amount,
+  }) {
+    final category = categoryById(categoryId);
+    final wallet = walletById(walletId);
+    final actualAmount = amount ?? event.amount;
+    if (category?.type != event.type ||
+        wallet == null ||
+        wallet.currencyCode != event.currencyCode ||
+        actualAmount <= 0 ||
+        hasPlannedEventTransaction(event, date)) {
+      return false;
+    }
+    final key = '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    final note = event.note.isEmpty ? event.title : '${event.title}\n${event.note}';
+    _transactions.add(
+      Transaction(
+        id: 'event_$key',
+        type: event.type,
+        categoryId: categoryId,
+        walletId: walletId,
+        amount: actualAmount,
+        date: DateTime(date.year, date.month, date.day, 12),
+        note: note,
+      ),
+    );
+    final recurringId = event.recurringId;
+    if (recurringId != null) {
+      final index = _recurrings.indexWhere((item) => item.id == recurringId);
+      if (index != -1) {
+        final recurring = _recurrings[index];
+        final occurrence = RecurringTransaction.dateOnly(date);
+        if (!recurring.isSkipped(occurrence)) {
+          _recurrings[index] = recurring.copyWith(
+            skippedDates: [...recurring.skippedDates, occurrence],
+          );
+        }
+      }
+    }
+    notifyListeners();
+    _save();
+    return true;
+  }
+
   void updateTransaction(Transaction updated) {
     final index = _transactions.indexWhere((t) => t.id == updated.id);
     if (index == -1) return;
@@ -366,8 +479,196 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  List<Transaction> plannedEventTransactions(
+    String eventId, {
+    DateTime? occurrenceDate,
+  }) {
+    final eventIndex = _plannedEvents.indexWhere((event) => event.id == eventId);
+    if (eventIndex == -1) return const [];
+    final event = _plannedEvents[eventIndex];
+    return _transactions.where((transaction) {
+      final sameDate = occurrenceDate == null ||
+          (transaction.date.year == occurrenceDate.year &&
+              transaction.date.month == occurrenceDate.month &&
+              transaction.date.day == occurrenceDate.day);
+      if (!sameDate) return false;
+      if (transaction.id.startsWith('event_${event.id}_')) return true;
+      return transaction.id.startsWith('rec_') &&
+          event.frequency != null &&
+          event.walletId != null &&
+          transaction.type == event.type &&
+          transaction.amount == event.amount &&
+          transaction.walletId == event.walletId &&
+          transaction.note == event.title &&
+          _isPlannedEventOccurrence(event, transaction.date);
+    }).toList();
+  }
+
+  bool _isPlannedEventOccurrence(PlannedEvent event, DateTime date) {
+    final frequency = event.frequency;
+    if (frequency == null) {
+      return event.date.year == date.year &&
+          event.date.month == date.month &&
+          event.date.day == date.day;
+    }
+    var occurrence = DateTime(event.date.year, event.date.month, event.date.day);
+    final target = DateTime(date.year, date.month, date.day);
+    var guard = 0;
+    while (occurrence.isBefore(target) && guard < 100000) {
+      occurrence = _advanceEventDate(occurrence, event.date, frequency);
+      guard++;
+    }
+    return occurrence.year == target.year &&
+        occurrence.month == target.month &&
+        occurrence.day == target.day;
+  }
+
+  void removePlannedEventTransactions(
+    String eventId, {
+    DateTime? occurrenceDate,
+  }) {
+    final ids = plannedEventTransactions(
+      eventId,
+      occurrenceDate: occurrenceDate,
+    ).map((transaction) => transaction.id).toSet();
+    if (ids.isEmpty) return;
+    _transactions.removeWhere((transaction) => ids.contains(transaction.id));
+    notifyListeners();
+    _save();
+  }
+
   void removeTransaction(String id) {
     _transactions.removeWhere((t) => t.id == id);
+    notifyListeners();
+    _save();
+  }
+
+  List<PlannedEvent> get plannedEvents => List.unmodifiable(
+    _plannedEvents.where((event) {
+      if (event.currencyCode != _currency.code) return false;
+      final selected = selectedWalletId;
+      return selected == null || event.walletId == null || event.walletId == selected;
+    }),
+  );
+
+  List<PlannedEvent> get allPlannedEvents => List.unmodifiable(_plannedEvents);
+
+  bool _detachEventsFromRecurringPayments() {
+    final linkedIds = <String>{};
+    var changed = false;
+    for (var i = 0; i < _plannedEvents.length; i++) {
+      final event = _plannedEvents[i];
+      final recurringId = event.recurringId;
+      if (recurringId == null) continue;
+      final recurring = recurringById(recurringId);
+      _plannedEvents[i] = event.copyWith(
+        clearRecurringId: true,
+        frequency: event.frequency ?? recurring?.frequency,
+        skippedDates: event.skippedDates.isEmpty
+            ? recurring?.skippedDates ?? const []
+            : event.skippedDates,
+      );
+      linkedIds.add(recurringId);
+      changed = true;
+    }
+    if (linkedIds.isNotEmpty) {
+      _recurrings.removeWhere((recurring) => linkedIds.contains(recurring.id));
+    }
+    return changed;
+  }
+
+  List<PlannedEvent> plannedEventsInRange(
+    DateRange range, {
+    bool includeAllWallets = false,
+  }) {
+    final result = <PlannedEvent>[];
+    final source = includeAllWallets
+        ? _plannedEvents.where((event) => event.currencyCode == _currency.code)
+        : plannedEvents;
+    for (final event in source) {
+      final frequency = event.frequency;
+      if (frequency == null) {
+        if (range.contains(event.date)) result.add(event);
+        continue;
+      }
+      var date = event.date;
+      var guard = 0;
+      while (date.isBefore(range.start) && guard < 100000) {
+        date = _advanceEventDate(date, event.date, frequency);
+        guard++;
+      }
+      while (date.isBefore(range.end) && guard < 100000) {
+        if (!event.skippedDates.any((skipped) =>
+            skipped.year == date.year && skipped.month == date.month &&
+            skipped.day == date.day)) {
+          result.add(event.copyWith(date: date, seriesStartDate: event.date));
+        }
+        date = _advanceEventDate(date, event.date, frequency);
+        guard++;
+      }
+    }
+    return result;
+  }
+
+  DateTime _advanceEventDate(DateTime from, DateTime start, Frequency frequency) {
+    switch (frequency) {
+      case Frequency.daily:
+        return DateTime(from.year, from.month, from.day + 1);
+      case Frequency.weekly:
+        return DateTime(from.year, from.month, from.day + 7);
+      case Frequency.monthly:
+        return _advanceEventMonth(from, start, 1);
+      case Frequency.yearly:
+        return _advanceEventMonth(from, start, 12);
+    }
+  }
+
+  DateTime _advanceEventMonth(DateTime from, DateTime start, int months) {
+    final total = from.month - 1 + months;
+    final year = from.year + total ~/ 12;
+    final month = total % 12 + 1;
+    final lastDay = DateTime(year, month + 1, 0).day;
+    final day = start.day < lastDay ? start.day : lastDay;
+    return DateTime(year, month, day);
+  }
+
+  void skipPlannedEventOccurrence(String eventId, DateTime date) {
+    final index = _plannedEvents.indexWhere((event) => event.id == eventId);
+    if (index == -1) return;
+    final event = _plannedEvents[index];
+    final skipped = DateTime(date.year, date.month, date.day);
+    if (event.skippedDates.any((item) =>
+        item.year == skipped.year && item.month == skipped.month && item.day == skipped.day)) {
+      return;
+    }
+    _plannedEvents[index] = event.copyWith(skippedDates: [...event.skippedDates, skipped]);
+    notifyListeners();
+    _save();
+  }
+
+  void skipRecurringOccurrence(String recurringId, DateTime date) {
+    final recurring = recurringById(recurringId);
+    if (recurring == null || recurring.isSkipped(date)) return;
+    final skipped = [...recurring.skippedDates, RecurringTransaction.dateOnly(date)];
+    updateRecurring(recurring.copyWith(skippedDates: skipped));
+  }
+
+  void addPlannedEvent(PlannedEvent event) {
+    _plannedEvents.add(event);
+    notifyListeners();
+    _save();
+  }
+
+  void updatePlannedEvent(PlannedEvent updated) {
+    final index = _plannedEvents.indexWhere((event) => event.id == updated.id);
+    if (index == -1) return;
+    _plannedEvents[index] = updated;
+    notifyListeners();
+    _save();
+  }
+
+  void removePlannedEvent(String id) {
+    _plannedEvents.removeWhere((event) => event.id == id);
     notifyListeners();
     _save();
   }
@@ -393,7 +694,14 @@ class AppStore extends ChangeNotifier {
     _categories.removeWhere((c) => c.id == id);
     _transactions.removeWhere((t) => t.categoryId == id);
     _budgets.removeWhere((b) => b.categoryId == id);
-    _recurrings.removeWhere((r) => r.categoryId == id);
+    final recurringIds = _recurrings
+        .where((r) => r.categoryId == id)
+        .map((r) => r.id)
+        .toSet();
+    _recurrings.removeWhere((r) => recurringIds.contains(r.id));
+    _plannedEvents.removeWhere(
+      (event) => recurringIds.contains(event.recurringId),
+    );
     notifyListeners();
     _save();
   }
@@ -591,8 +899,27 @@ class AppStore extends ChangeNotifier {
     return processRecurring();
   }
 
-  void removeRecurring(String id) {
+  void removeRecurring(String id, {bool preservePlannedEvent = false}) {
     _recurrings.removeWhere((r) => r.id == id);
+    if (preservePlannedEvent) {
+      for (var i = 0; i < _plannedEvents.length; i++) {
+        final event = _plannedEvents[i];
+        if (event.recurringId != id) continue;
+        _plannedEvents[i] = PlannedEvent(
+          id: event.id,
+          title: event.title,
+          type: event.type,
+          amount: event.amount,
+          date: event.date,
+          currencyCode: event.currencyCode,
+          note: event.note,
+          walletId: event.walletId,
+          reminderMinutes: event.reminderMinutes,
+        );
+      }
+    } else {
+      _plannedEvents.removeWhere((event) => event.recurringId == id);
+    }
     notifyListeners();
     _save();
   }
@@ -629,17 +956,19 @@ class AppStore extends ChangeNotifier {
       var steps = 0;
       while (r.isDue(today) && steps < 400) {
         final d = r.nextDate;
-        _transactions.add(
-          Transaction(
-            id: 'rec_${r.id}_${d.millisecondsSinceEpoch}',
-            type: r.type,
-            categoryId: r.categoryId,
-            walletId: r.walletId,
-            amount: r.amount,
-            date: DateTime(d.year, d.month, d.day, 12),
-            note: r.note,
-          ),
-        );
+        if (!r.isSkipped(d)) {
+          _transactions.add(
+            Transaction(
+              id: 'rec_${r.id}_${d.millisecondsSinceEpoch}',
+              type: r.type,
+              categoryId: r.categoryId,
+              walletId: r.walletId,
+              amount: r.amount,
+              date: DateTime(d.year, d.month, d.day, 12),
+              note: r.note,
+            ),
+          );
+        }
         r = r.copyWith(nextDate: r.advance(d));
         steps++;
       }
@@ -654,6 +983,18 @@ class AppStore extends ChangeNotifier {
       _save();
     }
     return created;
+  }
+
+  void setHideBalancesByDefault(bool value) {
+    _hideBalancesByDefault = value;
+    _prefs.setBool(_hideBalancesKey, value);
+    notifyListeners();
+  }
+
+  void setDateFormat(String value) {
+    _dateFormat = value;
+    _prefs.setString(_dateFormatKey, value);
+    notifyListeners();
   }
 
   void setThemeMode(ThemeMode mode) {
@@ -673,6 +1014,8 @@ class AppStore extends ChangeNotifier {
   }
 
   void setCurrency(AppCurrency currency) {
+    _canUndoCurrencyConversion = false;
+    _prefs.remove(_currencyConversionUndoKey);
     _currency = currency;
     AppCurrency.current = currency;
     _prefs.setString(_currencyKey, currency.code);
@@ -685,6 +1028,7 @@ class AppStore extends ChangeNotifier {
     double factor, {
     required Set<String> walletIds,
   }) async {
+    final backupBeforeConversion = createBackup().encode();
     final fromCode = from.code;
     final sourceWalletIds = walletIds
         .where((id) => walletById(id)?.currencyCode == fromCode)
@@ -799,11 +1143,39 @@ class AppStore extends ChangeNotifier {
       if (!sourceWalletIds.contains(r.walletId)) continue;
       _recurrings[i] = r.copyWith(amount: conv(r.amount));
     }
+    for (var i = 0; i < _plannedEvents.length; i++) {
+      final event = _plannedEvents[i];
+      if (!sourceWalletIds.contains(event.walletId)) continue;
+      _plannedEvents[i] = event.copyWith(
+        amount: conv(event.amount),
+        currencyCode: to.code,
+      );
+    }
     _currency = to;
     AppCurrency.current = to;
     _prefs.setString(_currencyKey, to.code);
     notifyListeners();
     await _save();
+    await _prefs.setString(
+      _currencyConversionUndoKey,
+      backupBeforeConversion,
+    );
+    _canUndoCurrencyConversion = true;
+    notifyListeners();
+  }
+
+  Future<bool> undoLastCurrencyConversion() async {
+    final raw = _prefs.getString(_currencyConversionUndoKey);
+    if (raw == null) return false;
+    _canUndoCurrencyConversion = false;
+    try {
+      await restoreBackup(BackupData.parse(raw));
+      return true;
+    } catch (_) {
+      await _prefs.remove(_currencyConversionUndoKey);
+      notifyListeners();
+      return false;
+    }
   }
 
   BackupData createBackup() {
@@ -815,6 +1187,7 @@ class AppStore extends ChangeNotifier {
       goals: List.of(_goals),
       debts: List.of(_debts),
       recurrings: List.of(_recurrings),
+      plannedEvents: List.of(_plannedEvents),
       currency: _currency.code,
     );
   }
@@ -841,6 +1214,9 @@ class AppStore extends ChangeNotifier {
     _recurrings
       ..clear()
       ..addAll(data.recurrings);
+    _plannedEvents
+      ..clear()
+      ..addAll(data.plannedEvents);
     if (data.currency != null) {
       _currency = AppCurrency.byCode(data.currency);
       AppCurrency.current = _currency;
@@ -856,6 +1232,11 @@ class AppStore extends ChangeNotifier {
     _prefs.setBool(_onboardedKey, true);
     notifyListeners();
     _save();
+  }
+
+  void markOverviewGuideShown() {
+    _overviewGuideShown = true;
+    _prefs.setBool(_overviewGuideShownKey, true);
   }
 
   String newId() => DateTime.now().microsecondsSinceEpoch.toString();

@@ -65,6 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _finish(Wallet? wallet) {
+    _store.setCurrency(_currency);
     _store.completeOnboarding(wallet);
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -83,7 +84,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ScaffoldMessenger.of(context).showApp(l.pleaseEnterWalletName);
       return;
     }
-    _store.setCurrency(_currency);
     _finish(
       Wallet(
         id: _store.newId(),
@@ -94,6 +94,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         currencyCode: _currency.code,
       ),
     );
+  }
+
+  void _skipWalletSetup() {
+    _finish(null);
   }
 
   @override
@@ -155,7 +159,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    Text(
+                    DropdownButtonFormField<AppCurrency>(
+                      initialValue: _currency,
+                      decoration: InputDecoration(labelText: l.currencyDefault),
+                      items: [
+                        for (final currency in AppCurrency.all)
+                          DropdownMenuItem(
+                            value: currency,
+                            child: Text(
+                              '${currency.localizedName(context)} (${currency.code})',
+                            ),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() {
+                          _currency = value;
+                          _balanceCtrl.useCurrency(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),                    Text(
                       l.quickSuggestions,
                       style: TextStyle(color: context.textSecondary),
                     ),
@@ -195,27 +219,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         hintText: '0',
                         suffixText: _currency.symbol,
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    DropdownButtonFormField<AppCurrency>(
-                      initialValue: _currency,
-                      decoration: InputDecoration(labelText: l.walletCurrency),
-                      items: [
-                        for (final currency in AppCurrency.all)
-                          DropdownMenuItem(
-                            value: currency,
-                            child: Text(
-                              '${currency.localizedName(context)} (${currency.code})',
-                            ),
-                          ),
-                      ],
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() {
-                          _currency = value;
-                          _balanceCtrl.useCurrency(value);
-                        });
-                      },
                     ),
                     const SizedBox(height: 24),
                     Text(
@@ -289,6 +292,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                     ),
+                    TextButton(
+                      onPressed: _skipWalletSetup,
+                      child: Text(l.skipWalletSetup),
+                    ),
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -301,3 +308,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

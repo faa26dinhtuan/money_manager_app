@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
@@ -22,10 +24,12 @@ class AddTransactionScreen extends StatefulWidget {
     super.key,
     this.initialType = TxType.expense,
     this.transaction,
+    this.previewOnly = false,
   });
 
   final TxType initialType;
   final Transaction? transaction;
+  final bool previewOnly;
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -55,7 +59,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         (_store.selectedWalletId == null ||
                 _store.walletById(_store.selectedWalletId!)?.currencyCode !=
                     _store.currency.code
-            ? sameCurrencyWallets.first.id
+            ? (sameCurrencyWallets.isEmpty ? null : sameCurrencyWallets.first.id)
             : _store.selectedWalletId!);
     if (t != null) {
       _amountCtrl.amount = t.amount;
@@ -73,7 +77,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
@@ -96,7 +100,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final l = context.l10n;
     final amount = _amountCtrl.amount;
     if (amount <= 0) {
@@ -116,6 +120,27 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       date: _date,
       note: _noteCtrl.text.trim(),
     );
+    if (transaction.type == TxType.expense && _projectedWalletBalance(transaction) < 0) {
+      final confirmed = await showAdaptiveDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => CupertinoAlertDialog(
+          title: Text(context.l10n.negativeWalletBalanceTitle),
+          content: Text(context.l10n.negativeWalletBalanceMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(context.l10n.recordAnyway),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || confirmed != true) return;
+    }
     final messenger = ScaffoldMessenger.of(context);
     if (_isEditing) {
       _store.updateTransaction(transaction);
@@ -127,6 +152,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (warning != null) messenger.showApp(warning);
   }
 
+  double _projectedWalletBalance(Transaction transaction) {
+    var balance = _store.walletBalance(transaction.walletId);
+    final previous = widget.transaction;
+    if (previous != null && previous.walletId == transaction.walletId) {
+      balance -= previous.type == TxType.income
+          ? previous.amount
+          : -previous.amount;
+    }
+    balance += transaction.type == TxType.income
+        ? transaction.amount
+        : -transaction.amount;
+    return balance;
+  }
   String? _budgetWarning(Transaction t) {
     if (t.type != TxType.expense) return null;
     final budget = _store.budgetOfCategory(t.categoryId);
@@ -152,9 +190,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   Future<void> _confirmDelete() async {
     final l = context.l10n;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteTransactionTitle),
         content: Text(l.deleteTransactionPermanent),
         actions: [
@@ -192,18 +230,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           preferredSize: const Size.fromHeight(48),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TypeTabs(
-              type: _type,
-              onChanged: (t) => setState(() {
-                _type = t;
-                _categoryId = null;
-              }),
+            child: IgnorePointer(
+              ignoring: widget.previewOnly,
+              child: TypeTabs(
+                type: _type,
+                onChanged: (t) => setState(() {
+                  _type = t;
+                  _categoryId = null;
+                }),
+              ),
             ),
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: AbsorbPointer(
+        absorbing: widget.previewOnly,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -363,6 +406,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
           ],
         ],
+        ),
       ),
     );
   }

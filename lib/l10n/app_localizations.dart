@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In vi, this message translates to:
-  /// **'Money Manager'**
+  /// **'Pocketwise'**
   String get appName;
 
   /// No description provided for @overview.
@@ -133,6 +133,102 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tháng sau'**
   String get nextMonth;
+
+  /// No description provided for @plannedEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện dự kiến'**
+  String get plannedEvent;
+
+  /// No description provided for @plannedEvents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện dự kiến'**
+  String get plannedEvents;
+
+  /// No description provided for @addPlannedEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo sự kiện'**
+  String get addPlannedEvent;
+
+  /// No description provided for @editPlannedEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa sự kiện'**
+  String get editPlannedEvent;
+
+  /// No description provided for @plannedEventName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên sự kiện'**
+  String get plannedEventName;
+
+  /// No description provided for @pleaseEnterEventName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vui lòng nhập tên sự kiện'**
+  String get pleaseEnterEventName;
+
+  /// No description provided for @deletePlannedEventTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa sự kiện dự kiến?'**
+  String get deletePlannedEventTitle;
+
+  /// No description provided for @deletePlannedEventMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện này sẽ bị xóa khỏi lịch.'**
+  String get deletePlannedEventMessage;
+
+  /// No description provided for @repeatEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lặp lại sự kiện'**
+  String get repeatEvent;
+
+  /// No description provided for @repeatFrequency.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tần suất lặp lại'**
+  String get repeatFrequency;
+
+  /// No description provided for @deleteThisOccurrence.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ xóa ngày này'**
+  String get deleteThisOccurrence;
+
+  /// No description provided for @deleteEventSeries.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tất cả các lần lặp'**
+  String get deleteEventSeries;
+
+  /// No description provided for @deleteRecurringEventWarning.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn phạm vi sự kiện muốn xóa.'**
+  String get deleteRecurringEventWarning;
+
+  /// No description provided for @pleaseSelectWallet.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vui lòng chọn ví'**
+  String get pleaseSelectWallet;
+
+  /// No description provided for @stopRecurringEventTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tắt lặp lại sự kiện?'**
+  String get stopRecurringEventTitle;
+
+  /// No description provided for @stopRecurringEventMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giao dịch định kỳ liên kết sẽ bị xóa. Các giao dịch đã được tạo trước đó vẫn được giữ lại.'**
+  String get stopRecurringEventMessage;
 
   /// No description provided for @categories.
   ///
@@ -2467,6 +2563,498 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Mượn mua xe đạp'**
   String get seedDebtBorrowNote;
+
+  /// No description provided for @dayEvents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện trong ngày'**
+  String get dayEvents;
+
+  /// No description provided for @noTransactionsOnDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có giao dịch trong ngày này'**
+  String get noTransactionsOnDate;
+
+  /// No description provided for @noEventsOnDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có sự kiện trong ngày này'**
+  String get noEventsOnDate;
+
+  /// No description provided for @pastEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện đã qua'**
+  String get pastEvent;
+
+  /// No description provided for @todayEvent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện hôm nay'**
+  String get todayEvent;
+
+  /// No description provided for @todayEvents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện hôm nay'**
+  String get todayEvents;
+
+  /// No description provided for @recordEventTransaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi giao dịch'**
+  String get recordEventTransaction;
+
+  /// No description provided for @confirmEventTransactionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận tạo giao dịch?'**
+  String get confirmEventTransactionTitle;
+
+  /// No description provided for @confirmEventTransactionMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản dự kiến dưới đây sẽ được ghi vào sổ và cập nhật số dư ví.'**
+  String get confirmEventTransactionMessage;
+
+  /// No description provided for @eventTransactionNeedsSetup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần có danh mục phù hợp và ví cùng loại tiền tệ để ghi giao dịch.'**
+  String get eventTransactionNeedsSetup;
+
+  /// No description provided for @eventTransactionAlreadyRecorded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sự kiện này đã có giao dịch trong sổ.'**
+  String get eventTransactionAlreadyRecorded;
+
+  /// No description provided for @plannedExpense.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản chi dự kiến'**
+  String get plannedExpense;
+
+  /// No description provided for @plannedIncome.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản thu dự kiến'**
+  String get plannedIncome;
+
+  /// No description provided for @selectItemsToDelete.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn mục cần xóa'**
+  String get selectItemsToDelete;
+
+  /// No description provided for @deleteEventTransactionsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa giao dịch liên quan?'**
+  String get deleteEventTransactionsTitle;
+
+  /// No description provided for @deleteEventTransactionsMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có muốn xóa các giao dịch đã ghi từ sự kiện này không?'**
+  String get deleteEventTransactionsMessage;
+
+  /// No description provided for @keepEventTransactions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giữ lại giao dịch'**
+  String get keepEventTransactions;
+
+  /// No description provided for @deleteEventTransactions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa giao dịch'**
+  String get deleteEventTransactions;
+
+  /// No description provided for @actualAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền thực tế'**
+  String get actualAmount;
+
+  /// No description provided for @linkEventToRecurring.
+  ///
+  /// In vi, this message translates to:
+  /// **'Liên kết với giao dịch định kỳ'**
+  String get linkEventToRecurring;
+
+  /// No description provided for @autoRecordLinkedRecurring.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tự động ghi giao dịch khi đến hạn'**
+  String get autoRecordLinkedRecurring;
+
+  /// No description provided for @eventAmountOptional.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không bắt buộc'**
+  String get eventAmountOptional;
+
+  /// No description provided for @eventReminderToggle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc tôi'**
+  String get eventReminderToggle;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ nhắc'**
+  String get reminderTime;
+
+  /// No description provided for @eventReminderPermissionDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có quyền gửi thông báo. Hãy bật quyền trong cài đặt thiết bị.'**
+  String get eventReminderPermissionDenied;
+
+  /// No description provided for @eventReminderNotificationTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nhở sự kiện'**
+  String get eventReminderNotificationTitle;
+
+  /// No description provided for @eventReminderChannel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nhở sự kiện'**
+  String get eventReminderChannel;
+
+  /// No description provided for @eventReminderChannelDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông báo về các sự kiện đã lên lịch'**
+  String get eventReminderChannelDescription;
+
+  /// No description provided for @negativeWalletBalanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví không đủ tiền'**
+  String get negativeWalletBalanceTitle;
+
+  /// No description provided for @negativeWalletBalanceMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số dư ví không đủ cho khoản chi này. Nếu tiếp tục, số dư ví sẽ thành số âm.'**
+  String get negativeWalletBalanceMessage;
+
+  /// No description provided for @recordAnyway.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vẫn ghi giao dịch'**
+  String get recordAnyway;
+
+  /// No description provided for @hideBalanceByDefault.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn số dư mặc định'**
+  String get hideBalanceByDefault;
+
+  /// No description provided for @hideBalanceDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào số dư để hiện tạm thời.'**
+  String get hideBalanceDescription;
+
+  /// No description provided for @showBalance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện số dư'**
+  String get showBalance;
+
+  /// No description provided for @hideBalance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn số dư'**
+  String get hideBalance;
+
+  /// No description provided for @dateFormat.
+  ///
+  /// In vi, this message translates to:
+  /// **'Định dạng ngày'**
+  String get dateFormat;
+
+  /// No description provided for @dateFormatDayMonthYear.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày / tháng / năm'**
+  String get dateFormatDayMonthYear;
+
+  /// No description provided for @dateFormatMonthDayYear.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng / ngày / năm'**
+  String get dateFormatMonthDayYear;
+
+  /// No description provided for @dateFormatYearMonthDay.
+  ///
+  /// In vi, this message translates to:
+  /// **'Năm - tháng - ngày'**
+  String get dateFormatYearMonthDay;
+
+  /// No description provided for @showWalletBalances.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện số dư các ví'**
+  String get showWalletBalances;
+
+  /// No description provided for @hideWalletBalances.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn số dư các ví'**
+  String get hideWalletBalances;
+
+  /// No description provided for @undoLastWalletConversion.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hoàn tác lần quy đổi ví gần nhất'**
+  String get undoLastWalletConversion;
+
+  /// No description provided for @walletConversionUndone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hoàn tác quy đổi ví'**
+  String get walletConversionUndone;
+
+  /// No description provided for @skipWalletSetup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ qua, tạo ví sau'**
+  String get skipWalletSetup;
+
+  /// No description provided for @skipGuide.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ qua hướng dẫn'**
+  String get skipGuide;
+
+  /// No description provided for @showMeGuide.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cho tôi xem hướng dẫn'**
+  String get showMeGuide;
+
+  /// No description provided for @maybeLater.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để sau'**
+  String get maybeLater;
+
+  /// No description provided for @overviewGuideTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Làm quen với Tổng quan'**
+  String get overviewGuideTitle;
+
+  /// No description provided for @overviewGuideIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.'**
+  String get overviewGuideIntro;
+
+  /// No description provided for @overviewGuideDemoInstruction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví và giao dịch mẫu trong phần làm quen chỉ để minh họa, không làm thay đổi dữ liệu thật.'**
+  String get overviewGuideDemoInstruction;
+
+  /// No description provided for @overviewGuideSampleWallet.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví mẫu'**
+  String get overviewGuideSampleWallet;
+
+  /// No description provided for @overviewGuideSampleExpenseCategory.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ăn uống'**
+  String get overviewGuideSampleExpenseCategory;
+
+  /// No description provided for @overviewGuideSampleIncomeCategory.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lương'**
+  String get overviewGuideSampleIncomeCategory;
+
+  /// No description provided for @overviewGuideSampleExpenseTransaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bữa trưa'**
+  String get overviewGuideSampleExpenseTransaction;
+
+  /// No description provided for @overviewGuideSampleIncomeTransaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lương tháng'**
+  String get overviewGuideSampleIncomeTransaction;
+
+  /// No description provided for @overviewGuideWalletTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ví cần xem'**
+  String get overviewGuideWalletTitle;
+
+  /// No description provided for @overviewGuideWalletDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào bộ chọn ví để xem tổng quan của tất cả ví hoặc một ví riêng.'**
+  String get overviewGuideWalletDescription;
+
+  /// No description provided for @overviewGuideBalanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem số dư'**
+  String get overviewGuideBalanceTitle;
+
+  /// No description provided for @overviewGuideBalanceDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào số dư để hiện hoặc ẩn tạm thời theo cài đặt bảo mật.'**
+  String get overviewGuideBalanceDescription;
+
+  /// No description provided for @overviewGuideTypeTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển giữa thu và chi'**
+  String get overviewGuideTypeTitle;
+
+  /// No description provided for @overviewGuideTypeDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn tab thu hoặc chi để xem biểu đồ và danh mục tương ứng.'**
+  String get overviewGuideTypeDescription;
+
+  /// No description provided for @overviewGuidePeriodTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn khoảng thời gian'**
+  String get overviewGuidePeriodTitle;
+
+  /// No description provided for @overviewGuidePeriodDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi ngày, tuần, tháng, năm hoặc kỳ tùy chỉnh để xem dữ liệu trong khoảng đó.'**
+  String get overviewGuidePeriodDescription;
+
+  /// No description provided for @overviewGuideChartTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem biểu đồ và danh mục'**
+  String get overviewGuideChartTitle;
+
+  /// No description provided for @overviewGuideChartDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào một phần biểu đồ để làm nổi bật mục tương ứng.'**
+  String get overviewGuideChartDescription;
+
+  /// No description provided for @overviewGuideTransactionsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem danh sách theo danh mục'**
+  String get overviewGuideTransactionsTitle;
+
+  /// No description provided for @overviewGuideTransactionsDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào một danh mục để xem tổng tiền và các giao dịch thuộc danh mục đó.'**
+  String get overviewGuideTransactionsDescription;
+
+  /// No description provided for @overviewGuideNavigationTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển đến các mục khác'**
+  String get overviewGuideNavigationTitle;
+
+  /// No description provided for @overviewGuideNavigationDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thanh điều hướng gồm Tổng quan, Giao dịch, Lịch và Ví để chuyển nhanh giữa các mục. Nút + ở giữa dùng để thêm giao dịch.'**
+  String get overviewGuideNavigationDescription;
+
+  /// No description provided for @overviewGuideSettingsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở cài đặt'**
+  String get overviewGuideSettingsTitle;
+
+  /// No description provided for @overviewGuideSettingsDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.'**
+  String get overviewGuideSettingsDescription;
+
+  /// No description provided for @overviewGuideAddTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm giao dịch'**
+  String get overviewGuideAddTitle;
+
+  /// No description provided for @overviewGuideAddDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhấn dấu + để mở biểu mẫu thêm khoản thu hoặc chi.'**
+  String get overviewGuideAddDescription;
+
+  /// No description provided for @overviewGuideAddScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số tiền, chọn ví và danh mục, thêm ngày cùng ghi chú rồi lưu khoản thu hoặc chi.'**
+  String get overviewGuideAddScreenDescription;
+
+  /// No description provided for @overviewGuideTransactionsScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào Sổ giao dịch để xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.'**
+  String get overviewGuideTransactionsScreenDescription;
+
+  /// No description provided for @overviewGuideCalendarScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào Lịch để theo dõi thu chi theo ngày và xem các sự kiện đã lên lịch.'**
+  String get overviewGuideCalendarScreenDescription;
+
+  /// No description provided for @overviewGuideWalletScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví giúp theo dõi số dư và mở các phần quản lý ví, ngân sách, mục tiêu, sổ nợ và giao dịch định kỳ.'**
+  String get overviewGuideWalletScreenDescription;
+
+  /// No description provided for @overviewGuideWalletNavigationDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào Ví tiền để xem số dư và quản lý các ví của bạn.'**
+  String get overviewGuideWalletNavigationDescription;
+
+  /// No description provided for @overviewGuideClosing.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.'**
+  String get overviewGuideClosing;
+
+  /// No description provided for @overviewGuideFinish.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bắt đầu sử dụng'**
+  String get overviewGuideFinish;
+
+  /// No description provided for @overviewGuideTransactionsPageDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.'**
+  String get overviewGuideTransactionsPageDescription;
+
+  /// No description provided for @overviewGuideCalendarPageDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.'**
+  String get overviewGuideCalendarPageDescription;
 }
 
 class _AppLocalizationsDelegate

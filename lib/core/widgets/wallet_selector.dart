@@ -4,15 +4,61 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
-import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 class WalletSelector extends StatelessWidget {
-  const WalletSelector({super.key, this.onPrimary = false});
+  const WalletSelector({
+    super.key,
+    this.onPrimary = false,
+    this.demoWalletName,
+    this.demoWalletSelected = true,
+    this.onDemoWalletChanged,
+    this.onDemoInteraction,
+  });
 
   final bool onPrimary;
+  final String? demoWalletName;
+  final bool demoWalletSelected;
+  final ValueChanged<bool>? onDemoWalletChanged;
+  final VoidCallback? onDemoInteraction;
+
+  Future<void> _openDemo(BuildContext context) async {
+    final l = context.l10n;
+    final selected = await showModalBottomSheet<bool>(
+      context: context,
+      useSafeArea: true,
+      backgroundColor: context.surfaceColor,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+            child: Text(
+              l.selectWallet,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            title: Text(l.allWallets),
+            trailing: !demoWalletSelected ? const Icon(Icons.check) : null,
+            onTap: () => Navigator.of(context).pop(false),
+          ),
+          ListTile(
+            title: Text(demoWalletName!),
+            trailing: demoWalletSelected ? const Icon(Icons.check) : null,
+            onTap: () => Navigator.of(context).pop(true),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+    if (selected == null) return;
+    onDemoWalletChanged?.call(selected);
+    onDemoInteraction?.call();
+  }
 
   void _open(BuildContext context) {
     showModalBottomSheet<void>(
@@ -25,6 +71,50 @@ class WalletSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (demoWalletName != null) {
+      final pillColor = onPrimary
+          ? Colors.white.withValues(alpha: 0.18)
+          : AppTheme.primary.withValues(alpha: 0.12);
+      final iconColor = onPrimary ? Colors.white : AppTheme.primary;
+      final textColor = onPrimary ? Colors.white : context.textPrimary;
+      return Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 140),
+          child: Material(
+            color: pillColor,
+            borderRadius: BorderRadius.circular(20),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () => _openDemo(context),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AppIcon(AppIcons.wallet, size: 18, color: iconColor),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        demoWalletSelected ? demoWalletName! : context.l10n.allWallets,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    AppIcon(AppIcons.chevronDown, size: 20, color: iconColor),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     final store = AppStore.instance;
     return ListenableBuilder(
       listenable: store,
@@ -169,8 +259,9 @@ class _WalletOption extends StatelessWidget {
       onTap: onTap,
       leading: CategoryIcon(icon: icon, color: color, size: 40),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(
-        formatMoney(balance, AppCurrency.byCode(currencyCode)),
+      subtitle: SensitiveBalance(
+        amount: balance,
+        currency: AppCurrency.byCode(currencyCode),
         style: TextStyle(color: context.textSecondary),
       ),
       trailing: selected

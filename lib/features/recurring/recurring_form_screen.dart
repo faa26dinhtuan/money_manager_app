@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
@@ -65,7 +67,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
   }
 
   Future<void> _pickStart() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _start,
       firstDate: DateTime(2000),
@@ -76,7 +78,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
 
   Future<void> _pickEnd() async {
     final initial = _end ?? _start.add(const Duration(days: 90));
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: initial.isBefore(_start) ? _start : initial,
       firstDate: _start,
@@ -116,6 +118,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
       endDate: end == null ? null : RecurringTransaction.dateOnly(end),
       note: _noteCtrl.text.trim(),
       active: existing?.active ?? true,
+      skippedDates: existing?.skippedDates ?? const [],
     );
     final messenger = ScaffoldMessenger.of(context);
     final created = _isEditing
@@ -129,9 +132,9 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
 
   Future<void> _confirmDelete() async {
     final l = context.l10n;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteRecurringTitle),
         content: Text(l.deleteRecurringConfirm),
         actions: [

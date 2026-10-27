@@ -19,12 +19,24 @@ class CategoryTransactionsScreen extends StatelessWidget {
     required this.type,
     required this.range,
     required this.rangeLabel,
+    this.guideMode = false,
+    this.guideCategoryName,
+    this.guideTransactionName,
+    this.guideIcon,
+    this.guideColor,
+    this.guideAmount,
   });
 
   final String categoryId;
   final TxType type;
   final DateRange range;
   final String rangeLabel;
+  final bool guideMode;
+  final String? guideCategoryName;
+  final String? guideTransactionName;
+  final AppIconData? guideIcon;
+  final Color? guideColor;
+  final double? guideAmount;
 
   @override
   Widget build(BuildContext context) {
@@ -38,21 +50,45 @@ class CategoryTransactionsScreen extends StatelessWidget {
             .query(type, range, walletId: store.selectedWalletId)
             .where((t) => t.categoryId == categoryId)
             .toList();
-        final total = items.fold<double>(0, (sum, t) => sum + t.amount);
+        final demoTransaction = guideMode
+            ? Transaction(
+                id: 'overview_guide_transaction',
+                type: type,
+                categoryId: categoryId,
+                walletId: '',
+                amount: guideAmount ?? 0,
+                date: DateTime.now(),
+                note: guideTransactionName ?? '',
+              )
+            : null;
+        final displayedItems = demoTransaction == null
+            ? items
+            : <Transaction>[demoTransaction];
+        final total = displayedItems.fold<double>(0, (sum, t) => sum + t.amount);
 
         final groups = <DateTime, List<Transaction>>{};
-        for (final t in items) {
+        for (final t in displayedItems) {
           final key = DateTime(t.date.year, t.date.month, t.date.day);
           groups.putIfAbsent(key, () => []).add(t);
         }
 
-        final categoryTitle = category?.localizedName(context) ?? l.other;
+        final categoryTitle = guideCategoryName ??
+            category?.localizedName(context) ??
+            l.other;
 
         return Scaffold(
           appBar: AppBar(title: Text(categoryTitle)),
           body: ListView(
             padding: const EdgeInsets.all(16),
+            physics: guideMode ? const NeverScrollableScrollPhysics() : null,
             children: [
+              if (guideMode) ...[
+                Text(
+                  l.overviewGuideTransactionsDescription,
+                  style: TextStyle(color: context.textSecondary),
+                ),
+                const SizedBox(height: 12),
+              ],
               Card(
                 color: context.surfaceColor,
                 elevation: 1.25,
@@ -64,8 +100,8 @@ class CategoryTransactionsScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       CategoryIcon(
-                        icon: category?.icon ?? AppIcons.help,
-                        color: category?.color ?? Colors.grey,
+                        icon: guideIcon ?? category?.icon ?? AppIcons.help,
+                        color: guideColor ?? category?.color ?? Colors.grey,
                         size: 48,
                       ),
                       const SizedBox(width: 14),
@@ -93,7 +129,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        l.transactionCount(items.length),
+                        l.transactionCount(displayedItems.length),
                         style: TextStyle(color: context.textTertiary),
                       ),
                     ],
@@ -137,7 +173,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
                         ),
                         for (final t in entry.value)
                           InkWell(
-                            onTap: () => Navigator.of(context).push(
+                            onTap: guideMode ? null : () => Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) =>
                                     AddTransactionScreen(transaction: t),

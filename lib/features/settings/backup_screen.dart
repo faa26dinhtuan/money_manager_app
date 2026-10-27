@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:flutter/services.dart';
@@ -30,9 +31,9 @@ class BackupScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showApp(l.restoreNotFound);
       return;
     }
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.restoreConfirmTitle),
         content: Text(
           '${backup.exportedAt == null ? '' : '${formatDate(backup.exportedAt!)}\n'}'

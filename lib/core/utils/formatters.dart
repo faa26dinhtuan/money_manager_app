@@ -1,4 +1,5 @@
 import 'package:money_manager_app/core/utils/currency.dart';
+import 'package:money_manager_app/data/services/app_store.dart';
 
 String groupDigits(String digits, [AppCurrency? currency]) {
   final sep = (currency ?? AppCurrency.current).thousandsSep;
@@ -43,9 +44,25 @@ String formatMoney(double value, [AppCurrency? currency]) {
 
 String _two(int n) => n.toString().padLeft(2, '0');
 
-String formatDate(DateTime d) => '${_two(d.day)}/${_two(d.month)}/${d.year}';
+String formatDate(DateTime d) {
+  final day = _two(d.day);
+  final month = _two(d.month);
+  return switch (AppStore.instance.dateFormat) {
+    'MM/dd/yyyy' => '$month/$day/${d.year}',
+    'yyyy-MM-dd' => '${d.year}-$month-$day',
+    _ => '$day/$month/${d.year}',
+  };
+}
 
-String formatDayMonth(DateTime d) => '${_two(d.day)}/${_two(d.month)}';
+String formatDayMonth(DateTime d) {
+  final day = _two(d.day);
+  final month = _two(d.month);
+  return AppStore.instance.dateFormat == 'MM/dd/yyyy'
+      ? '$month/$day'
+      : AppStore.instance.dateFormat == 'yyyy-MM-dd'
+      ? '$month-$day'
+      : '$day/$month';
+}
 
 bool isSameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;

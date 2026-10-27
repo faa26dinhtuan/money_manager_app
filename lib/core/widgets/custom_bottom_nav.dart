@@ -9,6 +9,7 @@ class CustomBottomNav extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.itemKeys,
   });
 
   static const double barHeight = 66;
@@ -17,6 +18,7 @@ class CustomBottomNav extends StatelessWidget {
 
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final List<GlobalKey>? itemKeys;
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +42,11 @@ class CustomBottomNav extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _item(context, 0, AppIcons.overview, context.l10n.overview),
-          _item(context, 1, AppIcons.transactions, context.l10n.transactions),
+          _item(context, 0, AppIcons.overview, context.l10n.overview, itemKeys?[0]),
+          _item(context, 1, AppIcons.transactions, context.l10n.transactions, itemKeys?[1]),
           const Expanded(child: SizedBox.shrink()),
-          _item(context, 2, AppIcons.calendar, context.l10n.calendar),
-          _item(context, 3, AppIcons.wallet, context.l10n.wallet),
+          _item(context, 2, AppIcons.calendar, context.l10n.calendar, itemKeys?[2]),
+          _item(context, 3, AppIcons.wallet, context.l10n.wallet, itemKeys?[3]),
         ],
       ),
     );
@@ -55,12 +57,14 @@ class CustomBottomNav extends StatelessWidget {
     int index,
     AppIconData icon,
     String label,
+    Key? key,
   ) {
     final selected = index == currentIndex;
     final selectedColor = context.isDark ? AppTheme.primaryLight : AppTheme.primary;
     final color = selected ? selectedColor : context.textSecondary;
     return Expanded(
       child: InkResponse(
+        key: key,
         radius: 34,
         onTap: () => onTap(index),
         child: Column(

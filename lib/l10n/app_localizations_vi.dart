@@ -10,7 +10,7 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appName => 'Money Manager';
+  String get appName => 'Pocketwise';
 
   @override
   String get overview => 'Tổng quan';
@@ -26,6 +26,55 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get nextMonth => 'Tháng sau';
+
+  @override
+  String get plannedEvent => 'Sự kiện dự kiến';
+
+  @override
+  String get plannedEvents => 'Sự kiện dự kiến';
+
+  @override
+  String get addPlannedEvent => 'Tạo sự kiện';
+
+  @override
+  String get editPlannedEvent => 'Sửa sự kiện';
+
+  @override
+  String get plannedEventName => 'Tên sự kiện';
+
+  @override
+  String get pleaseEnterEventName => 'Vui lòng nhập tên sự kiện';
+
+  @override
+  String get deletePlannedEventTitle => 'Xóa sự kiện dự kiến?';
+
+  @override
+  String get deletePlannedEventMessage => 'Sự kiện này sẽ bị xóa khỏi lịch.';
+
+  @override
+  String get repeatEvent => 'Lặp lại sự kiện';
+
+  @override
+  String get repeatFrequency => 'Tần suất lặp lại';
+
+  @override
+  String get deleteThisOccurrence => 'Chỉ xóa ngày này';
+
+  @override
+  String get deleteEventSeries => 'Xóa tất cả các lần lặp';
+
+  @override
+  String get deleteRecurringEventWarning => 'Chọn phạm vi sự kiện muốn xóa.';
+
+  @override
+  String get pleaseSelectWallet => 'Vui lòng chọn ví';
+
+  @override
+  String get stopRecurringEventTitle => 'Tắt lặp lại sự kiện?';
+
+  @override
+  String get stopRecurringEventMessage =>
+      'Giao dịch định kỳ liên kết sẽ bị xóa. Các giao dịch đã được tạo trước đó vẫn được giữ lại.';
 
   @override
   String get categories => 'Danh mục';
@@ -1314,4 +1363,276 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get seedDebtBorrowNote => 'Mượn mua xe đạp';
+
+  @override
+  String get dayEvents => 'Sự kiện trong ngày';
+
+  @override
+  String get noTransactionsOnDate => 'Chưa có giao dịch trong ngày này';
+
+  @override
+  String get noEventsOnDate => 'Không có sự kiện trong ngày này';
+
+  @override
+  String get pastEvent => 'Sự kiện đã qua';
+
+  @override
+  String get todayEvent => 'Sự kiện hôm nay';
+
+  @override
+  String get todayEvents => 'Sự kiện hôm nay';
+
+  @override
+  String get recordEventTransaction => 'Ghi giao dịch';
+
+  @override
+  String get confirmEventTransactionTitle => 'Xác nhận tạo giao dịch?';
+
+  @override
+  String get confirmEventTransactionMessage =>
+      'Khoản dự kiến dưới đây sẽ được ghi vào sổ và cập nhật số dư ví.';
+
+  @override
+  String get eventTransactionNeedsSetup =>
+      'Cần có danh mục phù hợp và ví cùng loại tiền tệ để ghi giao dịch.';
+
+  @override
+  String get eventTransactionAlreadyRecorded =>
+      'Sự kiện này đã có giao dịch trong sổ.';
+
+  @override
+  String get plannedExpense => 'Khoản chi dự kiến';
+
+  @override
+  String get plannedIncome => 'Khoản thu dự kiến';
+
+  @override
+  String get selectItemsToDelete => 'Chọn mục cần xóa';
+
+  @override
+  String get deleteEventTransactionsTitle => 'Xóa giao dịch liên quan?';
+
+  @override
+  String get deleteEventTransactionsMessage =>
+      'Bạn có muốn xóa các giao dịch đã ghi từ sự kiện này không?';
+
+  @override
+  String get keepEventTransactions => 'Giữ lại giao dịch';
+
+  @override
+  String get deleteEventTransactions => 'Xóa giao dịch';
+
+  @override
+  String get actualAmount => 'Số tiền thực tế';
+
+  @override
+  String get linkEventToRecurring => 'Liên kết với giao dịch định kỳ';
+
+  @override
+  String get autoRecordLinkedRecurring => 'Tự động ghi giao dịch khi đến hạn';
+
+  @override
+  String get eventAmountOptional => 'Không bắt buộc';
+
+  @override
+  String get eventReminderToggle => 'Nhắc tôi';
+
+  @override
+  String get reminderTime => 'Giờ nhắc';
+
+  @override
+  String get eventReminderPermissionDenied =>
+      'Chưa có quyền gửi thông báo. Hãy bật quyền trong cài đặt thiết bị.';
+
+  @override
+  String get eventReminderNotificationTitle => 'Nhắc nhở sự kiện';
+
+  @override
+  String get eventReminderChannel => 'Nhắc nhở sự kiện';
+
+  @override
+  String get eventReminderChannelDescription =>
+      'Thông báo về các sự kiện đã lên lịch';
+
+  @override
+  String get negativeWalletBalanceTitle => 'Ví không đủ tiền';
+
+  @override
+  String get negativeWalletBalanceMessage =>
+      'Số dư ví không đủ cho khoản chi này. Nếu tiếp tục, số dư ví sẽ thành số âm.';
+
+  @override
+  String get recordAnyway => 'Vẫn ghi giao dịch';
+
+  @override
+  String get hideBalanceByDefault => 'Ẩn số dư mặc định';
+
+  @override
+  String get hideBalanceDescription => 'Chạm vào số dư để hiện tạm thời.';
+
+  @override
+  String get showBalance => 'Hiện số dư';
+
+  @override
+  String get hideBalance => 'Ẩn số dư';
+
+  @override
+  String get dateFormat => 'Định dạng ngày';
+
+  @override
+  String get dateFormatDayMonthYear => 'Ngày / tháng / năm';
+
+  @override
+  String get dateFormatMonthDayYear => 'Tháng / ngày / năm';
+
+  @override
+  String get dateFormatYearMonthDay => 'Năm - tháng - ngày';
+
+  @override
+  String get showWalletBalances => 'Hiện số dư các ví';
+
+  @override
+  String get hideWalletBalances => 'Ẩn số dư các ví';
+
+  @override
+  String get undoLastWalletConversion => 'Hoàn tác lần quy đổi ví gần nhất';
+
+  @override
+  String get walletConversionUndone => 'Đã hoàn tác quy đổi ví';
+
+  @override
+  String get skipWalletSetup => 'Bỏ qua, tạo ví sau';
+
+  @override
+  String get skipGuide => 'Bỏ qua hướng dẫn';
+
+  @override
+  String get showMeGuide => 'Cho tôi xem hướng dẫn';
+
+  @override
+  String get maybeLater => 'Để sau';
+
+  @override
+  String get overviewGuideTitle => 'Làm quen với Tổng quan';
+
+  @override
+  String get overviewGuideIntro =>
+      'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.';
+
+  @override
+  String get overviewGuideDemoInstruction =>
+      'Ví và giao dịch mẫu trong phần làm quen chỉ để minh họa, không làm thay đổi dữ liệu thật.';
+
+  @override
+  String get overviewGuideSampleWallet => 'Ví mẫu';
+
+  @override
+  String get overviewGuideSampleExpenseCategory => 'Ăn uống';
+
+  @override
+  String get overviewGuideSampleIncomeCategory => 'Lương';
+
+  @override
+  String get overviewGuideSampleExpenseTransaction => 'Bữa trưa';
+
+  @override
+  String get overviewGuideSampleIncomeTransaction => 'Lương tháng';
+
+  @override
+  String get overviewGuideWalletTitle => 'Chọn ví cần xem';
+
+  @override
+  String get overviewGuideWalletDescription =>
+      'Chạm vào bộ chọn ví để xem tổng quan của tất cả ví hoặc một ví riêng.';
+
+  @override
+  String get overviewGuideBalanceTitle => 'Xem số dư';
+
+  @override
+  String get overviewGuideBalanceDescription =>
+      'Chạm vào số dư để hiện hoặc ẩn tạm thời theo cài đặt bảo mật.';
+
+  @override
+  String get overviewGuideTypeTitle => 'Chuyển giữa thu và chi';
+
+  @override
+  String get overviewGuideTypeDescription =>
+      'Chọn tab thu hoặc chi để xem biểu đồ và danh mục tương ứng.';
+
+  @override
+  String get overviewGuidePeriodTitle => 'Chọn khoảng thời gian';
+
+  @override
+  String get overviewGuidePeriodDescription =>
+      'Đổi ngày, tuần, tháng, năm hoặc kỳ tùy chỉnh để xem dữ liệu trong khoảng đó.';
+
+  @override
+  String get overviewGuideChartTitle => 'Xem biểu đồ và danh mục';
+
+  @override
+  String get overviewGuideChartDescription =>
+      'Chạm vào một phần biểu đồ để làm nổi bật mục tương ứng.';
+
+  @override
+  String get overviewGuideTransactionsTitle => 'Xem danh sách theo danh mục';
+
+  @override
+  String get overviewGuideTransactionsDescription =>
+      'Chạm vào một danh mục để xem tổng tiền và các giao dịch thuộc danh mục đó.';
+
+  @override
+  String get overviewGuideNavigationTitle => 'Chuyển đến các mục khác';
+
+  @override
+  String get overviewGuideNavigationDescription =>
+      'Thanh điều hướng gồm Tổng quan, Giao dịch, Lịch và Ví để chuyển nhanh giữa các mục. Nút + ở giữa dùng để thêm giao dịch.';
+
+  @override
+  String get overviewGuideSettingsTitle => 'Mở cài đặt';
+
+  @override
+  String get overviewGuideSettingsDescription =>
+      'Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.';
+
+  @override
+  String get overviewGuideAddTitle => 'Thêm giao dịch';
+
+  @override
+  String get overviewGuideAddDescription =>
+      'Nhấn dấu + để mở biểu mẫu thêm khoản thu hoặc chi.';
+
+  @override
+  String get overviewGuideAddScreenDescription =>
+      'Nhập số tiền, chọn ví và danh mục, thêm ngày cùng ghi chú rồi lưu khoản thu hoặc chi.';
+
+  @override
+  String get overviewGuideTransactionsScreenDescription =>
+      'Chạm vào Sổ giao dịch để xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.';
+
+  @override
+  String get overviewGuideCalendarScreenDescription =>
+      'Chạm vào Lịch để theo dõi thu chi theo ngày và xem các sự kiện đã lên lịch.';
+
+  @override
+  String get overviewGuideWalletScreenDescription =>
+      'Ví giúp theo dõi số dư và mở các phần quản lý ví, ngân sách, mục tiêu, sổ nợ và giao dịch định kỳ.';
+
+  @override
+  String get overviewGuideWalletNavigationDescription =>
+      'Chạm vào Ví tiền để xem số dư và quản lý các ví của bạn.';
+
+  @override
+  String get overviewGuideClosing =>
+      'Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.';
+
+  @override
+  String get overviewGuideFinish => 'Bắt đầu sử dụng';
+
+  @override
+  String get overviewGuideTransactionsPageDescription =>
+      'Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.';
+
+  @override
+  String get overviewGuideCalendarPageDescription =>
+      'Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.';
 }

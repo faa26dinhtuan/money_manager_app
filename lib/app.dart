@@ -7,10 +7,12 @@ import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/constants.dart';
 import 'package:money_manager_app/core/widgets/custom_bottom_nav.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
+import 'package:money_manager_app/data/services/event_reminder_service.dart';
 import 'package:money_manager_app/features/intro/intro_screen.dart';
 import 'package:money_manager_app/features/calendar/calendar_screen.dart';
 import 'package:money_manager_app/features/onboarding/onboarding_screen.dart';
 import 'package:money_manager_app/features/overview/overview_screen.dart';
+import 'package:money_manager_app/features/overview/overview_guide_dialog.dart';
 import 'package:money_manager_app/features/splash/splash_screen.dart';
 import 'package:money_manager_app/features/transactions/add_transaction_screen.dart';
 import 'package:money_manager_app/features/transactions/transactions_screen.dart';
@@ -54,18 +56,43 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+  late final _overviewGuideController = OverviewGuideController();
+  late final List<Widget> _screens = [
+    OverviewScreen(guideController: _overviewGuideController),
+    const TransactionsScreen(),
+    const CalendarScreen(),
+    const WalletScreen(),
+  ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _overviewGuideController.addListener(_onOverviewGuideChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) => _runRecurring());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _overviewGuideController
+      ..removeListener(_onOverviewGuideChanged)
+      ..dispose();
     super.dispose();
+  }
+
+  void _onOverviewGuideChanged() {
+    if (!mounted) return;
+    setState(() {
+      if (!_overviewGuideController.active) {
+        _currentIndex = _overviewGuideController.step == 8 ? 3 : 0;
+      } else if (_overviewGuideController.previewing &&
+          _overviewGuideController.step >= 6) {
+        _currentIndex = _overviewGuideController.step - 5;
+      } else if (_overviewGuideController.step == 6) {
+        _currentIndex = 0;
+      }
+    });
   }
 
   @override
@@ -75,27 +102,59 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   void _runRecurring() {
     final count = AppStore.instance.processRecurring();
+    EventReminderService.instance.sync(
+      AppStore.instance.allPlannedEvents,
+      localization: context.l10n,
+    );
     if (count > 0 && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showApp(context.l10n.autoAddedRecurring(count));
+      ScaffoldMessenger.of(context)
+          .showApp(context.l10n.autoAddedRecurring(count));
     }
   }
 
-  static const List<Widget> _screens = [
-    OverviewScreen(),
-    TransactionsScreen(),
-    CalendarScreen(),
-    WalletScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+    return Stack(
+      children: [
+        Scaffold(
+      body: Padding(
+        padding: EdgeInsets.only(
+          bottom: _overviewGuideController.previewing &&
+                  _overviewGuideController.step >= 6
+              ? 60
+              : 0,
+        ),
+        child: AbsorbPointer(
+          absorbing: _overviewGuideController.previewing,
+          child: IndexedStack(index: _currentIndex, children: _screens),
+        ),
+      ),
       floatingActionButtonLocation: const AddNavButtonLocation(),
       floatingActionButton: AddNavButton(
+        key: OverviewGuideTargets.addTransaction,
         onPressed: () {
+          if (_overviewGuideController.active) {
+            if (_overviewGuideController.step == 5 &&
+                !_overviewGuideController.previewing) {
+              _overviewGuideController.enterPreview();
+              Navigator.of(context)
+                  .push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          const AddTransactionScreen(previewOnly: true),
+                    ),
+                  )
+                  .then((_) {
+                    if (mounted &&
+                        _overviewGuideController.active &&
+                        _overviewGuideController.step == 5 &&
+                        _overviewGuideController.previewing) {
+                      _overviewGuideController.next();
+                    }
+                  });
+            }
+            return;
+          }
           HapticFeedback.lightImpact();
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
@@ -103,12 +162,40 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         },
       ),
       bottomNavigationBar: CustomBottomNav(
+        key: OverviewGuideTargets.navigation,
         currentIndex: _currentIndex,
+        itemKeys: [
+          OverviewGuideTargets.navigationOverview,
+          OverviewGuideTargets.navigationTransactions,
+          OverviewGuideTargets.navigationCalendar,
+          OverviewGuideTargets.navigationWallet,
+        ],
         onTap: (index) {
+          if (_overviewGuideController.active) {
+            if (!_overviewGuideController.previewing) {
+              final expectedIndex = switch (_overviewGuideController.step) {
+                6 => 1,
+                7 => 2,
+                8 => 3,
+                _ => -1,
+              };
+              if (index == expectedIndex) {
+                setState(() => _currentIndex = index);
+                _overviewGuideController.enterPreview();
+              }
+            }
+            return;
+          }
           if (index != _currentIndex) HapticFeedback.selectionClick();
           setState(() => _currentIndex = index);
         },
       ),
+        ),
+        if (_overviewGuideController.active)
+          Positioned.fill(
+            child: OverviewGuideOverlay(controller: _overviewGuideController),
+          ),
+      ],
     );
   }
 }

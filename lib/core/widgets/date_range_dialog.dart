@@ -10,7 +10,7 @@ Future<DateTimeRange?> showAppDateRangePicker(
   BuildContext context, {
   DateTimeRange? initial,
 }) {
-  return showDialog<DateTimeRange>(
+  return showAdaptiveDialog<DateTimeRange>(
     context: context,
     builder: (_) => _DateRangeDialog(initial: initial),
   );

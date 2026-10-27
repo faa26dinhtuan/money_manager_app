@@ -1,0 +1,102 @@
+import 'package:money_manager_app/data/models/category.dart';
+import 'package:money_manager_app/data/models/recurring_transaction.dart';
+
+class PlannedEvent {
+  const PlannedEvent({
+    required this.id,
+    required this.title,
+    required this.type,
+    required this.amount,
+    required this.date,
+    required this.currencyCode,
+    this.note = '',
+    this.walletId,
+    this.recurringId,
+    this.frequency,
+    this.reminderMinutes,
+    this.seriesStartDate,
+    this.skippedDates = const [],
+  });
+
+  final String id;
+  final String title;
+  final TxType type;
+  final double amount;
+  final DateTime date;
+  final String currencyCode;
+  final String note;
+  final String? walletId;
+  final String? recurringId;
+  final Frequency? frequency;
+  final int? reminderMinutes;
+  final DateTime? seriesStartDate;
+  final List<DateTime> skippedDates;
+
+  PlannedEvent copyWith({
+    String? title,
+    TxType? type,
+    double? amount,
+    DateTime? date,
+    String? currencyCode,
+    String? note,
+    String? recurringId,
+    Frequency? frequency,
+    int? reminderMinutes,
+    DateTime? seriesStartDate,
+    List<DateTime>? skippedDates,
+    bool clearRecurringId = false,
+    bool clearReminder = false,
+  }) => PlannedEvent(
+    id: id,
+    title: title ?? this.title,
+    type: type ?? this.type,
+    amount: amount ?? this.amount,
+    date: date ?? this.date,
+    currencyCode: currencyCode ?? this.currencyCode,
+    note: note ?? this.note,
+    walletId: walletId,
+    recurringId: clearRecurringId ? null : recurringId ?? this.recurringId,
+    frequency: frequency ?? this.frequency,
+    reminderMinutes: clearReminder ? null : reminderMinutes ?? this.reminderMinutes,
+    seriesStartDate: seriesStartDate ?? this.seriesStartDate,
+    skippedDates: skippedDates ?? this.skippedDates,
+  );
+
+  factory PlannedEvent.fromJson(Map<String, dynamic> json) => PlannedEvent(
+    id: json['id'] as String,
+    title: json['title'] as String,
+    type: TxType.values.byName(json['type'] as String),
+    amount: (json['amount'] as num).toDouble(),
+    date: DateTime.parse(json['date'] as String),
+    currencyCode: json['currencyCode'] as String? ?? 'VND',
+    note: json['note'] as String? ?? '',
+    walletId: json['walletId'] as String?,
+    recurringId: json['recurringId'] as String?,
+    frequency: json['frequency'] == null
+        ? null
+        : Frequency.values.byName(json['frequency'] as String),
+    reminderMinutes: (json['reminderMinutes'] as num?)?.toInt(),
+    seriesStartDate: json['seriesStartDate'] == null
+        ? null
+        : DateTime.parse(json['seriesStartDate'] as String),
+    skippedDates: (json['skippedDates'] as List? ?? const [])
+        .map((value) => DateTime.parse(value as String))
+        .toList(),
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'type': type.name,
+    'amount': amount,
+    'date': date.toIso8601String(),
+    'currencyCode': currencyCode,
+    'note': note,
+    'walletId': walletId,
+    'recurringId': recurringId,
+    'frequency': frequency?.name,
+    'reminderMinutes': reminderMinutes,
+    'seriesStartDate': seriesStartDate?.toIso8601String(),
+    'skippedDates': skippedDates.map((date) => date.toIso8601String()).toList(),
+  };
+}

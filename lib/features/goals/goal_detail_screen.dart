@@ -28,7 +28,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
   Goal? _last;
 
   Future<void> _openEntry(Goal goal, bool deposit) async {
-    final entry = await showDialog<GoalEntry>(
+    final entry = await showAdaptiveDialog<GoalEntry>(
       context: context,
       builder: (_) => GoalEntryDialog(goal: goal, deposit: deposit),
     );

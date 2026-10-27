@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
@@ -60,7 +62,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
@@ -71,7 +73,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
 
   Future<void> _pickDueDate() async {
     final initial = _dueDate ?? _date.add(const Duration(days: 30));
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -138,9 +140,9 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
   Future<void> _confirmDelete() async {
     final l = context.l10n;
     final debt = _store.debtById(widget.debt!.id) ?? widget.debt!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteDebtTitle),
         content: Text(l.deleteDebtMessage),
         actions: [

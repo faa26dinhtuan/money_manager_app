@@ -1,11 +1,27 @@
 {
   "@@locale": "en",
-  "appName": "Money Manager",
+  "appName": "Pocketwise",
   "overview": "Overview",
   "transactions": "Transactions",
   "calendar": "Calendar",
   "previousMonth": "Previous month",
   "nextMonth": "Next month",
+  "plannedEvent": "Planned event",
+  "plannedEvents": "Planned events",
+  "addPlannedEvent": "Add event",
+  "editPlannedEvent": "Edit event",
+  "plannedEventName": "Event name",
+  "pleaseEnterEventName": "Enter an event name",
+  "deletePlannedEventTitle": "Delete planned event?",
+  "deletePlannedEventMessage": "This event will be removed from the calendar.",
+  "repeatEvent": "Repeat event",
+  "repeatFrequency": "Repeat frequency",
+  "deleteThisOccurrence": "Delete this day only",
+  "deleteEventSeries": "Delete all repetitions",
+  "deleteRecurringEventWarning": "Choose which event occurrences to delete.",
+  "pleaseSelectWallet": "Select a wallet",
+  "stopRecurringEventTitle": "Stop repeating this event?",
+  "stopRecurringEventMessage": "The linked recurring transaction will be deleted. Transactions already created will be kept.",
   "categories": "Categories",
   "manageCategories": "Manage categories",
   "wallet": "Wallet",
@@ -255,7 +271,13 @@
   "restoreSuccess": "Data restored successfully",
   "convertCurrencyTitle": "Switch to {code}",
   "convertCurrencyPrompt": "Use or create wallets in {currency} without conversion, or convert the current data?",
-  "@convertCurrencyPrompt": {"placeholders": {"currency": {"type": "String"}}},
+  "@convertCurrencyPrompt": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
   "displayOnly": "Display only",
   "convertAll": "Convert all",
   "selectWalletsToConvert": "Select wallets to convert to the new currency",
@@ -268,7 +290,13 @@
   "selectTargetCurrency": "Choose the currency to convert to",
   "changeDefaultCurrency": "Use this currency",
   "askAddWalletForCurrency": "Do you want to add a new wallet for {currency}?",
-  "@askAddWalletForCurrency": {"placeholders": {"currency": {"type": "String"}}},
+  "@askAddWalletForCurrency": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
   "currencyConvertLinkedNotice": "If a goal or debt is linked to multiple wallets, those wallets will be converted together to keep the data consistent.",
   "backupSavedConfirmation": "I saved the backup somewhere safe",
   "ratesUpdated": "Exchange rates updated",
@@ -299,7 +327,13 @@
   "selectAll": "Select all",
   "deleteSelectedTitle": "Delete selected items?",
   "deleteSelectedMessage": "Delete {count} selected items? This action cannot be undone.",
-  "@deleteSelectedMessage": {"placeholders": {"count": {"type": "int"}}},
+  "@deleteSelectedMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exportCsvTitle": "Export to CSV file",
   "splashTagline": "Personal expense manager",
   "amountCannotBeLessThanPaid": "Amount cannot be less than paid amount",
@@ -378,8 +412,12 @@
   "csvBudgetTitle": "BUDGET FOR {month}/{year}",
   "@csvBudgetTitle": {
     "placeholders": {
-      "month": {"type": "int"},
-      "year": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
     }
   },
   "csvGoalHistory": "Goal history",
@@ -403,5 +441,87 @@
   "seedDebtLendNote": "Lent for rent",
   "seedDebtPayment": "First installment",
   "seedPersonLan": "Lan (older sister)",
-  "seedDebtBorrowNote": "Borrowed to buy a bicycle"
+  "seedDebtBorrowNote": "Borrowed to buy a bicycle",
+  "dayEvents": "Events for this day",
+  "noTransactionsOnDate": "No transactions on this day",
+  "noEventsOnDate": "No events on this day",
+  "pastEvent": "Past event",
+  "todayEvent": "Event today",
+  "todayEvents": "Today's events",
+  "recordEventTransaction": "Record transaction",
+  "confirmEventTransactionTitle": "Record this transaction?",
+  "confirmEventTransactionMessage": "This planned amount will be added to your ledger and wallet balance.",
+  "eventTransactionNeedsSetup": "Set up a matching category and a wallet in this currency before recording.",
+  "eventTransactionAlreadyRecorded": "A transaction for this event is already in your ledger.",
+  "plannedExpense": "Planned expense",
+  "plannedIncome": "Planned income",
+  "selectItemsToDelete": "Select items to delete",
+  "deleteEventTransactionsTitle": "Delete related transactions?",
+  "deleteEventTransactionsMessage": "Do you want to delete transactions recorded from this event?",
+  "keepEventTransactions": "Keep transactions",
+  "deleteEventTransactions": "Delete transactions",
+  "actualAmount": "Actual amount",
+  "linkEventToRecurring": "Link to a recurring transaction",
+  "autoRecordLinkedRecurring": "Automatically record when due",
+  "eventAmountOptional": "Optional",
+  "eventReminderToggle": "Remind me",
+  "reminderTime": "Reminder time",
+  "eventReminderPermissionDenied": "Notification permission is off. Enable it in your device settings.",
+  "eventReminderNotificationTitle": "Event reminder",
+  "eventReminderChannel": "Event reminders",
+  "eventReminderChannelDescription": "Notifications for scheduled events",
+  "negativeWalletBalanceTitle": "Insufficient wallet balance",
+  "negativeWalletBalanceMessage": "This wallet does not have enough money for this expense. Continuing will make its balance negative.",
+  "recordAnyway": "Record anyway",
+  "hideBalanceByDefault": "Hide balances by default",
+  "hideBalanceDescription": "Tap a balance to reveal it temporarily.",
+  "showBalance": "Show balance",
+  "hideBalance": "Hide balance",
+  "dateFormat": "Date format",
+  "dateFormatDayMonthYear": "Day / month / year",
+  "dateFormatMonthDayYear": "Month / day / year",
+  "dateFormatYearMonthDay": "Year - month - day",
+  "showWalletBalances": "Show wallet balances",
+  "hideWalletBalances": "Hide wallet balances",
+  "undoLastWalletConversion": "Undo last wallet conversion",
+  "walletConversionUndone": "Wallet conversion undone",
+  "skipWalletSetup": "Skip for now",
+  "skipGuide": "Skip guide",
+  "showMeGuide": "Show me the guide",
+  "maybeLater": "Maybe later",
+  "overviewGuideTitle": "Getting to know Overview",
+  "overviewGuideIntro": "See your balance, income, expenses, and category breakdown at a glance.",
+  "overviewGuideDemoInstruction": "The sample wallet and transactions in this walkthrough are illustrative and won't change your real data.",
+  "overviewGuideSampleWallet": "Sample wallet",
+  "overviewGuideSampleExpenseCategory": "Food & dining",
+  "overviewGuideSampleIncomeCategory": "Salary",
+  "overviewGuideSampleExpenseTransaction": "Lunch",
+  "overviewGuideSampleIncomeTransaction": "Monthly salary",
+  "overviewGuideWalletTitle": "Choose a wallet",
+  "overviewGuideWalletDescription": "Tap the wallet selector to view all wallets or focus on one wallet.",
+  "overviewGuideBalanceTitle": "View your balance",
+  "overviewGuideBalanceDescription": "Tap the balance to reveal or hide it temporarily, based on your privacy setting.",
+  "overviewGuideTypeTitle": "Switch between income and expenses",
+  "overviewGuideTypeDescription": "Choose the income or expense tab to see its matching chart and categories.",
+  "overviewGuidePeriodTitle": "Choose a time period",
+  "overviewGuidePeriodDescription": "Switch between day, week, month, year, or a custom period to review that range.",
+  "overviewGuideChartTitle": "Explore the chart and categories",
+  "overviewGuideChartDescription": "Tap a chart section to highlight the corresponding category.",
+  "overviewGuideTransactionsTitle": "Review categories",
+  "overviewGuideTransactionsDescription": "Tap a category to view its total and the transactions in that category.",
+  "overviewGuideNavigationTitle": "Move between sections",
+  "overviewGuideNavigationDescription": "The navigation bar has Overview, Transactions, Calendar, and Wallet for switching sections. The plus button adds a transaction.",
+  "overviewGuideSettingsTitle": "Open Settings",
+  "overviewGuideSettingsDescription": "Manage currency, date format, appearance, language, and backups.",
+  "overviewGuideAddTitle": "Add a transaction",
+  "overviewGuideAddDescription": "Tap the plus button to open the form for adding income or an expense.",
+  "overviewGuideAddScreenDescription": "Enter an amount, choose a wallet and category, add a date and note, then save the transaction.",
+  "overviewGuideTransactionsScreenDescription": "Tap Transactions to review, search, and filter income and expenses by date.",
+  "overviewGuideCalendarScreenDescription": "Tap Calendar to review daily income and expenses and see planned events.",
+  "overviewGuideWalletScreenDescription": "Wallet tracks balances and opens wallet, budget, goal, debt, and recurring transaction management.",
+  "overviewGuideWalletNavigationDescription": "Open Wallet to review balances and manage your wallets.",
+  "overviewGuideClosing": "You’ve seen the main sections. Start tracking your income, expenses, and financial goals whenever you’re ready.",
+  "overviewGuideFinish": "Start using the app",
+  "overviewGuideTransactionsPageDescription": "Tap a transaction to view its details, edit it, or delete it when needed.",
+  "overviewGuideCalendarPageDescription": "Add an event for an upcoming day to remember an expected income or expense and find it on the calendar."
 }

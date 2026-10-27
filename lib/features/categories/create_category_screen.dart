@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
@@ -55,9 +56,9 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
     final l = context.l10n;
     final category = widget.category!;
     final count = _store.transactionCountOf(category.id);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteCategoryTitle),
         content: Text(
           count == 0

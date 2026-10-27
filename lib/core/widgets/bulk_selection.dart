@@ -1,11 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 
 Future<bool> confirmBulkDelete(BuildContext context, int count) async {
   final l = context.l10n;
-  return await showDialog<bool>(
+  return await showAdaptiveDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => CupertinoAlertDialog(
           title: Text(l.deleteSelectedTitle),
           content: Text(l.deleteSelectedMessage(count)),
           actions: [
@@ -24,12 +25,14 @@ class BulkSelectionControls extends StatelessWidget {
     required this.selectedCount,
     required this.onSelectAll,
     required this.onDelete,
+    this.trailingAction,
   });
 
   final int count;
   final int selectedCount;
   final VoidCallback onSelectAll;
   final VoidCallback onDelete;
+  final Widget? trailingAction;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +45,7 @@ class BulkSelectionControls extends StatelessWidget {
             child: Text(selectedCount == count ? l.clearAll : l.selectAll),
           ),
         ),
+        if (trailingAction != null) trailingAction!,
         IconButton(
           tooltip: l.delete,
           onPressed: selectedCount == 0 ? null : onDelete,
@@ -59,12 +63,14 @@ class BulkSelectableItem extends StatelessWidget {
     required this.selected,
     required this.onChanged,
     required this.child,
+    this.allowChildInteraction = false,
   });
 
   final bool selecting;
   final bool selected;
   final ValueChanged<bool?> onChanged;
   final Widget child;
+  final bool allowChildInteraction;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +78,9 @@ class BulkSelectableItem extends StatelessWidget {
     return Row(
       children: [
         Checkbox(value: selected, onChanged: onChanged),
-        Expanded(child: IgnorePointer(child: child)),
+        Expanded(
+          child: allowChildInteraction ? child : IgnorePointer(child: child),
+        ),
       ],
     );
   }
