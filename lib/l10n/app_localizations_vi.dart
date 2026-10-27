@@ -1507,6 +1507,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get skipGuide => 'Bỏ qua hướng dẫn';
 
   @override
+  String get showMeGuide => 'Cho tôi xem hướng dẫn';
+
+  @override
+  String get maybeLater => 'Để sau';
+
+  @override
   String get overviewGuideTitle => 'Làm quen với Tổng quan';
 
   @override

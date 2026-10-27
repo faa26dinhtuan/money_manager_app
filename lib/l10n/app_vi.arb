@@ -812,6 +812,8 @@
   "walletConversionUndone": "Đã hoàn tác quy đổi ví",
   "skipWalletSetup": "Bỏ qua, tạo ví sau",
   "skipGuide": "Bỏ qua hướng dẫn",
+  "showMeGuide": "Cho tôi xem hướng dẫn",
+  "maybeLater": "Để sau",
   "overviewGuideTitle": "Làm quen với Tổng quan",
   "overviewGuideIntro": "Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.",
   "overviewGuideDemoInstruction": "Ví và giao dịch mẫu trong phần làm quen chỉ để minh họa, không làm thay đổi dữ liệu thật.",
@@ -839,4 +841,5 @@
   "overviewGuideAddTitle": "Thêm giao dịch",
   "overviewGuideAddDescription": "Nút dấu cộng mở phần ghi khoản thu hoặc chi. Trong hướng dẫn, chạm vào nút chỉ bật Tiếp tục."
 }
+
 

@@ -1509,6 +1509,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipGuide => 'Skip guide';
 
   @override
+  String get showMeGuide => 'Show me the guide';
+
+  @override
+  String get maybeLater => 'Maybe later';
+
+  @override
   String get overviewGuideTitle => 'Getting to know Overview';
 
   @override

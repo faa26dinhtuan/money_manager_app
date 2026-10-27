@@ -277,16 +277,15 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                   ),
                 ),
                 if (!widget.controller.started)
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: media.padding.bottom +
-                        CustomBottomNav.barHeight +
-                        CustomBottomNav.protrusion +
-                        12,
-                    child: _OverviewGuideIntro(
-                      onStart: widget.controller.start,
-                      onSkip: widget.controller.skip,
+                  Positioned.fill(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: _OverviewGuideIntro(
+                          onStart: widget.controller.start,
+                          onSkip: widget.controller.skip,
+                        ),
+                      ),
                     ),
                   )
                 else
@@ -355,9 +354,9 @@ class _OverviewGuideIntro extends StatelessWidget {
           Row(
             children: [
               const Spacer(),
-              TextButton(onPressed: onSkip, child: Text(l.skipGuide)),
+              TextButton(onPressed: onSkip, child: Text(l.maybeLater)),
               const SizedBox(width: 4),
-              FilledButton(onPressed: onStart, child: Text(l.continueText)),
+              FilledButton(onPressed: onStart, child: Text(l.showMeGuide)),
             ],
           ),
         ],
@@ -522,5 +521,7 @@ class _OverviewSpotlightPainter extends CustomPainter {
   bool shouldRepaint(_OverviewSpotlightPainter oldDelegate) =>
       oldDelegate.targets != targets || oldDelegate.step != step;
 }
+
+
 
 

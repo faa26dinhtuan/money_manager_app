@@ -487,6 +487,8 @@
   "walletConversionUndone": "Wallet conversion undone",
   "skipWalletSetup": "Skip for now",
   "skipGuide": "Skip guide",
+  "showMeGuide": "Show me the guide",
+  "maybeLater": "Maybe later",
   "overviewGuideTitle": "Getting to know Overview",
   "overviewGuideIntro": "See your balance, income, expenses, and category breakdown at a glance.",
   "overviewGuideDemoInstruction": "The sample wallet and transactions in this walkthrough are illustrative and won't change your real data.",
@@ -514,4 +516,5 @@
   "overviewGuideAddTitle": "Add a transaction",
   "overviewGuideAddDescription": "The plus button opens the income or expense form. In the guide, tapping it only enables Continue."
 }
+
 

@@ -2834,6 +2834,18 @@ abstract class AppLocalizations {
   /// **'Bỏ qua hướng dẫn'**
   String get skipGuide;
 
+  /// No description provided for @showMeGuide.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cho tôi xem hướng dẫn'**
+  String get showMeGuide;
+
+  /// No description provided for @maybeLater.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để sau'**
+  String get maybeLater;
+
   /// No description provided for @overviewGuideTitle.
   ///
   /// In vi, this message translates to:
