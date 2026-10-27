@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
@@ -43,7 +44,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),

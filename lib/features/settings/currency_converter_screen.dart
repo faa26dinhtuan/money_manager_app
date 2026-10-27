@@ -45,7 +45,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   Future<AppCurrency?> _pick(AppCurrency selected) {
     final l = context.l10n;
-    return showDialog<AppCurrency>(
+    return showAdaptiveDialog<AppCurrency>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: Text(l.selectCurrency),
@@ -82,7 +82,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
       orElse: () => options.first,
     );
     final l = context.l10n;
-    return showDialog<AppCurrency>(
+    return showAdaptiveDialog<AppCurrency>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(

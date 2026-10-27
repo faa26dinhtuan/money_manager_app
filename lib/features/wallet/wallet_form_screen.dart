@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
@@ -124,9 +125,9 @@ class _WalletFormScreenState extends State<WalletFormScreen> {
     if (linkedCount > 0) {
       message.write(l.deleteWalletLinkedNotice(linkedCount));
     }
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteWalletTitle),
         content: Text(message.toString()),
         actions: [

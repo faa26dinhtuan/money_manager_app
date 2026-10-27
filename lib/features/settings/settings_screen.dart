@@ -28,7 +28,7 @@ class SettingsScreen extends StatelessWidget {
   Future<void> _pickTheme(BuildContext context) {
     final store = AppStore.instance;
     final labels = _modeLabels(context);
-    return showDialog<void>(
+    return showAdaptiveDialog<void>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: Text(context.l10n.theme),
@@ -68,7 +68,7 @@ class SettingsScreen extends StatelessWidget {
       (l.langEn, const Locale('en')),
     ];
 
-    return showDialog<void>(
+    return showAdaptiveDialog<void>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: Text(l.language),
@@ -99,7 +99,7 @@ class SettingsScreen extends StatelessWidget {
       ('yyyy-MM-dd', l.dateFormatYearMonthDay),
     ];
 
-    return showDialog<void>(
+    return showAdaptiveDialog<void>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: Text(l.dateFormat),
@@ -123,7 +123,7 @@ class SettingsScreen extends StatelessWidget {
 
   Future<void> _pickCurrency(BuildContext context) async {
     final store = AppStore.instance;
-    final action = await showDialog<_DefaultCurrencyAction>(
+    final action = await showAdaptiveDialog<_DefaultCurrencyAction>(
       context: context,
       builder: (_) => _DefaultCurrencyDialog(initialCurrency: store.currency),
     );
@@ -131,7 +131,7 @@ class SettingsScreen extends StatelessWidget {
     store.setCurrency(action.currency);
     store.selectWallet(null);
     final l = context.l10n;
-    final addWallet = await showDialog<bool>(
+    final addWallet = await showAdaptiveDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l.addWallet),

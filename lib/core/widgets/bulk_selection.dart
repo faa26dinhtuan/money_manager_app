@@ -1,11 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 
 Future<bool> confirmBulkDelete(BuildContext context, int count) async {
   final l = context.l10n;
-  return await showDialog<bool>(
+  return await showAdaptiveDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => CupertinoAlertDialog(
           title: Text(l.deleteSelectedTitle),
           content: Text(l.deleteSelectedMessage(count)),
           actions: [

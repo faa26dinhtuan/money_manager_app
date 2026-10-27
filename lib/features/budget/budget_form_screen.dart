@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
@@ -87,9 +88,9 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
   Future<void> _confirmDelete() async {
     final l = context.l10n;
     final name = _store.categoryById(widget.budget!.categoryId)?.localizedName(context) ?? l.other;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteBudgetTitle),
         content: Text(l.deleteBudgetMessage(name)),
         actions: [

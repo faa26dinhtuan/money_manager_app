@@ -107,7 +107,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         wallets.any((wallet) => wallet.id == preferredWalletId)
         ? preferredWalletId!
         : wallets.first.id;
-    final input = await showDialog<_EventTransactionInput>(
+    final input = await showAdaptiveDialog<_EventTransactionInput>(
       context: context,
       builder: (_) => _RecordEventTransactionDialog(
         event: event,
@@ -120,7 +120,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         _store.walletBalance(input.walletId) -
         (event.type == TxType.expense ? input.amount : -input.amount);
     if (projectedBalance < 0) {
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showAdaptiveDialog<bool>(
         context: context,
         barrierDismissible: false,
         builder: (dialogContext) => AlertDialog(

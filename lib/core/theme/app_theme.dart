@@ -302,9 +302,9 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: surfaceColor,
         surfaceTintColor: Colors.transparent,
-        elevation: 12,
+        elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        titleTextStyle: TextStyle(color: foreground, fontSize: 19, fontWeight: FontWeight.w700),
+        titleTextStyle: TextStyle(color: foreground, fontSize: 17, fontWeight: FontWeight.w600),
         contentTextStyle: TextStyle(color: secondaryText, fontSize: 14),
       ),
       bottomSheetTheme: BottomSheetThemeData(
@@ -319,14 +319,14 @@ class AppTheme {
       popupMenuTheme: PopupMenuThemeData(
         color: surfaceColor,
         surfaceTintColor: Colors.transparent,
-        elevation: 8,
+        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         textStyle: TextStyle(color: foreground, fontSize: 14),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: darkSurfaceRaised,
-        contentTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
+        backgroundColor: surfaceColor,
+        contentTextStyle: TextStyle(color: foreground, fontSize: 14),
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         dismissDirection: DismissDirection.horizontal,

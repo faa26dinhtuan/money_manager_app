@@ -9,7 +9,7 @@ import 'package:money_manager_app/core/widgets/sensitive_balance.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
 Future<Set<String>?> showWalletConversionDialog(BuildContext context) {
-  return showDialog<Set<String>>(
+  return showAdaptiveDialog<Set<String>>(
     context: context,
     builder: (_) => const _WalletSelectionDialog(),
   );

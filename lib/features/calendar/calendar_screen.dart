@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -168,9 +169,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
     if (transactions.isEmpty) return false;
     final l = context.l10n;
-    return showDialog<bool>(
+    return showAdaptiveDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => CupertinoAlertDialog(
         title: Text(l.deleteEventTransactionsTitle),
         content: Text(l.deleteEventTransactionsMessage),
         actions: [
@@ -195,9 +196,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Future<void> _deletePlannedEvent(PlannedEvent event) async {
     final l = context.l10n;
     if (event.frequency != null) {
-      final deleteAll = await showDialog<bool>(
+      final deleteAll = await showAdaptiveDialog<bool>(
         context: context,
-        builder: (dialogContext) => AlertDialog(
+        builder: (dialogContext) => CupertinoAlertDialog(
           title: Text(l.deletePlannedEventTitle),
           content: Text(l.deleteRecurringEventWarning),
           actions: [
@@ -736,12 +737,35 @@ class _PlannedEventRow extends StatelessWidget {
               '${isExpense ? '−' : '+'}${formatMoney(event.amount, AppCurrency.byCode(event.currencyCode))}',
               style: TextStyle(color: color, fontWeight: FontWeight.w700),
             ),
-            PopupMenuButton<String>(
-              onSelected: (value) => value == 'edit' ? onEdit() : onDelete(),
-              itemBuilder: (context) => [
-                PopupMenuItem(value: 'edit', child: Text(context.l10n.edit)),
-                PopupMenuItem(value: 'delete', child: Text(context.l10n.delete)),
-              ],
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => showCupertinoModalPopup<void>(
+                context: context,
+                builder: (sheetContext) => CupertinoActionSheet(
+                  actions: [
+                    CupertinoActionSheetAction(
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop();
+                        onEdit();
+                      },
+                      child: Text(context.l10n.edit),
+                    ),
+                    CupertinoActionSheetAction(
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop();
+                        onDelete();
+                      },
+                      child: Text(context.l10n.delete),
+                    ),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                    child: Text(context.l10n.cancel),
+                  ),
+                ),
+              ),
+              child: const Icon(Icons.more_horiz),
             ),
           ],
         ),

@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
@@ -75,7 +77,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
@@ -119,10 +121,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       note: _noteCtrl.text.trim(),
     );
     if (transaction.type == TxType.expense && _projectedWalletBalance(transaction) < 0) {
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showAdaptiveDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
+        builder: (dialogContext) => CupertinoAlertDialog(
           title: Text(context.l10n.negativeWalletBalanceTitle),
           content: Text(context.l10n.negativeWalletBalanceMessage),
           actions: [
@@ -188,9 +190,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   Future<void> _confirmDelete() async {
     final l = context.l10n;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: Text(l.deleteTransactionTitle),
         content: Text(l.deleteTransactionPermanent),
         actions: [

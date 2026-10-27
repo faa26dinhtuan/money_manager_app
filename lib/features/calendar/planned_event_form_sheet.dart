@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
@@ -103,7 +104,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
@@ -113,7 +114,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
   }
 
   Future<void> _pickReminderTime() async {
-    final picked = await showTimePicker(
+    final picked = await showAppTimePicker(
       context: context,
       initialTime: _reminderTime,
     );
