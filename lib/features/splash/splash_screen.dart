@@ -100,8 +100,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     duration: const Duration(milliseconds: 420),
                     curve: Curves.easeOutBack,
                     child: Container(
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
-                        color: Colors.white,
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
@@ -111,7 +111,12 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                         ],
                       ),
-                      child: const Center(child: FlutterLogo(size: 72)),
+                      child: Image.asset(
+                        'assets/images/money_manager_app_icon.png',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
