@@ -80,6 +80,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
           appBar: AppBar(title: Text(categoryTitle)),
           body: ListView(
             padding: const EdgeInsets.all(16),
+            physics: guideMode ? const NeverScrollableScrollPhysics() : null,
             children: [
               if (guideMode) ...[
                 Text(

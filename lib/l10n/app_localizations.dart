@@ -2963,7 +2963,7 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideNavigationDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Thanh dưới giúp bạn mở nhanh Tổng quan, Sổ giao dịch, Lịch và Ví tiền. Nút cộng dùng để thêm giao dịch.'**
+  /// **'Thanh điều hướng gồm Tổng quan, Giao dịch, Lịch và Ví để chuyển nhanh giữa các mục. Nút + ở giữa dùng để thêm giao dịch.'**
   String get overviewGuideNavigationDescription;
 
   /// No description provided for @overviewGuideSettingsTitle.
@@ -2987,7 +2987,7 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideAddDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Nút dấu cộng là lối tắt để bắt đầu ghi một khoản thu hoặc chi.'**
+  /// **'Nút dấu cộng mở phần ghi khoản thu hoặc chi. Trong hướng dẫn, chạm vào nút chỉ bật Tiếp tục.'**
   String get overviewGuideAddDescription;
 }
 

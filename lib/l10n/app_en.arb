@@ -508,9 +508,10 @@
   "overviewGuideTransactionsTitle": "Review categories",
   "overviewGuideTransactionsDescription": "Tap a category to view its total and the transactions in that category.",
   "overviewGuideNavigationTitle": "Move between sections",
-  "overviewGuideNavigationDescription": "Use the bottom bar to open Overview, Transactions, Calendar, and Wallets. The plus button starts a new transaction.",
+  "overviewGuideNavigationDescription": "The navigation bar has Overview, Transactions, Calendar, and Wallet for switching sections. The plus button adds a transaction.",
   "overviewGuideSettingsTitle": "Open Settings",
   "overviewGuideSettingsDescription": "Manage currency, date format, appearance, language, and backups.",
   "overviewGuideAddTitle": "Add a transaction",
-  "overviewGuideAddDescription": "The plus button is a shortcut for starting an income or expense entry."
+  "overviewGuideAddDescription": "The plus button opens the income or expense form. In the guide, tapping it only enables Continue."
 }
+

@@ -112,11 +112,11 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       floatingActionButton: AddNavButton(
         key: OverviewGuideTargets.addTransaction,
         onPressed: () {
-          HapticFeedback.lightImpact();
-          if (_overviewGuideController.active &&
-              _overviewGuideController.step == 6) {
-            _overviewGuideController.markInteraction(6);
+          if (_overviewGuideController.active) {
+            _overviewGuideController.markInteraction(9);
+            return;
           }
+          HapticFeedback.lightImpact();
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
           );
@@ -125,7 +125,17 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       bottomNavigationBar: CustomBottomNav(
         key: OverviewGuideTargets.navigation,
         currentIndex: _currentIndex,
+        itemKeys: [
+          OverviewGuideTargets.navigationOverview,
+          OverviewGuideTargets.navigationTransactions,
+          OverviewGuideTargets.navigationCalendar,
+          OverviewGuideTargets.navigationWallet,
+        ],
         onTap: (index) {
+          if (_overviewGuideController.active) {
+            _overviewGuideController.markInteraction(5 + index);
+            return;
+          }
           if (index != _currentIndex) HapticFeedback.selectionClick();
           setState(() => _currentIndex = index);
         },

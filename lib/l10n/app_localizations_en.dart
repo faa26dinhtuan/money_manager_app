@@ -1581,7 +1581,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideNavigationDescription =>
-      'Use the bottom bar to open Overview, Transactions, Calendar, and Wallets. The plus button starts a new transaction.';
+      'The navigation bar has Overview, Transactions, Calendar, and Wallet for switching sections. The plus button adds a transaction.';
 
   @override
   String get overviewGuideSettingsTitle => 'Open Settings';
@@ -1595,5 +1595,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideAddDescription =>
-      'The plus button is a shortcut for starting an income or expense entry.';
+      'The plus button opens the income or expense form. In the guide, tapping it only enables Continue.';
 }

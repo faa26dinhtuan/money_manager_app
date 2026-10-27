@@ -833,9 +833,10 @@
   "overviewGuideTransactionsTitle": "Xem danh sách theo danh mục",
   "overviewGuideTransactionsDescription": "Chạm vào một danh mục để xem tổng tiền và các giao dịch thuộc danh mục đó.",
   "overviewGuideNavigationTitle": "Chuyển đến các mục khác",
-  "overviewGuideNavigationDescription": "Thanh dưới giúp bạn mở nhanh Tổng quan, Sổ giao dịch, Lịch và Ví tiền. Nút cộng dùng để thêm giao dịch.",
+  "overviewGuideNavigationDescription": "Thanh điều hướng gồm Tổng quan, Giao dịch, Lịch và Ví để chuyển nhanh giữa các mục. Nút + ở giữa dùng để thêm giao dịch.",
   "overviewGuideSettingsTitle": "Mở cài đặt",
   "overviewGuideSettingsDescription": "Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.",
   "overviewGuideAddTitle": "Thêm giao dịch",
-  "overviewGuideAddDescription": "Nút dấu cộng là lối tắt để bắt đầu ghi một khoản thu hoặc chi."
+  "overviewGuideAddDescription": "Nút dấu cộng mở phần ghi khoản thu hoặc chi. Trong hướng dẫn, chạm vào nút chỉ bật Tiếp tục."
 }
+

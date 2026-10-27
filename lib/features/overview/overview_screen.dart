@@ -227,6 +227,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                    physics: _guideController.active
+                        ? const NeverScrollableScrollPhysics()
+                        : null,
                     children: [
                       if (todayEvents.isNotEmpty) ...[
                         _TodayEventsCard(
@@ -749,6 +752,7 @@ class _Header extends StatelessWidget {
             ),
             Text(
               context.l10n.balanceUpper,
+              key: OverviewGuideTargets.balanceLabel,
               style: const TextStyle(color: Colors.white70, letterSpacing: 1.5),
             ),
             const SizedBox(height: 4),

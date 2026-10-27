@@ -11,11 +11,16 @@ class OverviewGuideTargets {
 
   static final wallet = GlobalKey();
   static final balance = GlobalKey();
+  static final balanceLabel = GlobalKey();
   static final type = GlobalKey();
   static final period = GlobalKey();
   static final chart = GlobalKey();
   static final transactions = GlobalKey();
   static final navigation = GlobalKey();
+  static final navigationOverview = GlobalKey();
+  static final navigationTransactions = GlobalKey();
+  static final navigationCalendar = GlobalKey();
+  static final navigationWallet = GlobalKey();
   static final settings = GlobalKey();
   static final addTransaction = GlobalKey();
 }
@@ -38,8 +43,8 @@ class OverviewGuideController extends ChangeNotifier {
   }
 
   void next() {
-    if (!active || !started || (step < 5 && !interacted)) return;
-    if (step == 6) {
+    if (!active || !started || (!interacted && step != 5)) return;
+    if (step == 5) {
       active = false;
     } else {
       step++;
@@ -78,7 +83,10 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         description: l.overviewGuideWalletDescription,
       ),
       _OverviewGuideStep(
-        targets: [OverviewGuideTargets.balance],
+        targets: [
+          OverviewGuideTargets.balanceLabel,
+          OverviewGuideTargets.balance,
+        ],
         materialIcon: Icons.visibility_outlined,
         title: l.overviewGuideBalanceTitle,
         description: l.overviewGuideBalanceDescription,
@@ -107,18 +115,15 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
       ),
       _OverviewGuideStep(
         targets: [
-          OverviewGuideTargets.navigation,
+          OverviewGuideTargets.navigationOverview,
+          OverviewGuideTargets.navigationTransactions,
+          OverviewGuideTargets.navigationCalendar,
+          OverviewGuideTargets.navigationWallet,
           OverviewGuideTargets.addTransaction,
         ],
         materialIcon: Icons.dashboard_outlined,
         title: l.overviewGuideNavigationTitle,
         description: l.overviewGuideNavigationDescription,
-      ),
-      _OverviewGuideStep(
-        targets: [OverviewGuideTargets.addTransaction],
-        icon: AppIcons.add,
-        title: l.overviewGuideAddTitle,
-        description: l.overviewGuideAddDescription,
       ),
     ];
   }
@@ -191,8 +196,27 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
       final object = key.currentContext?.findRenderObject();
       if (object is! RenderBox || !object.hasSize) continue;
       final global = object.localToGlobal(Offset.zero) & object.size;
-      final rect = global.shift(-origin).intersect(Offset.zero & overlayObject.size);
+      var rect = global.shift(-origin).intersect(Offset.zero & overlayObject.size);
+      if (widget.controller.step == 0 && identical(key, OverviewGuideTargets.wallet)) {
+        rect = Rect.fromLTRB(
+          math.min(rect.right, rect.left + 12),
+          rect.top,
+          rect.right,
+          rect.bottom,
+        );
+      }
       if (!rect.isEmpty) next.add(rect);
+    }
+    if (widget.controller.step == 1 && next.length > 1) {
+      final combined = next.reduce((a, b) => Rect.fromLTRB(
+            math.min(a.left, b.left),
+            math.min(a.top, b.top),
+            math.max(a.right, b.right),
+            math.max(a.bottom, b.bottom),
+          ));
+      next
+        ..clear()
+        ..add(combined);
     }
     if (next.length == _targetRects.length &&
         List.generate(next.length, (index) => next[index] == _targetRects[index])
@@ -218,7 +242,6 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
       animation: widget.controller,
       builder: (context, _) {
         if (!widget.controller.active) return const SizedBox.shrink();
-        final l = context.l10n;
         final steps = _steps(context);
         final step = steps[widget.controller.step];
         final media = MediaQuery.of(context);
@@ -231,20 +254,16 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
               width: 64,
               height: 64,
             );
-            final bottomAnchoredStep = widget.controller.step == 2 ||
-                widget.controller.step == 3;
-            final top = bottomAnchoredStep
+            final bottomAnchoredStep = widget.controller.step == 1 ||
+                widget.controller.step == 2;
+            final top = widget.controller.step == 3
+                ? media.padding.top + 12
+                : bottomAnchoredStep
                 ? math.max(
                     media.padding.top + 12,
                     size.height - media.padding.bottom - 202.0,
                   ).toDouble()
                 : _bubbleTop(size, media.padding, anchor);
-            final bubble = Rect.fromLTWH(
-              16,
-              top,
-              size.width - 32,
-              math.min(190.0, size.height - top - 12).toDouble(),
-            );
             return Stack(
               children: [
                 Positioned.fill(
@@ -252,15 +271,11 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                     child: CustomPaint(
                       painter: _OverviewSpotlightPainter(
                         targets: targets,
-                        bubble: bubble,
+                        step: widget.controller.step,
                       ),
                     ),
                   ),
                 ),
-                if (widget.controller.started && widget.controller.step >= 5)
-                  const Positioned.fill(
-                    child: AbsorbPointer(child: SizedBox.expand()),
-                  ),
                 if (!widget.controller.started)
                   Positioned(
                     left: 16,
@@ -283,7 +298,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                       step: step,
                       index: widget.controller.step,
                       count: steps.length,
-                      interacted: widget.controller.interacted,
+                      interacted: widget.controller.interacted || widget.controller.step == 5,
                       onNext: widget.controller.next,
                       onSkip: widget.controller.skip,
                     ),
@@ -336,8 +351,6 @@ class _OverviewGuideIntro extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(l.overviewGuideIntro),
-          const SizedBox(height: 6),
-          Text(l.overviewGuideDemoInstruction),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -468,10 +481,10 @@ class _GuideCard extends StatelessWidget {
 }
 
 class _OverviewSpotlightPainter extends CustomPainter {
-  const _OverviewSpotlightPainter({required this.targets, required this.bubble});
+  const _OverviewSpotlightPainter({required this.targets, required this.step});
 
   final List<Rect> targets;
-  final Rect bubble;
+  final int step;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -479,10 +492,11 @@ class _OverviewSpotlightPainter extends CustomPainter {
     canvas.saveLayer(bounds, Paint());
     canvas.drawRect(bounds, Paint()..color = Colors.black.withValues(alpha: 0.76));
     for (final targetRect in targets) {
+      final spotlight = targetRect.inflate(step == 9 ? 2 : 4);
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          targetRect.inflate(8),
-          const Radius.circular(18),
+          spotlight,
+          Radius.circular(step == 9 ? spotlight.width / 2 : 18),
         ),
         Paint()..blendMode = BlendMode.clear,
       );
@@ -490,36 +504,23 @@ class _OverviewSpotlightPainter extends CustomPainter {
     canvas.restore();
     if (targets.isEmpty) return;
     for (var index = 0; index < targets.length; index++) {
-      final spotlight = targets[index].inflate(8);
+      final spotlight = targets[index].inflate(step == 9 ? 2 : 4);
       canvas.drawRRect(
-        RRect.fromRectAndRadius(spotlight, const Radius.circular(18)),
+        RRect.fromRectAndRadius(
+          spotlight,
+          Radius.circular(step == 9 ? spotlight.width / 2 : 18),
+        ),
         Paint()
           ..color = Colors.white
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2,
       );
-      if (index > 0) continue;
-      final below = bubble.top >= spotlight.bottom;
-      final start = Offset(
-        spotlight.center.dx,
-        below ? spotlight.bottom : spotlight.top,
-      );
-      final end = Offset(
-        start.dx.clamp(bubble.left + 24, bubble.right - 24).toDouble(),
-        below ? bubble.top : bubble.bottom,
-      );
-      canvas.drawLine(
-        start,
-        end,
-        Paint()
-          ..color = Colors.white
-          ..strokeWidth = 2,
-      );
-      canvas.drawCircle(start, 3, Paint()..color = Colors.white);
     }
   }
 
   @override
   bool shouldRepaint(_OverviewSpotlightPainter oldDelegate) =>
-      oldDelegate.targets != targets || oldDelegate.bubble != bubble;
+      oldDelegate.targets != targets || oldDelegate.step != step;
 }
+
+
