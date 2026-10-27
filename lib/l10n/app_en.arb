@@ -516,10 +516,12 @@
   "overviewGuideAddTitle": "Add a transaction",
   "overviewGuideAddDescription": "Tap the plus button to open the form for adding income or an expense.",
   "overviewGuideAddScreenDescription": "Enter an amount, choose a wallet and category, add a date and note, then save the transaction.",
-  "overviewGuideTransactionsScreenDescription": "Transactions lets you review, search, and filter income and expenses by date.",
-  "overviewGuideCalendarScreenDescription": "Calendar shows income and expenses by day alongside planned events.",
+  "overviewGuideTransactionsScreenDescription": "Tap Transactions to review, search, and filter income and expenses by date.",
+  "overviewGuideCalendarScreenDescription": "Tap Calendar to review daily income and expenses and see planned events.",
   "overviewGuideWalletScreenDescription": "Wallet tracks balances and opens wallet, budget, goal, debt, and recurring transaction management.",
   "overviewGuideWalletNavigationDescription": "Open Wallet to review balances and manage your wallets.",
   "overviewGuideClosing": "You’ve seen the main sections. Start tracking your income, expenses, and financial goals whenever you’re ready.",
-  "overviewGuideFinish": "Start using the app"
+  "overviewGuideFinish": "Start using the app",
+  "overviewGuideTransactionsPageDescription": "Tap a transaction to view its details, edit it, or delete it when needed.",
+  "overviewGuideCalendarPageDescription": "Add an event for an upcoming day to remember an expected income or expense and find it on the calendar."
 }

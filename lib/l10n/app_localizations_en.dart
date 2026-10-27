@@ -1609,11 +1609,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideTransactionsScreenDescription =>
-      'Transactions lets you review, search, and filter income and expenses by date.';
+      'Tap Transactions to review, search, and filter income and expenses by date.';
 
   @override
   String get overviewGuideCalendarScreenDescription =>
-      'Calendar shows income and expenses by day alongside planned events.';
+      'Tap Calendar to review daily income and expenses and see planned events.';
 
   @override
   String get overviewGuideWalletScreenDescription =>
@@ -1629,4 +1629,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideFinish => 'Start using the app';
+
+  @override
+  String get overviewGuideTransactionsPageDescription =>
+      'Tap a transaction to view its details, edit it, or delete it when needed.';
+
+  @override
+  String get overviewGuideCalendarPageDescription =>
+      'Add an event for an upcoming day to remember an expected income or expense and find it on the calendar.';
 }

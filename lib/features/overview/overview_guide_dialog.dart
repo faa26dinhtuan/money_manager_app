@@ -302,9 +302,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
           builder: (context, constraints) {
             final size = Size(constraints.maxWidth, constraints.maxHeight);
             final targets = widget.controller.started &&
-                    (!widget.controller.previewing ||
-                        widget.controller.step == 5 ||
-                        widget.controller.step == 8)
+                    (!widget.controller.previewing || widget.controller.step == 5)
                 ? _targetRects
                 : <Rect>[];
             final anchor = targets.isNotEmpty ? targets.first : Rect.fromCenter(
@@ -342,8 +340,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                       painter: _OverviewSpotlightPainter(
                         targets: targets,
                         step: widget.controller.step,
-                        dimBackground: !widget.controller.previewing ||
-                            widget.controller.step == 8,
+                        dimBackground: !widget.controller.previewing,
                       ),
                     ),
                   ),
@@ -365,7 +362,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                   Positioned(
                     left: 16,
                     right: 16,
-                    top: top,
+                    bottom: media.padding.bottom + CustomBottomNav.barHeight + 12,
                     child: _GuideCard(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -395,13 +392,40 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                     ),
                   )
                 else if (widget.controller.previewing &&
-                    widget.controller.step >= 6)
+                    widget.controller.step >= 6 &&
+                    widget.controller.step <= 7)
                   Positioned(
+                    left: 16,
                     right: 16,
-                    bottom: media.padding.bottom + CustomBottomNav.barHeight + 12,
-                    child: FilledButton(
-                      onPressed: widget.controller.next,
-                      child: Text(l.continueText),
+                    top: top,
+                    child: _GuideCard(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            step.title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            widget.controller.step == 6
+                                ? l.overviewGuideTransactionsPageDescription
+                                : l.overviewGuideCalendarPageDescription,
+                          ),
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: FilledButton(
+                              onPressed: widget.controller.next,
+                              child: Text(l.continueText),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 else

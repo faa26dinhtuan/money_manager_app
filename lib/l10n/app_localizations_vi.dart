@@ -1607,11 +1607,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get overviewGuideTransactionsScreenDescription =>
-      'Sổ giao dịch giúp xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.';
+      'Chạm vào Sổ giao dịch để xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.';
 
   @override
   String get overviewGuideCalendarScreenDescription =>
-      'Lịch hiển thị thu chi theo từng ngày cùng các sự kiện dự kiến.';
+      'Chạm vào Lịch để theo dõi thu chi theo ngày và xem các sự kiện đã lên lịch.';
 
   @override
   String get overviewGuideWalletScreenDescription =>
@@ -1627,4 +1627,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get overviewGuideFinish => 'Bắt đầu sử dụng';
+
+  @override
+  String get overviewGuideTransactionsPageDescription =>
+      'Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.';
+
+  @override
+  String get overviewGuideCalendarPageDescription =>
+      'Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.';
 }

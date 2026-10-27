@@ -841,10 +841,12 @@
   "overviewGuideAddTitle": "Thêm giao dịch",
   "overviewGuideAddDescription": "Nhấn dấu + để mở biểu mẫu thêm khoản thu hoặc chi.",
   "overviewGuideAddScreenDescription": "Nhập số tiền, chọn ví và danh mục, thêm ngày cùng ghi chú rồi lưu khoản thu hoặc chi.",
-  "overviewGuideTransactionsScreenDescription": "Sổ giao dịch giúp xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.",
-  "overviewGuideCalendarScreenDescription": "Lịch hiển thị thu chi theo từng ngày cùng các sự kiện dự kiến.",
+  "overviewGuideTransactionsScreenDescription": "Chạm vào Sổ giao dịch để xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.",
+  "overviewGuideCalendarScreenDescription": "Chạm vào Lịch để theo dõi thu chi theo ngày và xem các sự kiện đã lên lịch.",
   "overviewGuideWalletScreenDescription": "Ví giúp theo dõi số dư và mở các phần quản lý ví, ngân sách, mục tiêu, sổ nợ và giao dịch định kỳ.",
   "overviewGuideWalletNavigationDescription": "Chạm vào Ví tiền để xem số dư và quản lý các ví của bạn.",
   "overviewGuideClosing": "Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.",
-  "overviewGuideFinish": "Bắt đầu sử dụng"
+  "overviewGuideFinish": "Bắt đầu sử dụng",
+  "overviewGuideTransactionsPageDescription": "Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.",
+  "overviewGuideCalendarPageDescription": "Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch."
 }

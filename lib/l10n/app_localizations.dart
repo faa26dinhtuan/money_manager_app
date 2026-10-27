@@ -3011,13 +3011,13 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideTransactionsScreenDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Sổ giao dịch giúp xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.'**
+  /// **'Chạm vào Sổ giao dịch để xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.'**
   String get overviewGuideTransactionsScreenDescription;
 
   /// No description provided for @overviewGuideCalendarScreenDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Lịch hiển thị thu chi theo từng ngày cùng các sự kiện dự kiến.'**
+  /// **'Chạm vào Lịch để theo dõi thu chi theo ngày và xem các sự kiện đã lên lịch.'**
   String get overviewGuideCalendarScreenDescription;
 
   /// No description provided for @overviewGuideWalletScreenDescription.
@@ -3043,6 +3043,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Bắt đầu sử dụng'**
   String get overviewGuideFinish;
+
+  /// No description provided for @overviewGuideTransactionsPageDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.'**
+  String get overviewGuideTransactionsPageDescription;
+
+  /// No description provided for @overviewGuideCalendarPageDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.'**
+  String get overviewGuideCalendarPageDescription;
 }
 
 class _AppLocalizationsDelegate
