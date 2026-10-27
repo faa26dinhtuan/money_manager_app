@@ -1601,5 +1601,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overviewGuideAddDescription =>
-      'The plus button opens the income or expense form. In the guide, tapping it only enables Continue.';
+      'Tap the plus button to open the form for adding income or an expense.';
+
+  @override
+  String get overviewGuideAddScreenDescription =>
+      'Enter an amount, choose a wallet and category, add a date and note, then save the transaction.';
+
+  @override
+  String get overviewGuideTransactionsScreenDescription =>
+      'Transactions lets you review, search, and filter income and expenses by date.';
+
+  @override
+  String get overviewGuideCalendarScreenDescription =>
+      'Calendar shows income and expenses by day alongside planned events.';
+
+  @override
+  String get overviewGuideWalletScreenDescription =>
+      'Wallet tracks balances and opens wallet, budget, goal, debt, and recurring transaction management.';
+
+  @override
+  String get overviewGuideWalletNavigationDescription =>
+      'Open Wallet to review balances and manage your wallets.';
+
+  @override
+  String get overviewGuideClosing =>
+      'You’ve seen the main sections. Start tracking your income, expenses, and financial goals whenever you’re ready.';
+
+  @override
+  String get overviewGuideFinish => 'Start using the app';
 }

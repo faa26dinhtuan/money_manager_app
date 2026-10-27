@@ -514,7 +514,12 @@
   "overviewGuideSettingsTitle": "Open Settings",
   "overviewGuideSettingsDescription": "Manage currency, date format, appearance, language, and backups.",
   "overviewGuideAddTitle": "Add a transaction",
-  "overviewGuideAddDescription": "The plus button opens the income or expense form. In the guide, tapping it only enables Continue."
+  "overviewGuideAddDescription": "Tap the plus button to open the form for adding income or an expense.",
+  "overviewGuideAddScreenDescription": "Enter an amount, choose a wallet and category, add a date and note, then save the transaction.",
+  "overviewGuideTransactionsScreenDescription": "Transactions lets you review, search, and filter income and expenses by date.",
+  "overviewGuideCalendarScreenDescription": "Calendar shows income and expenses by day alongside planned events.",
+  "overviewGuideWalletScreenDescription": "Wallet tracks balances and opens wallet, budget, goal, debt, and recurring transaction management.",
+  "overviewGuideWalletNavigationDescription": "Open Wallet to review balances and manage your wallets.",
+  "overviewGuideClosing": "You’ve seen the main sections. Start tracking your income, expenses, and financial goals whenever you’re ready.",
+  "overviewGuideFinish": "Start using the app"
 }
-
-

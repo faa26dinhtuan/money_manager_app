@@ -30,6 +30,7 @@ class OverviewGuideController extends ChangeNotifier {
   bool started = false;
   bool interacted = false;
   int step = 0;
+  bool previewing = false;
 
   void start() {
     started = true;
@@ -42,13 +43,24 @@ class OverviewGuideController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void enterPreview() {
+    if (!active || !started || previewing) return;
+    previewing = true;
+    interacted = true;
+    notifyListeners();
+  }
+
   void next() {
-    if (!active || !started || (!interacted && step != 5)) return;
-    if (step == 5) {
+    if (!active || !started) return;
+    if (step < 5 && !interacted) return;
+    if (step >= 5 && !previewing) return;
+    if (step == 8) {
       active = false;
+      previewing = false;
     } else {
       step++;
       interacted = false;
+      previewing = false;
     }
     notifyListeners();
   }
@@ -114,16 +126,28 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         description: l.overviewGuideTransactionsDescription,
       ),
       _OverviewGuideStep(
-        targets: [
-          OverviewGuideTargets.navigationOverview,
-          OverviewGuideTargets.navigationTransactions,
-          OverviewGuideTargets.navigationCalendar,
-          OverviewGuideTargets.navigationWallet,
-          OverviewGuideTargets.addTransaction,
-        ],
-        materialIcon: Icons.dashboard_outlined,
-        title: l.overviewGuideNavigationTitle,
-        description: l.overviewGuideNavigationDescription,
+        targets: [OverviewGuideTargets.addTransaction],
+        icon: AppIcons.add,
+        title: l.overviewGuideAddTitle,
+        description: l.overviewGuideAddDescription,
+      ),
+      _OverviewGuideStep(
+        targets: [OverviewGuideTargets.navigationTransactions],
+        icon: AppIcons.transactions,
+        title: l.transactions,
+        description: l.overviewGuideTransactionsScreenDescription,
+      ),
+      _OverviewGuideStep(
+        targets: [OverviewGuideTargets.navigationCalendar],
+        icon: AppIcons.calendar,
+        title: l.calendar,
+        description: l.overviewGuideCalendarScreenDescription,
+      ),
+      _OverviewGuideStep(
+        targets: [OverviewGuideTargets.navigationWallet],
+        icon: AppIcons.wallet,
+        title: l.wallet,
+        description: l.overviewGuideWalletNavigationDescription,
       ),
     ];
   }
@@ -156,6 +180,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         (controller.step != _lastStep || !_lastStarted);
     _lastStep = controller.step;
     _lastStarted = controller.started;
+    if (shouldRefocus) _targetRects = [];
     setState(() {});
     if (controller.started) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -164,6 +189,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         } else {
           _measureTarget();
         }
+        WidgetsBinding.instance.addPostFrameCallback((_) => _measureTarget());
       });
     }
   }
@@ -218,6 +244,32 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         ..clear()
         ..add(combined);
     }
+    if (widget.controller.step >= 6 && widget.controller.step <= 8) {
+      final slot = switch (widget.controller.step) {
+        6 => 1,
+        7 => 3,
+        _ => 4,
+      };
+      final navObject = OverviewGuideTargets.navigation.currentContext?.findRenderObject();
+      final navBox = navObject is RenderBox && navObject.hasSize ? navObject : null;
+      final navBounds = navBox == null
+          ? null
+          : ((navBox.localToGlobal(Offset.zero) & navBox.size).shift(-origin));
+      final navWidth = navBounds?.width ?? overlayObject.size.width;
+      final itemWidth = navWidth / 5;
+      final top = navBounds?.top ??
+          overlayObject.size.height -
+              MediaQuery.of(context).padding.bottom -
+              CustomBottomNav.barHeight;
+      next
+        ..clear()
+        ..add(Rect.fromLTWH(
+          (navBounds?.left ?? 0) + slot * itemWidth,
+          top,
+          itemWidth,
+          CustomBottomNav.barHeight,
+        ));
+    }
     if (next.length == _targetRects.length &&
         List.generate(next.length, (index) => next[index] == _targetRects[index])
             .every((matches) => matches)) {
@@ -244,11 +296,17 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         if (!widget.controller.active) return const SizedBox.shrink();
         final steps = _steps(context);
         final step = steps[widget.controller.step];
+        final l = context.l10n;
         final media = MediaQuery.of(context);
         return LayoutBuilder(
           builder: (context, constraints) {
             final size = Size(constraints.maxWidth, constraints.maxHeight);
-            final targets = widget.controller.started ? _targetRects : <Rect>[];
+            final targets = widget.controller.started &&
+                    (!widget.controller.previewing ||
+                        widget.controller.step == 5 ||
+                        widget.controller.step == 8)
+                ? _targetRects
+                : <Rect>[];
             final anchor = targets.isNotEmpty ? targets.first : Rect.fromCenter(
               center: Offset(size.width / 2, size.height / 2),
               width: 64,
@@ -256,7 +314,19 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
             );
             final bottomAnchoredStep = widget.controller.step == 1 ||
                 widget.controller.step == 2;
-            final top = widget.controller.step == 3
+            final previewTop = switch (widget.controller.step) {
+              5 => media.padding.top + 112,
+              6 => media.padding.top + 112,
+              7 => media.padding.top + 64,
+              8 => media.padding.top + 210,
+              _ => media.padding.top + 12,
+            };
+            final top = widget.controller.previewing
+                ? previewTop.clamp(
+                    media.padding.top + 12,
+                    math.max(media.padding.top + 12, size.height - 206),
+                  ).toDouble()
+                : widget.controller.step == 3
                 ? media.padding.top + 12
                 : bottomAnchoredStep
                 ? math.max(
@@ -272,6 +342,8 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                       painter: _OverviewSpotlightPainter(
                         targets: targets,
                         step: widget.controller.step,
+                        dimBackground: !widget.controller.previewing ||
+                            widget.controller.step == 8,
                       ),
                     ),
                   ),
@@ -288,6 +360,50 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                       ),
                     ),
                   )
+                else if (widget.controller.previewing &&
+                    widget.controller.step == 8)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    top: top,
+                    child: _GuideCard(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            step.title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(l.overviewGuideWalletScreenDescription),
+                          const SizedBox(height: 8),
+                          Text(l.overviewGuideClosing),
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: FilledButton(
+                              onPressed: widget.controller.next,
+                              child: Text(l.overviewGuideFinish),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (widget.controller.previewing &&
+                    widget.controller.step >= 6)
+                  Positioned(
+                    right: 16,
+                    bottom: media.padding.bottom + CustomBottomNav.barHeight + 12,
+                    child: FilledButton(
+                      onPressed: widget.controller.next,
+                      child: Text(l.continueText),
+                    ),
+                  )
                 else
                   Positioned(
                     left: 16,
@@ -297,7 +413,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                       step: step,
                       index: widget.controller.step,
                       count: steps.length,
-                      interacted: widget.controller.interacted || widget.controller.step == 5,
+                      interacted: widget.controller.interacted,
                       onNext: widget.controller.next,
                       onSkip: widget.controller.skip,
                     ),
@@ -440,7 +556,7 @@ class _OverviewGuideCallout extends StatelessWidget {
               const SizedBox(width: 4),
               FilledButton(
                 onPressed: interacted ? onNext : null,
-                child: Text(index == count - 1 ? l.done : l.continueText),
+                child: Text(l.continueText),
               ),
             ],
           ),
@@ -480,47 +596,61 @@ class _GuideCard extends StatelessWidget {
 }
 
 class _OverviewSpotlightPainter extends CustomPainter {
-  const _OverviewSpotlightPainter({required this.targets, required this.step});
+  const _OverviewSpotlightPainter({
+    required this.targets,
+    required this.step,
+    required this.dimBackground,
+  });
 
   final List<Rect> targets;
   final int step;
+  final bool dimBackground;
 
   @override
   void paint(Canvas canvas, Size size) {
     final bounds = Offset.zero & size;
-    canvas.saveLayer(bounds, Paint());
-    canvas.drawRect(bounds, Paint()..color = Colors.black.withValues(alpha: 0.76));
-    for (final targetRect in targets) {
-      final spotlight = targetRect.inflate(step == 9 ? 2 : 4);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          spotlight,
-          Radius.circular(step == 9 ? spotlight.width / 2 : 18),
-        ),
-        Paint()..blendMode = BlendMode.clear,
-      );
+    if (dimBackground) {
+      canvas.saveLayer(bounds, Paint());
+      canvas.drawRect(bounds, Paint()..color = Colors.black.withValues(alpha: 0.76));
+      for (final targetRect in targets) {
+        final spotlight = targetRect.inflate(step == 5 ? 2 : 4);
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            spotlight,
+            Radius.circular(step == 5 ? spotlight.width / 2 : 18),
+          ),
+          Paint()..blendMode = BlendMode.clear,
+        );
+      }
+      canvas.restore();
     }
-    canvas.restore();
     if (targets.isEmpty) return;
     for (var index = 0; index < targets.length; index++) {
-      final spotlight = targets[index].inflate(step == 9 ? 2 : 4);
+      final spotlight = targets[index].inflate(step == 5 ? 2 : 4);
+      final radius = Radius.circular(step == 5 ? spotlight.width / 2 : 18);
+      if (!dimBackground) {
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(spotlight, radius),
+          Paint()..color = AppTheme.primary.withValues(alpha: 0.14),
+        );
+      }
       canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          spotlight,
-          Radius.circular(step == 9 ? spotlight.width / 2 : 18),
-        ),
+        RRect.fromRectAndRadius(spotlight, radius),
         Paint()
-          ..color = Colors.white
+          ..color = dimBackground ? Colors.white : AppTheme.primary
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2,
+          ..strokeWidth = dimBackground ? 2 : 3,
       );
     }
   }
 
   @override
   bool shouldRepaint(_OverviewSpotlightPainter oldDelegate) =>
-      oldDelegate.targets != targets || oldDelegate.step != step;
+      oldDelegate.targets != targets ||
+      oldDelegate.step != step ||
+      oldDelegate.dimBackground != dimBackground;
 }
+
 
 
 

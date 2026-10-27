@@ -82,7 +82,17 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   }
 
   void _onOverviewGuideChanged() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {
+      if (!_overviewGuideController.active) {
+        _currentIndex = _overviewGuideController.step == 8 ? 3 : 0;
+      } else if (_overviewGuideController.previewing &&
+          _overviewGuideController.step >= 6) {
+        _currentIndex = _overviewGuideController.step - 5;
+      } else if (_overviewGuideController.step == 6) {
+        _currentIndex = 0;
+      }
+    });
   }
 
   @override
@@ -107,13 +117,42 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     return Stack(
       children: [
         Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: Padding(
+        padding: EdgeInsets.only(
+          bottom: _overviewGuideController.previewing &&
+                  _overviewGuideController.step >= 6
+              ? 60
+              : 0,
+        ),
+        child: AbsorbPointer(
+          absorbing: _overviewGuideController.previewing,
+          child: IndexedStack(index: _currentIndex, children: _screens),
+        ),
+      ),
       floatingActionButtonLocation: const AddNavButtonLocation(),
       floatingActionButton: AddNavButton(
         key: OverviewGuideTargets.addTransaction,
         onPressed: () {
           if (_overviewGuideController.active) {
-            _overviewGuideController.markInteraction(9);
+            if (_overviewGuideController.step == 5 &&
+                !_overviewGuideController.previewing) {
+              _overviewGuideController.enterPreview();
+              Navigator.of(context)
+                  .push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          const AddTransactionScreen(previewOnly: true),
+                    ),
+                  )
+                  .then((_) {
+                    if (mounted &&
+                        _overviewGuideController.active &&
+                        _overviewGuideController.step == 5 &&
+                        _overviewGuideController.previewing) {
+                      _overviewGuideController.next();
+                    }
+                  });
+            }
             return;
           }
           HapticFeedback.lightImpact();
@@ -133,7 +172,18 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         ],
         onTap: (index) {
           if (_overviewGuideController.active) {
-            _overviewGuideController.markInteraction(5 + index);
+            if (!_overviewGuideController.previewing) {
+              final expectedIndex = switch (_overviewGuideController.step) {
+                6 => 1,
+                7 => 2,
+                8 => 3,
+                _ => -1,
+              };
+              if (index == expectedIndex) {
+                setState(() => _currentIndex = index);
+                _overviewGuideController.enterPreview();
+              }
+            }
             return;
           }
           if (index != _currentIndex) HapticFeedback.selectionClick();

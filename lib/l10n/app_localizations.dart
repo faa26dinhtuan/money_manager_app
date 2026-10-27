@@ -2999,8 +2999,50 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideAddDescription.
   ///
   /// In vi, this message translates to:
-  /// **'Nút dấu cộng mở phần ghi khoản thu hoặc chi. Trong hướng dẫn, chạm vào nút chỉ bật Tiếp tục.'**
+  /// **'Nhấn dấu + để mở biểu mẫu thêm khoản thu hoặc chi.'**
   String get overviewGuideAddDescription;
+
+  /// No description provided for @overviewGuideAddScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số tiền, chọn ví và danh mục, thêm ngày cùng ghi chú rồi lưu khoản thu hoặc chi.'**
+  String get overviewGuideAddScreenDescription;
+
+  /// No description provided for @overviewGuideTransactionsScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sổ giao dịch giúp xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.'**
+  String get overviewGuideTransactionsScreenDescription;
+
+  /// No description provided for @overviewGuideCalendarScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch hiển thị thu chi theo từng ngày cùng các sự kiện dự kiến.'**
+  String get overviewGuideCalendarScreenDescription;
+
+  /// No description provided for @overviewGuideWalletScreenDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ví giúp theo dõi số dư và mở các phần quản lý ví, ngân sách, mục tiêu, sổ nợ và giao dịch định kỳ.'**
+  String get overviewGuideWalletScreenDescription;
+
+  /// No description provided for @overviewGuideWalletNavigationDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chạm vào Ví tiền để xem số dư và quản lý các ví của bạn.'**
+  String get overviewGuideWalletNavigationDescription;
+
+  /// No description provided for @overviewGuideClosing.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.'**
+  String get overviewGuideClosing;
+
+  /// No description provided for @overviewGuideFinish.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bắt đầu sử dụng'**
+  String get overviewGuideFinish;
 }
 
 class _AppLocalizationsDelegate

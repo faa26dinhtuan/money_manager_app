@@ -839,7 +839,12 @@
   "overviewGuideSettingsTitle": "Mở cài đặt",
   "overviewGuideSettingsDescription": "Tùy chỉnh tiền tệ, định dạng ngày, giao diện, ngôn ngữ và sao lưu dữ liệu.",
   "overviewGuideAddTitle": "Thêm giao dịch",
-  "overviewGuideAddDescription": "Nút dấu cộng mở phần ghi khoản thu hoặc chi. Trong hướng dẫn, chạm vào nút chỉ bật Tiếp tục."
+  "overviewGuideAddDescription": "Nhấn dấu + để mở biểu mẫu thêm khoản thu hoặc chi.",
+  "overviewGuideAddScreenDescription": "Nhập số tiền, chọn ví và danh mục, thêm ngày cùng ghi chú rồi lưu khoản thu hoặc chi.",
+  "overviewGuideTransactionsScreenDescription": "Sổ giao dịch giúp xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.",
+  "overviewGuideCalendarScreenDescription": "Lịch hiển thị thu chi theo từng ngày cùng các sự kiện dự kiến.",
+  "overviewGuideWalletScreenDescription": "Ví giúp theo dõi số dư và mở các phần quản lý ví, ngân sách, mục tiêu, sổ nợ và giao dịch định kỳ.",
+  "overviewGuideWalletNavigationDescription": "Chạm vào Ví tiền để xem số dư và quản lý các ví của bạn.",
+  "overviewGuideClosing": "Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.",
+  "overviewGuideFinish": "Bắt đầu sử dụng"
 }
-
-

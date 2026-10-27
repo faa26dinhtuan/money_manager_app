@@ -22,10 +22,12 @@ class AddTransactionScreen extends StatefulWidget {
     super.key,
     this.initialType = TxType.expense,
     this.transaction,
+    this.previewOnly = false,
   });
 
   final TxType initialType;
   final Transaction? transaction;
+  final bool previewOnly;
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -55,7 +57,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         (_store.selectedWalletId == null ||
                 _store.walletById(_store.selectedWalletId!)?.currencyCode !=
                     _store.currency.code
-            ? sameCurrencyWallets.first.id
+            ? (sameCurrencyWallets.isEmpty ? null : sameCurrencyWallets.first.id)
             : _store.selectedWalletId!);
     if (t != null) {
       _amountCtrl.amount = t.amount;
@@ -226,18 +228,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           preferredSize: const Size.fromHeight(48),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TypeTabs(
-              type: _type,
-              onChanged: (t) => setState(() {
-                _type = t;
-                _categoryId = null;
-              }),
+            child: IgnorePointer(
+              ignoring: widget.previewOnly,
+              child: TypeTabs(
+                type: _type,
+                onChanged: (t) => setState(() {
+                  _type = t;
+                  _categoryId = null;
+                }),
+              ),
             ),
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: AbsorbPointer(
+        absorbing: widget.previewOnly,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -397,6 +404,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
           ],
         ],
+        ),
       ),
     );
   }

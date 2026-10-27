@@ -1599,5 +1599,32 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get overviewGuideAddDescription =>
-      'Nút dấu cộng mở phần ghi khoản thu hoặc chi. Trong hướng dẫn, chạm vào nút chỉ bật Tiếp tục.';
+      'Nhấn dấu + để mở biểu mẫu thêm khoản thu hoặc chi.';
+
+  @override
+  String get overviewGuideAddScreenDescription =>
+      'Nhập số tiền, chọn ví và danh mục, thêm ngày cùng ghi chú rồi lưu khoản thu hoặc chi.';
+
+  @override
+  String get overviewGuideTransactionsScreenDescription =>
+      'Sổ giao dịch giúp xem lại, tìm kiếm và lọc các khoản thu chi theo thời gian.';
+
+  @override
+  String get overviewGuideCalendarScreenDescription =>
+      'Lịch hiển thị thu chi theo từng ngày cùng các sự kiện dự kiến.';
+
+  @override
+  String get overviewGuideWalletScreenDescription =>
+      'Ví giúp theo dõi số dư và mở các phần quản lý ví, ngân sách, mục tiêu, sổ nợ và giao dịch định kỳ.';
+
+  @override
+  String get overviewGuideWalletNavigationDescription =>
+      'Chạm vào Ví tiền để xem số dư và quản lý các ví của bạn.';
+
+  @override
+  String get overviewGuideClosing =>
+      'Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.';
+
+  @override
+  String get overviewGuideFinish => 'Bắt đầu sử dụng';
 }
