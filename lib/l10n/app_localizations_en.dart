@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Money Manager';
+  String get appName => 'Pocketwise';
 
   @override
   String get overview => 'Overview';

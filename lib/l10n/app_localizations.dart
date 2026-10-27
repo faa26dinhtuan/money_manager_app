@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In vi, this message translates to:
-  /// **'Money Manager'**
+  /// **'Pocketwise'**
   String get appName;
 
   /// No description provided for @overview.

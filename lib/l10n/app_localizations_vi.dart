@@ -10,7 +10,7 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appName => 'Money Manager';
+  String get appName => 'Pocketwise';
 
   @override
   String get overview => 'Tổng quan';
