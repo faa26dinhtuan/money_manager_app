@@ -1635,4 +1635,13 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get overviewGuideCalendarPageDescription =>
       'Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.';
+
+  @override
+  String get transactionSaved => 'Đã lưu giao dịch';
+
+  @override
+  String get eventTransactionSaved => 'Đã ghi sự kiện thành giao dịch';
+
+  @override
+  String get animatedIconsByLordicon => 'Animated icons by Lordicon.com';
 }

@@ -8,8 +8,8 @@ import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
-import 'package:money_manager_app/core/widgets/welcome_icon_tile.dart';
 import 'package:money_manager_app/core/widgets/welcome_backdrop.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:money_manager_app/data/models/wallet.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
 
@@ -116,12 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Column(
                 children: [
-                  const WelcomeIconTile(
-                    icon: AppIcons.wallet,
-                    size: 88,
-                    iconSize: 48,
-                    radius: 28,
-                  ),
+                  const AppLottie(asset: AppAnimations.wallet, size: 88),
                   const SizedBox(height: 20),
                   Text(
                     l.welcome,

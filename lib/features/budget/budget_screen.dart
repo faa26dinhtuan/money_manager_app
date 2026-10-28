@@ -9,6 +9,7 @@ import 'package:money_manager_app/core/utils/budget_status.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/budget_progress_bar.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
 import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/budget.dart';
@@ -155,8 +156,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      AppIcon(AppIcons.budget,
-                          size: 56, color: context.textDisabled),
+                      const AppLottie(asset: AppAnimations.budget, size: 72),
                       const SizedBox(height: 12),
                       Text(
                         l.noBudgetsYet,

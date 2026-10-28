@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:flutter/services.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
+import 'package:money_manager_app/core/utils/app_snackbar.dart';
 import 'package:money_manager_app/core/utils/date_range.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -150,6 +152,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
     if (!recorded && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l.eventTransactionAlreadyRecorded)),
+      );
+    } else if (recorded && mounted) {
+      ScaffoldMessenger.of(context).showAppWithAnimation(
+        l.eventTransactionSaved,
+        animation: AppAnimations.success,
       );
     }
   }

@@ -14,6 +14,7 @@ import 'package:money_manager_app/core/widgets/period_bar.dart';
 import 'package:money_manager_app/core/widgets/settings_button.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/core/widgets/wallet_selector.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:money_manager_app/data/models/category.dart';
 import 'package:money_manager_app/data/models/transaction.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -190,12 +191,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       _SummaryRow(income: income, expense: expense),
                       if (groups.isEmpty)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 32),
-                          child: Text(
-                            _query.trim().isEmpty
-                                ? l.noTransactions
-                                : l.noTransactionsFound,
-                            style: TextStyle(color: context.textSecondary),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: Column(
+                            children: [
+                              if (_query.trim().isEmpty)
+                                const AppLottie(asset: AppAnimations.empty, size: 88),
+                              Text(
+                                _query.trim().isEmpty
+                                    ? l.noTransactions
+                                    : l.noTransactionsFound,
+                                style: TextStyle(color: context.textSecondary),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       for (final entry in groups.entries) ...[
