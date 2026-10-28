@@ -1,5 +1,6 @@
 class AppConstants {
   AppConstants._();
 
-  static const bool alwaysShowOnboarding = true;
+  static const bool alwaysShowOnboarding = false;
 }
+

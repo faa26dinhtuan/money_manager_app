@@ -1226,8 +1226,8 @@ class AppStore extends ChangeNotifier {
     await _save();
   }
 
-  void completeOnboarding([Wallet? wallet]) {
-    if (wallet != null) _wallets.add(wallet);
+  void completeOnboarding(Wallet wallet) {
+    _wallets.add(wallet);
     _onboarded = true;
     _prefs.setBool(_onboardedKey, true);
     notifyListeners();
@@ -1461,3 +1461,5 @@ class AppStore extends ChangeNotifier {
     ]);
   }
 }
+
+
