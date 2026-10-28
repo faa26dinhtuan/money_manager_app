@@ -26,7 +26,8 @@ class OverviewGuideTargets {
 }
 
 class OverviewGuideController extends ChangeNotifier {
-  bool active = true;
+  OverviewGuideController({this.active = true});
+  bool active;
   bool started = false;
   bool interacted = false;
   int step = 0;
@@ -674,6 +675,9 @@ class _OverviewSpotlightPainter extends CustomPainter {
       oldDelegate.step != step ||
       oldDelegate.dimBackground != dimBackground;
 }
+
+
+
 
 
 

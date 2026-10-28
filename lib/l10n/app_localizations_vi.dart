@@ -1513,11 +1513,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get maybeLater => 'Để sau';
 
   @override
-  String get overviewGuideTitle => 'Làm quen với Tổng quan';
+  String get overviewGuideTitle => 'Khám phá Pocketwise';
 
   @override
   String get overviewGuideIntro =>
-      'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.';
+      'Tìm hiểu các tính năng chính giúp bạn theo dõi thu chi và quản lý tài chính.';
 
   @override
   String get overviewGuideDemoInstruction =>

@@ -1515,11 +1515,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maybeLater => 'Maybe later';
 
   @override
-  String get overviewGuideTitle => 'Getting to know Overview';
+  String get overviewGuideTitle => 'Explore Pocketwise';
 
   @override
   String get overviewGuideIntro =>
-      'See your balance, income, expenses, and category breakdown at a glance.';
+      'Discover the key features for tracking income and expenses and managing your finances.';
 
   @override
   String get overviewGuideDemoInstruction =>

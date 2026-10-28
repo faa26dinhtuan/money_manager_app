@@ -64,7 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  void _finish(Wallet? wallet) {
+  void _finish(Wallet wallet) {
     _store.setCurrency(_currency);
     _store.completeOnboarding(wallet);
     Navigator.of(context).pushReplacement(
@@ -94,10 +94,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         currencyCode: _currency.code,
       ),
     );
-  }
-
-  void _skipWalletSetup() {
-    _finish(null);
   }
 
   @override
@@ -291,10 +287,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: _skipWalletSetup,
-                      child: Text(l.skipWalletSetup),
                     ),
                     const SizedBox(height: 12),
                   ],

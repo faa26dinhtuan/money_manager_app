@@ -38,7 +38,7 @@ class App extends StatelessWidget {
         scrollBehavior: const IosScrollBehavior(),
         home: SplashScreen(
           next:
-              AppStore.instance.onboarded && !AppConstants.alwaysShowOnboarding
+              AppStore.instance.onboarded && AppStore.instance.wallets.isNotEmpty && !AppConstants.alwaysShowOnboarding
               ? const MainShell()
               : const IntroScreen(next: OnboardingScreen(next: MainShell())),
         ),
@@ -56,7 +56,9 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
-  late final _overviewGuideController = OverviewGuideController();
+  late final _overviewGuideController = OverviewGuideController(
+    active: !AppStore.instance.overviewGuideShown,
+  );
   late final List<Widget> _screens = [
     OverviewScreen(guideController: _overviewGuideController),
     const TransactionsScreen(),
@@ -83,6 +85,10 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   void _onOverviewGuideChanged() {
     if (!mounted) return;
+    if (!_overviewGuideController.active &&
+        !AppStore.instance.overviewGuideShown) {
+      AppStore.instance.markOverviewGuideShown();
+    }
     setState(() {
       if (!_overviewGuideController.active) {
         _currentIndex = _overviewGuideController.step == 8 ? 3 : 0;
@@ -199,3 +205,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     );
   }
 }
+
+
+
