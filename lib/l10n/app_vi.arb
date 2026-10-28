@@ -814,8 +814,8 @@
   "skipGuide": "Bỏ qua hướng dẫn",
   "showMeGuide": "Cho tôi xem hướng dẫn",
   "maybeLater": "Để sau",
-  "overviewGuideTitle": "Làm quen với Tổng quan",
-  "overviewGuideIntro": "Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.",
+  "overviewGuideTitle": "Khám phá Pocketwise",
+  "overviewGuideIntro": "Tìm hiểu các tính năng chính giúp bạn theo dõi thu chi và quản lý tài chính.",
   "overviewGuideDemoInstruction": "Ví và giao dịch mẫu trong phần làm quen chỉ để minh họa, không làm thay đổi dữ liệu thật.",
   "overviewGuideSampleWallet": "Ví mẫu",
   "overviewGuideSampleExpenseCategory": "Ăn uống",
@@ -850,3 +850,4 @@
   "overviewGuideTransactionsPageDescription": "Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.",
   "overviewGuideCalendarPageDescription": "Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch."
 }
+

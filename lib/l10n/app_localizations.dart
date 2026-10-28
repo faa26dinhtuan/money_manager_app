@@ -2849,13 +2849,13 @@ abstract class AppLocalizations {
   /// No description provided for @overviewGuideTitle.
   ///
   /// In vi, this message translates to:
-  /// **'Làm quen với Tổng quan'**
+  /// **'Khám phá Pocketwise'**
   String get overviewGuideTitle;
 
   /// No description provided for @overviewGuideIntro.
   ///
   /// In vi, this message translates to:
-  /// **'Xem nhanh số dư, thu nhập, chi tiêu và phân bổ theo danh mục.'**
+  /// **'Tìm hiểu các tính năng chính giúp bạn theo dõi thu chi và quản lý tài chính.'**
   String get overviewGuideIntro;
 
   /// No description provided for @overviewGuideDemoInstruction.

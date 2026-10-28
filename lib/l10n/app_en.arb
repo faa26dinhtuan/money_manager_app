@@ -489,8 +489,8 @@
   "skipGuide": "Skip guide",
   "showMeGuide": "Show me the guide",
   "maybeLater": "Maybe later",
-  "overviewGuideTitle": "Getting to know Overview",
-  "overviewGuideIntro": "See your balance, income, expenses, and category breakdown at a glance.",
+  "overviewGuideTitle": "Explore Pocketwise",
+  "overviewGuideIntro": "Discover the key features for tracking income and expenses and managing your finances.",
   "overviewGuideDemoInstruction": "The sample wallet and transactions in this walkthrough are illustrative and won't change your real data.",
   "overviewGuideSampleWallet": "Sample wallet",
   "overviewGuideSampleExpenseCategory": "Food & dining",
@@ -525,3 +525,4 @@
   "overviewGuideTransactionsPageDescription": "Tap a transaction to view its details, edit it, or delete it when needed.",
   "overviewGuideCalendarPageDescription": "Add an event for an upcoming day to remember an expected income or expense and find it on the calendar."
 }
+
