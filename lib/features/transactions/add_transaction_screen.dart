@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/ios_picker.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
@@ -149,7 +150,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
     final warning = _budgetWarning(transaction);
     Navigator.of(context).pop();
-    if (warning != null) messenger.showApp(warning);
+    if (warning != null) {
+      messenger.showApp(warning);
+    } else {
+      messenger.showAppWithAnimation(
+        l.transactionSaved,
+        animation: AppAnimations.success,
+      );
+    }
   }
 
   double _projectedWalletBalance(Transaction transaction) {

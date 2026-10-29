@@ -3055,6 +3055,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.'**
   String get overviewGuideCalendarPageDescription;
+
+  /// No description provided for @transactionSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu giao dịch'**
+  String get transactionSaved;
+
+  /// No description provided for @eventTransactionSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã ghi sự kiện thành giao dịch'**
+  String get eventTransactionSaved;
+
+  /// No description provided for @animatedIconsByLordicon.
+  ///
+  /// In vi, this message translates to:
+  /// **'Animated icons by Lordicon.com'**
+  String get animatedIconsByLordicon;
 }
 
 class _AppLocalizationsDelegate

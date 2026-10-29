@@ -1637,4 +1637,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get overviewGuideCalendarPageDescription =>
       'Add an event for an upcoming day to remember an expected income or expense and find it on the calendar.';
+
+  @override
+  String get transactionSaved => 'Transaction saved';
+
+  @override
+  String get eventTransactionSaved => 'Event recorded as a transaction';
+
+  @override
+  String get animatedIconsByLordicon => 'Animated icons by Lordicon.com';
 }

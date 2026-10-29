@@ -20,11 +20,6 @@ class CategoryTransactionsScreen extends StatelessWidget {
     required this.range,
     required this.rangeLabel,
     this.guideMode = false,
-    this.guideCategoryName,
-    this.guideTransactionName,
-    this.guideIcon,
-    this.guideColor,
-    this.guideAmount,
   });
 
   final String categoryId;
@@ -32,11 +27,6 @@ class CategoryTransactionsScreen extends StatelessWidget {
   final DateRange range;
   final String rangeLabel;
   final bool guideMode;
-  final String? guideCategoryName;
-  final String? guideTransactionName;
-  final AppIconData? guideIcon;
-  final Color? guideColor;
-  final double? guideAmount;
 
   @override
   Widget build(BuildContext context) {
@@ -50,21 +40,11 @@ class CategoryTransactionsScreen extends StatelessWidget {
             .query(type, range, walletId: store.selectedWalletId)
             .where((t) => t.categoryId == categoryId)
             .toList();
-        final demoTransaction = guideMode
-            ? Transaction(
-                id: 'overview_guide_transaction',
-                type: type,
-                categoryId: categoryId,
-                walletId: '',
-                amount: guideAmount ?? 0,
-                date: DateTime.now(),
-                note: guideTransactionName ?? '',
-              )
-            : null;
-        final displayedItems = demoTransaction == null
-            ? items
-            : <Transaction>[demoTransaction];
-        final total = displayedItems.fold<double>(0, (sum, t) => sum + t.amount);
+        final displayedItems = items;
+        final total = displayedItems.fold<double>(
+          0,
+          (sum, t) => sum + t.amount,
+        );
 
         final groups = <DateTime, List<Transaction>>{};
         for (final t in displayedItems) {
@@ -72,9 +52,7 @@ class CategoryTransactionsScreen extends StatelessWidget {
           groups.putIfAbsent(key, () => []).add(t);
         }
 
-        final categoryTitle = guideCategoryName ??
-            category?.localizedName(context) ??
-            l.other;
+        final categoryTitle = category?.localizedName(context) ?? l.other;
 
         return Scaffold(
           appBar: AppBar(title: Text(categoryTitle)),
@@ -100,8 +78,8 @@ class CategoryTransactionsScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       CategoryIcon(
-                        icon: guideIcon ?? category?.icon ?? AppIcons.help,
-                        color: guideColor ?? category?.color ?? Colors.grey,
+                        icon: category?.icon ?? AppIcons.help,
+                        color: category?.color ?? Colors.grey,
                         size: 48,
                       ),
                       const SizedBox(width: 14),
@@ -173,12 +151,14 @@ class CategoryTransactionsScreen extends StatelessWidget {
                         ),
                         for (final t in entry.value)
                           InkWell(
-                            onTap: guideMode ? null : () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    AddTransactionScreen(transaction: t),
-                              ),
-                            ),
+                            onTap: guideMode
+                                ? null
+                                : () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          AddTransactionScreen(transaction: t),
+                                    ),
+                                  ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 vertical: 10,

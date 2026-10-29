@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/utils/currency.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:money_manager_app/core/widgets/money_field.dart';
 import 'package:money_manager_app/core/widgets/type_tabs.dart';
 import 'package:money_manager_app/data/models/category.dart';
@@ -203,11 +204,19 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                event == null ? l.addPlannedEvent : l.editPlannedEvent,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  const AppLottie(asset: AppAnimations.calendar, size: 36),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      event == null ? l.addPlannedEvent : l.editPlannedEvent,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 14),
               TextField(
@@ -282,7 +291,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
               ),
               if (_repeat) ...[
                 DropdownButtonFormField<Frequency>(
-                  value: _frequency,
+                  initialValue: _frequency,
                   decoration: InputDecoration(labelText: l.repeatFrequency),
                   items: [
                     for (final frequency in Frequency.values)
@@ -307,7 +316,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                 ),
                 if (_linkToRecurring) ...[
                   DropdownButtonFormField<String>(
-                    value: _categoryId,
+                    initialValue: _categoryId,
                     decoration: InputDecoration(labelText: l.category),
                     items: [
                       for (final category in _store.categoriesOf(_type))
@@ -323,7 +332,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _walletId,
+                    initialValue: _walletId,
                     decoration: InputDecoration(labelText: l.wallet),
                     items: [
                       for (final wallet in _store.wallets.where(
@@ -429,3 +438,5 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
     );
   }
 }
+
+

@@ -31,6 +31,8 @@ class AppStore extends ChangeNotifier {
   static const _plannedEventsKey = 'plannedEvents';
   static const _onboardedKey = 'onboarded';
   static const _overviewGuideShownKey = 'overviewGuideShown';
+  static const _legacySeedCleanupKey = 'legacySampleDataCleanedV1';
+  static const guideCashWalletId = 'guide_cash';
   static const _themeModeKey = 'themeMode';
   static const _currencyKey = 'currency';
   static const _selectedWalletKey = 'selectedWallet';
@@ -38,7 +40,6 @@ class AppStore extends ChangeNotifier {
   static const _hideBalancesKey = 'hideBalancesByDefault';
   static const _dateFormatKey = 'dateFormat';
   static const _currencyConversionUndoKey = 'currencyConversionUndo';
-
 
   late final SharedPreferences _prefs;
 
@@ -59,6 +60,7 @@ class AppStore extends ChangeNotifier {
   bool _hideBalancesByDefault = true;
   String _dateFormat = 'dd/MM/yyyy';
   bool _canUndoCurrencyConversion = false;
+  _GuideDemoSnapshot? _guideDemoSnapshot;
 
   bool get onboarded => _onboarded;
 
@@ -71,7 +73,6 @@ class AppStore extends ChangeNotifier {
   String get dateFormat => _dateFormat;
 
   bool get canUndoCurrencyConversion => _canUndoCurrencyConversion;
-
 
   AppCurrency get currency => _currency;
 
@@ -99,7 +100,9 @@ class AppStore extends ChangeNotifier {
     if (rawRecurrings != null) {
       try {
         final recurrings = (jsonDecode(rawRecurrings) as List)
-            .map((e) => RecurringTransaction.fromJson(e as Map<String, dynamic>))
+            .map(
+              (e) => RecurringTransaction.fromJson(e as Map<String, dynamic>),
+            )
             .toList();
         _recurrings
           ..clear()
@@ -131,7 +134,8 @@ class AppStore extends ChangeNotifier {
     final rawDebts = _prefs.getString(_debtsKey);
     if (rawCategories != null && rawTransactions != null) {
       try {
-        bool missingCurrencyCode(String? raw) => raw != null &&
+        bool missingCurrencyCode(String? raw) =>
+            raw != null &&
             (jsonDecode(raw) as List).any(
               (item) => item is Map && !item.containsKey('currencyCode'),
             );
@@ -161,7 +165,6 @@ class AppStore extends ChangeNotifier {
             : (jsonDecode(rawDebts) as List)
                   .map((e) => Debt.fromJson(e as Map<String, dynamic>))
                   .toList();
-        if (wallets.isEmpty) throw const FormatException('no wallets');
         _categories
           ..clear()
           ..addAll(categories);
@@ -180,7 +183,9 @@ class AppStore extends ChangeNotifier {
         _debts
           ..clear()
           ..addAll(debts);
-        if (rawWallets == null ||
+        final legacySeedsRemoved = await _removeLegacySampleData();
+        if (legacySeedsRemoved ||
+            rawWallets == null ||
             rawBudgets == null ||
             rawGoals == null ||
             rawDebts == null ||
@@ -202,44 +207,34 @@ class AppStore extends ChangeNotifier {
       }
     }
     _seed();
+    await _prefs.setBool(_legacySeedCleanupKey, true);
     await _save();
   }
 
   Future<void> _save() async {
+    if (_guideDemoSnapshot != null) return;
+    final categories = jsonEncode(_categories.map((c) => c.toJson()).toList());
+    final transactions = jsonEncode(
+      _transactions.map((t) => t.toJson()).toList(),
+    );
+    final wallets = jsonEncode(_wallets.map((w) => w.toJson()).toList());
+    final budgets = jsonEncode(_budgets.map((b) => b.toJson()).toList());
+    final goals = jsonEncode(_goals.map((g) => g.toJson()).toList());
+    final debts = jsonEncode(_debts.map((d) => d.toJson()).toList());
+    final recurrings = jsonEncode(_recurrings.map((r) => r.toJson()).toList());
+    final plannedEvents = jsonEncode(
+      _plannedEvents.map((e) => e.toJson()).toList(),
+    );
     _canUndoCurrencyConversion = false;
     await _prefs.remove(_currencyConversionUndoKey);
-    await _prefs.setString(
-      _categoriesKey,
-      jsonEncode(_categories.map((c) => c.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _transactionsKey,
-      jsonEncode(_transactions.map((t) => t.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _walletsKey,
-      jsonEncode(_wallets.map((w) => w.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _budgetsKey,
-      jsonEncode(_budgets.map((b) => b.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _goalsKey,
-      jsonEncode(_goals.map((g) => g.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _debtsKey,
-      jsonEncode(_debts.map((d) => d.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _recurringsKey,
-      jsonEncode(_recurrings.map((r) => r.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _plannedEventsKey,
-      jsonEncode(_plannedEvents.map((e) => e.toJson()).toList()),
-    );
+    await _prefs.setString(_categoriesKey, categories);
+    await _prefs.setString(_transactionsKey, transactions);
+    await _prefs.setString(_walletsKey, wallets);
+    await _prefs.setString(_budgetsKey, budgets);
+    await _prefs.setString(_goalsKey, goals);
+    await _prefs.setString(_debtsKey, debts);
+    await _prefs.setString(_recurringsKey, recurrings);
+    await _prefs.setString(_plannedEventsKey, plannedEvents);
   }
 
   List<Category> categoriesOf(TxType type) =>
@@ -340,11 +335,15 @@ class AppStore extends ChangeNotifier {
 
   void selectWallet(String? id) {
     _selectedWalletId = id;
-    if (id != null) setCurrency(AppCurrency.byCode(walletById(id)?.currencyCode));
-    if (id == null) {
-      _prefs.remove(_selectedWalletKey);
-    } else {
-      _prefs.setString(_selectedWalletKey, id);
+    if (id != null && _guideDemoSnapshot == null) {
+      setCurrency(AppCurrency.byCode(walletById(id)?.currencyCode));
+    }
+    if (_guideDemoSnapshot == null) {
+      if (id == null) {
+        _prefs.remove(_selectedWalletKey);
+      } else {
+        _prefs.setString(_selectedWalletKey, id);
+      }
     }
     notifyListeners();
   }
@@ -367,7 +366,8 @@ class AppStore extends ChangeNotifier {
     if (_wallets.length <= 1) return;
     final wallet = walletById(id);
     if (wallet == null ||
-        _wallets.where((w) => w.currencyCode == wallet.currencyCode).length <= 1) {
+        _wallets.where((w) => w.currencyCode == wallet.currencyCode).length <=
+            1) {
       return;
     }
     _wallets.removeWhere((w) => w.id == id);
@@ -407,18 +407,22 @@ class AppStore extends ChangeNotifier {
   }
 
   bool hasPlannedEventTransaction(PlannedEvent event, DateTime date) {
-    final key = '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    final key =
+        '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
     return _transactions.any((transaction) {
       if (transaction.id == 'event_$key') return true;
       final transactionDate = transaction.date;
-      final sameDate = transactionDate.year == date.year &&
+      final sameDate =
+          transactionDate.year == date.year &&
           transactionDate.month == date.month &&
           transactionDate.day == date.day;
-      final sameEvent = transaction.id.startsWith('rec_') &&
+      final sameEvent =
+          transaction.id.startsWith('rec_') &&
           transaction.type == event.type &&
           transaction.amount == event.amount &&
           (event.walletId == null || transaction.walletId == event.walletId) &&
-          (transaction.note == event.title || transaction.note.startsWith('${event.title}\n'));
+          (transaction.note == event.title ||
+              transaction.note.startsWith('${event.title}\n'));
       return sameDate && sameEvent;
     });
   }
@@ -440,8 +444,11 @@ class AppStore extends ChangeNotifier {
         hasPlannedEventTransaction(event, date)) {
       return false;
     }
-    final key = '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
-    final note = event.note.isEmpty ? event.title : '${event.title}\n${event.note}';
+    final key =
+        '${event.id}_${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    final note = event.note.isEmpty
+        ? event.title
+        : '${event.title}\n${event.note}';
     _transactions.add(
       Transaction(
         id: 'event_$key',
@@ -483,11 +490,14 @@ class AppStore extends ChangeNotifier {
     String eventId, {
     DateTime? occurrenceDate,
   }) {
-    final eventIndex = _plannedEvents.indexWhere((event) => event.id == eventId);
+    final eventIndex = _plannedEvents.indexWhere(
+      (event) => event.id == eventId,
+    );
     if (eventIndex == -1) return const [];
     final event = _plannedEvents[eventIndex];
     return _transactions.where((transaction) {
-      final sameDate = occurrenceDate == null ||
+      final sameDate =
+          occurrenceDate == null ||
           (transaction.date.year == occurrenceDate.year &&
               transaction.date.month == occurrenceDate.month &&
               transaction.date.day == occurrenceDate.day);
@@ -511,7 +521,11 @@ class AppStore extends ChangeNotifier {
           event.date.month == date.month &&
           event.date.day == date.day;
     }
-    var occurrence = DateTime(event.date.year, event.date.month, event.date.day);
+    var occurrence = DateTime(
+      event.date.year,
+      event.date.month,
+      event.date.day,
+    );
     final target = DateTime(date.year, date.month, date.day);
     var guard = 0;
     while (occurrence.isBefore(target) && guard < 100000) {
@@ -547,7 +561,9 @@ class AppStore extends ChangeNotifier {
     _plannedEvents.where((event) {
       if (event.currencyCode != _currency.code) return false;
       final selected = selectedWalletId;
-      return selected == null || event.walletId == null || event.walletId == selected;
+      return selected == null ||
+          event.walletId == null ||
+          event.walletId == selected;
     }),
   );
 
@@ -598,9 +614,12 @@ class AppStore extends ChangeNotifier {
         guard++;
       }
       while (date.isBefore(range.end) && guard < 100000) {
-        if (!event.skippedDates.any((skipped) =>
-            skipped.year == date.year && skipped.month == date.month &&
-            skipped.day == date.day)) {
+        if (!event.skippedDates.any(
+          (skipped) =>
+              skipped.year == date.year &&
+              skipped.month == date.month &&
+              skipped.day == date.day,
+        )) {
           result.add(event.copyWith(date: date, seriesStartDate: event.date));
         }
         date = _advanceEventDate(date, event.date, frequency);
@@ -610,7 +629,11 @@ class AppStore extends ChangeNotifier {
     return result;
   }
 
-  DateTime _advanceEventDate(DateTime from, DateTime start, Frequency frequency) {
+  DateTime _advanceEventDate(
+    DateTime from,
+    DateTime start,
+    Frequency frequency,
+  ) {
     switch (frequency) {
       case Frequency.daily:
         return DateTime(from.year, from.month, from.day + 1);
@@ -637,11 +660,17 @@ class AppStore extends ChangeNotifier {
     if (index == -1) return;
     final event = _plannedEvents[index];
     final skipped = DateTime(date.year, date.month, date.day);
-    if (event.skippedDates.any((item) =>
-        item.year == skipped.year && item.month == skipped.month && item.day == skipped.day)) {
+    if (event.skippedDates.any(
+      (item) =>
+          item.year == skipped.year &&
+          item.month == skipped.month &&
+          item.day == skipped.day,
+    )) {
       return;
     }
-    _plannedEvents[index] = event.copyWith(skippedDates: [...event.skippedDates, skipped]);
+    _plannedEvents[index] = event.copyWith(
+      skippedDates: [...event.skippedDates, skipped],
+    );
     notifyListeners();
     _save();
   }
@@ -649,7 +678,10 @@ class AppStore extends ChangeNotifier {
   void skipRecurringOccurrence(String recurringId, DateTime date) {
     final recurring = recurringById(recurringId);
     if (recurring == null || recurring.isSkipped(date)) return;
-    final skipped = [...recurring.skippedDates, RecurringTransaction.dateOnly(date)];
+    final skipped = [
+      ...recurring.skippedDates,
+      RecurringTransaction.dateOnly(date),
+    ];
     updateRecurring(recurring.copyWith(skippedDates: skipped));
   }
 
@@ -714,7 +746,9 @@ class AppStore extends ChangeNotifier {
 
   Budget? budgetOfCategory(String categoryId) {
     for (final b in _budgets) {
-      if (b.categoryId == categoryId && b.currencyCode == _currency.code) return b;
+      if (b.categoryId == categoryId && b.currencyCode == _currency.code) {
+        return b;
+      }
     }
     return null;
   }
@@ -727,8 +761,11 @@ class AppStore extends ChangeNotifier {
     final code = currencyCode ?? _currency.code;
     var sum = 0.0;
     for (final t in _transactions) {
-      if (t.type != TxType.expense || t.categoryId != categoryId ||
-          walletById(t.walletId)?.currencyCode != code) continue;
+      if (t.type != TxType.expense ||
+          t.categoryId != categoryId ||
+          walletById(t.walletId)?.currencyCode != code) {
+        continue;
+      }
       if (range.contains(t.date)) sum += t.amount;
     }
     return sum;
@@ -738,8 +775,11 @@ class AppStore extends ChangeNotifier {
     final code = currencyCode ?? _currency.code;
     var sum = 0.0;
     for (final t in _transactions) {
-      if (t.type == TxType.expense && range.contains(t.date) &&
-          walletById(t.walletId)?.currencyCode == code) sum += t.amount;
+      if (t.type == TxType.expense &&
+          range.contains(t.date) &&
+          walletById(t.walletId)?.currencyCode == code) {
+        sum += t.amount;
+      }
     }
     return sum;
   }
@@ -764,9 +804,8 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
-  List<Goal> get goals => List.unmodifiable(
-    _goals.where((g) => g.currencyCode == _currency.code),
-  );
+  List<Goal> get goals =>
+      List.unmodifiable(_goals.where((g) => g.currencyCode == _currency.code));
 
   List<Goal> get allGoals => List.unmodifiable(_goals);
 
@@ -817,9 +856,8 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
-  List<Debt> get debts => List.unmodifiable(
-    _debts.where((d) => d.currencyCode == _currency.code),
-  );
+  List<Debt> get debts =>
+      List.unmodifiable(_debts.where((d) => d.currencyCode == _currency.code));
 
   List<Debt> get allDebts => List.unmodifiable(_debts);
 
@@ -871,10 +909,13 @@ class AppStore extends ChangeNotifier {
   }
 
   List<RecurringTransaction> get recurrings => List.unmodifiable(
-    _recurrings.where((r) => walletById(r.walletId)?.currencyCode == _currency.code),
+    _recurrings.where(
+      (r) => walletById(r.walletId)?.currencyCode == _currency.code,
+    ),
   );
 
-  List<RecurringTransaction> get allRecurrings => List.unmodifiable(_recurrings);
+  List<RecurringTransaction> get allRecurrings =>
+      List.unmodifiable(_recurrings);
 
   RecurringTransaction? recurringById(String id) {
     for (final r in _recurrings) {
@@ -947,6 +988,7 @@ class AppStore extends ChangeNotifier {
   }
 
   int processRecurring([DateTime? now]) {
+    if (_guideDemoSnapshot != null) return 0;
     final current = now ?? DateTime.now();
     final today = DateTime(current.year, current.month, current.day);
     var created = 0;
@@ -1038,7 +1080,9 @@ class AppStore extends ChangeNotifier {
       expanded = false;
       for (final goal in _goals) {
         if (goal.currencyCode != fromCode ||
-            !goal.entries.any((entry) => sourceWalletIds.contains(entry.walletId))) {
+            !goal.entries.any(
+              (entry) => sourceWalletIds.contains(entry.walletId),
+            )) {
           continue;
         }
         for (final entry in goal.entries) {
@@ -1051,8 +1095,11 @@ class AppStore extends ChangeNotifier {
         }
       }
       for (final debt in _debts) {
-        final linked = sourceWalletIds.contains(debt.walletId) ||
-            debt.payments.any((payment) => sourceWalletIds.contains(payment.walletId));
+        final linked =
+            sourceWalletIds.contains(debt.walletId) ||
+            debt.payments.any(
+              (payment) => sourceWalletIds.contains(payment.walletId),
+            );
         if (debt.currencyCode != fromCode || !linked) continue;
         final linkedIds = <String?>[
           debt.walletId,
@@ -1102,7 +1149,9 @@ class AppStore extends ChangeNotifier {
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
       if (g.currencyCode != fromCode ||
-          !g.entries.any((entry) => sourceWalletIds.contains(entry.walletId))) continue;
+          !g.entries.any((entry) => sourceWalletIds.contains(entry.walletId))) {
+        continue;
+      }
       _goals[i] = g.copyWith(
         target: conv(g.target),
         currencyCode: to.code,
@@ -1122,7 +1171,11 @@ class AppStore extends ChangeNotifier {
       final d = _debts[i];
       if (d.currencyCode != fromCode ||
           (!sourceWalletIds.contains(d.walletId) &&
-              !d.payments.any((payment) => sourceWalletIds.contains(payment.walletId)))) continue;
+              !d.payments.any(
+                (payment) => sourceWalletIds.contains(payment.walletId),
+              ))) {
+        continue;
+      }
       _debts[i] = d.copyWith(
         amount: conv(d.amount),
         currencyCode: to.code,
@@ -1156,10 +1209,7 @@ class AppStore extends ChangeNotifier {
     _prefs.setString(_currencyKey, to.code);
     notifyListeners();
     await _save();
-    await _prefs.setString(
-      _currencyConversionUndoKey,
-      backupBeforeConversion,
-    );
+    await _prefs.setString(_currencyConversionUndoKey, backupBeforeConversion);
     _canUndoCurrencyConversion = true;
     notifyListeners();
   }
@@ -1234,6 +1284,166 @@ class AppStore extends ChangeNotifier {
     _save();
   }
 
+  void beginOverviewGuideDemo() {
+    if (_guideDemoSnapshot != null) return;
+    _guideDemoSnapshot = _GuideDemoSnapshot(
+      categories: _categories,
+      transactions: _transactions,
+      wallets: _wallets,
+      budgets: _budgets,
+      goals: _goals,
+      debts: _debts,
+      recurrings: _recurrings,
+      plannedEvents: _plannedEvents,
+      selectedWalletId: _selectedWalletId,
+    );
+    _categories.clear();
+    _transactions.clear();
+    _wallets.clear();
+    _budgets.clear();
+    _goals.clear();
+    _debts.clear();
+    _recurrings.clear();
+    _plannedEvents.clear();
+    _seed(includeExamples: true);
+    _selectedWalletId = guideCashWalletId;
+    notifyListeners();
+  }
+
+  void endOverviewGuideDemo() {
+    final snapshot = _guideDemoSnapshot;
+    if (snapshot == null) return;
+    _categories
+      ..clear()
+      ..addAll(snapshot.categories);
+    _transactions
+      ..clear()
+      ..addAll(snapshot.transactions);
+    _wallets
+      ..clear()
+      ..addAll(snapshot.wallets);
+    _budgets
+      ..clear()
+      ..addAll(snapshot.budgets);
+    _goals
+      ..clear()
+      ..addAll(snapshot.goals);
+    _debts
+      ..clear()
+      ..addAll(snapshot.debts);
+    _recurrings
+      ..clear()
+      ..addAll(snapshot.recurrings);
+    _plannedEvents
+      ..clear()
+      ..addAll(snapshot.plannedEvents);
+    _selectedWalletId = snapshot.selectedWalletId;
+    _guideDemoSnapshot = null;
+    notifyListeners();
+  }
+
+  Future<bool> _removeLegacySampleData() async {
+    if (_prefs.getBool(_legacySeedCleanupKey) ?? false) return false;
+    final vi = lookupAppLocalizations(const Locale('vi'));
+    final en = lookupAppLocalizations(const Locale('en'));
+    const transactionCategories = <String, String>{
+      '1': 'expense|food',
+      '2': 'expense|transport',
+      '3': 'expense|grocery',
+      '4': 'expense|shop',
+      '5': 'expense|food',
+      '6': 'expense|bill',
+      '7': 'expense|home',
+      '8': 'expense|health',
+      '9': 'expense|food',
+      '10': 'income|salary',
+      '11': 'income|bonus',
+      '12': 'income|invest',
+    };
+    final transactionNotes = <String, Set<String>>{
+      '1': {vi.seedNoteLunch, en.seedNoteLunch},
+      '2': {vi.seedNoteRide, en.seedNoteRide},
+      '3': {vi.seedNoteVegetables, en.seedNoteVegetables},
+      '4': {vi.seedNoteTshirt, en.seedNoteTshirt},
+      '5': {vi.seedNoteCoffee, en.seedNoteCoffee},
+      '6': {vi.seedNoteElectricity, en.seedNoteElectricity},
+      '7': {vi.seedNoteRent, en.seedNoteRent},
+      '8': {vi.seedNoteMedicine, en.seedNoteMedicine},
+      '9': {''},
+      '10': {vi.seedNoteSalary, en.seedNoteSalary},
+      '11': {vi.seedNoteProjectBonus, en.seedNoteProjectBonus},
+      '12': {vi.seedNoteInterest, en.seedNoteInterest},
+    };
+    final transactionCount = _transactions.length;
+    _transactions.removeWhere((transaction) {
+      final category = transactionCategories[transaction.id];
+      final notes = transactionNotes[transaction.id];
+      return category == '${transaction.type.name}|${transaction.categoryId}' &&
+          notes?.contains(transaction.note) == true;
+    });
+    final budgetCount = _budgets.length;
+    _budgets.removeWhere(
+      (budget) =>
+          (budget.id == 'b_food' && budget.categoryId == 'food') ||
+          (budget.id == 'b_shop' && budget.categoryId == 'shop') ||
+          (budget.id == 'b_transport' && budget.categoryId == 'transport'),
+    );
+    final goalCount = _goals.length;
+    final oldGoalNames = {vi.seedGoalTrip, en.seedGoalTrip};
+    _goals.removeWhere(
+      (goal) => goal.id == 'g_trip' && oldGoalNames.contains(goal.name),
+    );
+    final debtCount = _debts.length;
+    final oldLenders = {vi.seedPersonMinh, en.seedPersonMinh};
+    final oldBorrowers = {vi.seedPersonLan, en.seedPersonLan};
+    _debts.removeWhere(
+      (debt) =>
+          (debt.id == 'd_minh' &&
+              debt.type == DebtType.lend &&
+              oldLenders.contains(debt.person)) ||
+          (debt.id == 'd_lan' &&
+              debt.type == DebtType.borrow &&
+              oldBorrowers.contains(debt.person)),
+    );
+    final referencedWalletIds = <String>{
+      ..._transactions.map((transaction) => transaction.walletId),
+      ..._recurrings.map((recurring) => recurring.walletId),
+      ..._plannedEvents.map((event) => event.walletId).whereType<String>(),
+    };
+    for (final goal in _goals) {
+      referencedWalletIds.addAll(
+        goal.entries.map((entry) => entry.walletId).whereType<String>(),
+      );
+    }
+    for (final debt in _debts) {
+      if (debt.walletId != null) referencedWalletIds.add(debt.walletId!);
+      referencedWalletIds.addAll(
+        debt.payments.map((payment) => payment.walletId).whereType<String>(),
+      );
+    }
+    final walletCount = _wallets.length;
+    final oldCashNames = {vi.cashWallet, en.cashWallet};
+    final oldBankNames = {vi.bankWallet, en.bankWallet};
+    _wallets.removeWhere(
+      (wallet) =>
+          ((wallet.id == 'cash' && oldCashNames.contains(wallet.name)) ||
+              (wallet.id == 'bank' && oldBankNames.contains(wallet.name))) &&
+          wallet.initialBalance == 0 &&
+          !referencedWalletIds.contains(wallet.id),
+    );
+    if (_selectedWalletId != null &&
+        !_wallets.any((wallet) => wallet.id == _selectedWalletId)) {
+      _selectedWalletId = null;
+      await _prefs.remove(_selectedWalletKey);
+    }
+    await _prefs.setBool(_legacySeedCleanupKey, true);
+    return transactionCount != _transactions.length ||
+        budgetCount != _budgets.length ||
+        goalCount != _goals.length ||
+        debtCount != _debts.length ||
+        walletCount != _wallets.length;
+  }
+
   void markOverviewGuideShown() {
     _overviewGuideShown = true;
     _prefs.setBool(_overviewGuideShownKey, true);
@@ -1259,7 +1469,7 @@ class AppStore extends ChangeNotifier {
     currencyCode: _currency.code,
   );
 
-  void _seed() {
+  void _seed({bool includeExamples = false}) {
     final l = _seedStrings();
     const e = TxType.expense;
     const i = TxType.income;
@@ -1350,21 +1560,71 @@ class AppStore extends ChangeNotifier {
       ),
     ]);
 
+    if (!includeExamples) return;
+
+    double scaleAmount(double value) {
+      final factor = switch (_currency.code) {
+        'USD' => 1 / 25000,
+        'EUR' => 1 / 28000,
+        'GBP' => 1 / 32000,
+        'JPY' => 1 / 170,
+        'CNY' => 1 / 3500,
+        'KRW' => 1 / 18,
+        'THB' => 1 / 700,
+        'SGD' => 1 / 19000,
+        'AUD' => 1 / 16000,
+        'CAD' => 1 / 18000,
+        'CHF' => 1 / 30000,
+        'INR' => 1 / 300,
+        'HKD' => 1 / 3200,
+        'MYR' => 1 / 5500,
+        'IDR' => 1.3,
+        'PHP' => 1 / 450,
+        'TWD' => 1 / 800,
+        _ => 1.0,
+      };
+      final scale = _currency.scale;
+      return (value * factor * scale).round() / scale;
+    }
+
     _wallets.addAll([
-      _cashWallet(l),
       Wallet(
-        id: 'bank',
+        id: 'guide_cash',
+        name: l.overviewGuideSampleWallet,
+        icon: AppIcons.payments,
+        color: const Color(0xFF2A8C66),
+        initialBalance: scaleAmount(3755000),
+        currencyCode: _currency.code,
+      ),
+      Wallet(
+        id: 'guide_bank',
         name: l.bankWallet,
         icon: AppIcons.bank,
         color: const Color(0xFF4C9BE8),
+        initialBalance: scaleAmount(3000000),
         currencyCode: _currency.code,
       ),
     ]);
 
     _budgets.addAll([
-      Budget(id: 'b_food', categoryId: 'food', limit: 2000000, currencyCode: _currency.code),
-      Budget(id: 'b_shop', categoryId: 'shop', limit: 1000000, currencyCode: _currency.code),
-      Budget(id: 'b_transport', categoryId: 'transport', limit: 500000, currencyCode: _currency.code),
+      Budget(
+        id: 'guide_budget_food',
+        categoryId: 'food',
+        limit: scaleAmount(2000000),
+        currencyCode: _currency.code,
+      ),
+      Budget(
+        id: 'guide_budget_shop',
+        categoryId: 'shop',
+        limit: scaleAmount(1000000),
+        currencyCode: _currency.code,
+      ),
+      Budget(
+        id: 'guide_budget_transport',
+        categoryId: 'transport',
+        limit: scaleAmount(500000),
+        currencyCode: _currency.code,
+      ),
     ]);
 
     final now = DateTime.now();
@@ -1372,16 +1632,17 @@ class AppStore extends ChangeNotifier {
     Transaction tx(
       String id,
       TxType type,
-      String cat,
+      String categoryId,
       double amount,
       int daysAgo, [
       String note = '',
+      String walletId = guideCashWalletId,
     ]) => Transaction(
       id: id,
       type: type,
-      categoryId: cat,
-      walletId: type == TxType.income ? 'bank' : 'cash',
-      amount: amount,
+      categoryId: categoryId,
+      walletId: walletId,
+      amount: scaleAmount(amount),
       date: today
           .subtract(Duration(days: daysAgo))
           .add(const Duration(hours: 12)),
@@ -1389,39 +1650,74 @@ class AppStore extends ChangeNotifier {
     );
 
     _transactions.addAll([
-      tx('1', e, 'food', 85000, 0, l.seedNoteLunch),
-      tx('2', e, 'transport', 30000, 0, l.seedNoteRide),
-      tx('3', e, 'grocery', 220000, 1, l.seedNoteVegetables),
-      tx('4', e, 'shop', 450000, 2, l.seedNoteTshirt),
-      tx('5', e, 'food', 120000, 3, l.seedNoteCoffee),
-      tx('6', e, 'bill', 650000, 5, l.seedNoteElectricity),
-      tx('7', e, 'home', 3000000, 8, l.seedNoteRent),
-      tx('8', e, 'health', 180000, 12, l.seedNoteMedicine),
-      tx('9', e, 'food', 95000, 15),
-      tx('10', i, 'salary', 15000000, 4, l.seedNoteSalary),
-      tx('11', i, 'bonus', 1000000, 10, l.seedNoteProjectBonus),
-      tx('12', i, 'invest', 350000, 20, l.seedNoteInterest),
+      tx('guide_tx_01', e, 'food', 85000, 0, l.seedNoteLunch),
+      tx('guide_tx_02', e, 'transport', 30000, 0, l.seedNoteRide),
+      tx('guide_tx_03', e, 'food', 55000, 0, l.seedNoteCoffee),
+      tx('guide_tx_04', i, 'bonus', 300000, 0, l.seedNoteProjectBonus),
+      tx('guide_tx_05', e, 'grocery', 220000, 1, l.seedNoteVegetables),
+      tx('guide_tx_06', e, 'food', 65000, 1, l.seedNoteCoffee),
+      tx('guide_tx_07', e, 'shop', 450000, 2, l.seedNoteTshirt),
+      tx('guide_tx_08', e, 'food', 120000, 3, l.seedNoteLunch),
+      tx('guide_tx_09', e, 'transport', 45000, 3, l.seedNoteRide),
+      tx('guide_tx_10', e, 'bill', 650000, 5, l.seedNoteElectricity),
+      tx('guide_tx_11', i, 'salary', 4500000, 4, l.seedNoteSalary),
+      tx('guide_tx_12', e, 'home', 3000000, 8, l.seedNoteRent),
+      tx('guide_tx_13', e, 'health', 180000, 12, l.seedNoteMedicine),
+      tx('guide_tx_14', i, 'bonus', 1000000, 10, l.seedNoteProjectBonus),
+      tx('guide_tx_15', e, 'food', 95000, 15, l.seedNoteLunch),
+      tx('guide_tx_16', e, 'grocery', 240000, 18, l.seedNoteVegetables),
+      tx('guide_tx_17', i, 'invest', 350000, 20, l.seedNoteInterest),
+      tx('guide_tx_18', e, 'transport', 70000, 21, l.seedNoteRide),
+      tx('guide_tx_19', e, 'shop', 250000, 24, l.seedNoteTshirt),
+      tx(
+        'guide_tx_20',
+        i,
+        'salary',
+        1200000,
+        25,
+        l.seedNoteSalary,
+        'guide_bank',
+      ),
+      tx('guide_tx_21', e, 'food', 150000, 26, l.seedNoteCoffee),
+      tx(
+        'guide_tx_22',
+        e,
+        'bill',
+        220000,
+        28,
+        l.seedNoteElectricity,
+        'guide_bank',
+      ),
+      tx(
+        'guide_tx_23',
+        i,
+        'salary',
+        15000000,
+        4,
+        l.seedNoteSalary,
+        'guide_bank',
+      ),
     ]);
 
     _goals.add(
       Goal(
-        id: 'g_trip',
+        id: 'guide_goal_trip',
         name: l.seedGoalTrip,
         icon: AppIcons.flight,
         color: const Color(0xFF4C9BE8),
-        target: 10000000,
+        target: scaleAmount(10000000),
         currencyCode: _currency.code,
         deadline: today.add(const Duration(days: 90)),
         entries: [
           GoalEntry(
-            id: 'ge_1',
-            amount: 2000000,
+            id: 'guide_goal_entry_1',
+            amount: scaleAmount(2000000),
             date: today.subtract(const Duration(days: 20)),
             note: l.seedGoalInitial,
           ),
           GoalEntry(
-            id: 'ge_2',
-            amount: 1500000,
+            id: 'guide_goal_entry_2',
+            amount: scaleAmount(1500000),
             date: today.subtract(const Duration(days: 6)),
             note: l.seedGoalMonthly,
           ),
@@ -1431,35 +1727,114 @@ class AppStore extends ChangeNotifier {
 
     _debts.addAll([
       Debt(
-        id: 'd_minh',
+        id: 'guide_debt_lend',
         type: DebtType.lend,
         person: l.seedPersonMinh,
-        amount: 1500000,
+        amount: scaleAmount(1500000),
         date: today.subtract(const Duration(days: 12)),
         dueDate: today.add(const Duration(days: 18)),
         note: l.seedDebtLendNote,
         currencyCode: _currency.code,
         payments: [
           DebtPayment(
-            id: 'dp_1',
-            amount: 500000,
+            id: 'guide_debt_payment_1',
+            amount: scaleAmount(500000),
             date: today.subtract(const Duration(days: 4)),
             note: l.seedDebtPayment,
           ),
         ],
       ),
       Debt(
-        id: 'd_lan',
+        id: 'guide_debt_borrow',
         type: DebtType.borrow,
         person: l.seedPersonLan,
-        amount: 3000000,
+        amount: scaleAmount(3000000),
         date: today.subtract(const Duration(days: 40)),
         dueDate: today.subtract(const Duration(days: 3)),
         note: l.seedDebtBorrowNote,
         currencyCode: _currency.code,
       ),
     ]);
+
+    _recurrings.addAll([
+      RecurringTransaction(
+        id: 'guide_recurring_bill',
+        type: e,
+        categoryId: 'bill',
+        walletId: 'guide_bank',
+        amount: scaleAmount(650000),
+        frequency: Frequency.monthly,
+        startDate: today,
+        nextDate: today.add(const Duration(days: 5)),
+        note: l.seedNoteElectricity,
+      ),
+      RecurringTransaction(
+        id: 'guide_recurring_grocery',
+        type: e,
+        categoryId: 'grocery',
+        walletId: guideCashWalletId,
+        amount: scaleAmount(220000),
+        frequency: Frequency.weekly,
+        startDate: today,
+        nextDate: today.add(const Duration(days: 3)),
+        note: l.seedNoteVegetables,
+      ),
+    ]);
+
+    _plannedEvents.addAll([
+      PlannedEvent(
+        id: 'guide_event_today',
+        title: l.seedNoteElectricity,
+        type: e,
+        amount: scaleAmount(650000),
+        date: today.add(const Duration(hours: 18)),
+        currencyCode: _currency.code,
+        note: l.seedNoteElectricity,
+        walletId: 'guide_bank',
+      ),
+      PlannedEvent(
+        id: 'guide_event_upcoming',
+        title: l.seedGoalTrip,
+        type: e,
+        amount: scaleAmount(1500000),
+        date: today.add(const Duration(days: 4, hours: 10)),
+        currencyCode: _currency.code,
+        note: l.seedGoalTrip,
+        walletId: guideCashWalletId,
+      ),
+    ]);
   }
+}
+
+class _GuideDemoSnapshot {
+  _GuideDemoSnapshot({
+    required List<Category> categories,
+    required List<Transaction> transactions,
+    required List<Wallet> wallets,
+    required List<Budget> budgets,
+    required List<Goal> goals,
+    required List<Debt> debts,
+    required List<RecurringTransaction> recurrings,
+    required List<PlannedEvent> plannedEvents,
+    required this.selectedWalletId,
+  }) : categories = List.of(categories),
+       transactions = List.of(transactions),
+       wallets = List.of(wallets),
+       budgets = List.of(budgets),
+       goals = List.of(goals),
+       debts = List.of(debts),
+       recurrings = List.of(recurrings),
+       plannedEvents = List.of(plannedEvents);
+
+  final List<Category> categories;
+  final List<Transaction> transactions;
+  final List<Wallet> wallets;
+  final List<Budget> budgets;
+  final List<Goal> goals;
+  final List<Debt> debts;
+  final List<RecurringTransaction> recurrings;
+  final List<PlannedEvent> plannedEvents;
+  final String? selectedWalletId;
 }
 
 

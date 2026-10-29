@@ -523,6 +523,8 @@
   "overviewGuideClosing": "You’ve seen the main sections. Start tracking your income, expenses, and financial goals whenever you’re ready.",
   "overviewGuideFinish": "Start using the app",
   "overviewGuideTransactionsPageDescription": "Tap a transaction to view its details, edit it, or delete it when needed.",
-  "overviewGuideCalendarPageDescription": "Add an event for an upcoming day to remember an expected income or expense and find it on the calendar."
+  "overviewGuideCalendarPageDescription": "Add an event for an upcoming day to remember an expected income or expense and find it on the calendar.",
+  "transactionSaved": "Transaction saved",
+  "eventTransactionSaved": "Event recorded as a transaction",
+  "animatedIconsByLordicon": "Animated icons by Lordicon.com"
 }
-

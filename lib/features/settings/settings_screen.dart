@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
@@ -12,9 +13,40 @@ import 'package:money_manager_app/features/settings/currency_converter_screen.da
 import 'package:money_manager_app/features/settings/export_screen.dart';
 import 'package:money_manager_app/features/categories/categories_screen.dart';
 import 'package:money_manager_app/features/wallet/wallet_form_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  Future<void> _showAbout(BuildContext context) {
+    final l = context.l10n;
+    return showAdaptiveDialog<void>(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: Text(l.about),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l.appVersion(AppInfo.version)),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => launchUrl(Uri.parse('https://lordicon.com/')),
+                child: Text(l.animatedIconsByLordicon),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l.done),
+          ),
+        ],
+      ),
+    );
+  }
 
   Map<ThemeMode, String> _modeLabels(BuildContext context) {
     final l = context.l10n;
@@ -225,7 +257,7 @@ class SettingsScreen extends StatelessWidget {
             AppIcons.info,
             l.about,
             l.appVersion(AppInfo.version),
-            () {},
+            () => _showAbout(context),
           ),
         ];
 

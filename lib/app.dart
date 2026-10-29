@@ -38,7 +38,9 @@ class App extends StatelessWidget {
         scrollBehavior: const IosScrollBehavior(),
         home: SplashScreen(
           next:
-              AppStore.instance.onboarded && AppStore.instance.wallets.isNotEmpty && !AppConstants.alwaysShowOnboarding
+              AppStore.instance.onboarded &&
+                  AppStore.instance.wallets.isNotEmpty &&
+                  !AppConstants.alwaysShowOnboarding
               ? const MainShell()
               : const IntroScreen(next: OnboardingScreen(next: MainShell())),
         ),
@@ -56,6 +58,7 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+  final _store = AppStore.instance;
   late final _overviewGuideController = OverviewGuideController(
     active: !AppStore.instance.overviewGuideShown,
   );
@@ -71,6 +74,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _overviewGuideController.addListener(_onOverviewGuideChanged);
+    if (_overviewGuideController.active) _store.beginOverviewGuideDemo();
     WidgetsBinding.instance.addPostFrameCallback((_) => _runRecurring());
   }
 
@@ -88,6 +92,10 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     if (!_overviewGuideController.active &&
         !AppStore.instance.overviewGuideShown) {
       AppStore.instance.markOverviewGuideShown();
+      AppStore.instance.endOverviewGuideDemo();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _runRecurring();
+      });
     }
     setState(() {
       if (!_overviewGuideController.active) {
@@ -107,6 +115,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   }
 
   void _runRecurring() {
+    if (_overviewGuideController.active) return;
     final count = AppStore.instance.processRecurring();
     EventReminderService.instance.sync(
       AppStore.instance.allPlannedEvents,
@@ -123,79 +132,80 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     return Stack(
       children: [
         Scaffold(
-      body: Padding(
-        padding: EdgeInsets.only(
-          bottom: _overviewGuideController.previewing &&
-                  _overviewGuideController.step >= 6
-              ? 60
-              : 0,
-        ),
-        child: AbsorbPointer(
-          absorbing: _overviewGuideController.previewing,
-          child: IndexedStack(index: _currentIndex, children: _screens),
-        ),
-      ),
-      floatingActionButtonLocation: const AddNavButtonLocation(),
-      floatingActionButton: AddNavButton(
-        key: OverviewGuideTargets.addTransaction,
-        onPressed: () {
-          if (_overviewGuideController.active) {
-            if (_overviewGuideController.step == 5 &&
-                !_overviewGuideController.previewing) {
-              _overviewGuideController.enterPreview();
-              Navigator.of(context)
-                  .push<void>(
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          const AddTransactionScreen(previewOnly: true),
-                    ),
-                  )
-                  .then((_) {
-                    if (mounted &&
-                        _overviewGuideController.active &&
-                        _overviewGuideController.step == 5 &&
-                        _overviewGuideController.previewing) {
-                      _overviewGuideController.next();
-                    }
-                  });
-            }
-            return;
-          }
-          HapticFeedback.lightImpact();
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
-          );
-        },
-      ),
-      bottomNavigationBar: CustomBottomNav(
-        key: OverviewGuideTargets.navigation,
-        currentIndex: _currentIndex,
-        itemKeys: [
-          OverviewGuideTargets.navigationOverview,
-          OverviewGuideTargets.navigationTransactions,
-          OverviewGuideTargets.navigationCalendar,
-          OverviewGuideTargets.navigationWallet,
-        ],
-        onTap: (index) {
-          if (_overviewGuideController.active) {
-            if (!_overviewGuideController.previewing) {
-              final expectedIndex = switch (_overviewGuideController.step) {
-                6 => 1,
-                7 => 2,
-                8 => 3,
-                _ => -1,
-              };
-              if (index == expectedIndex) {
-                setState(() => _currentIndex = index);
-                _overviewGuideController.enterPreview();
+          body: Padding(
+            padding: EdgeInsets.only(
+              bottom:
+                  _overviewGuideController.previewing &&
+                      _overviewGuideController.step >= 6
+                  ? 60
+                  : 0,
+            ),
+            child: AbsorbPointer(
+              absorbing: _overviewGuideController.previewing,
+              child: IndexedStack(index: _currentIndex, children: _screens),
+            ),
+          ),
+          floatingActionButtonLocation: const AddNavButtonLocation(),
+          floatingActionButton: AddNavButton(
+            key: OverviewGuideTargets.addTransaction,
+            onPressed: () {
+              if (_overviewGuideController.active) {
+                if (_overviewGuideController.step == 5 &&
+                    !_overviewGuideController.previewing) {
+                  _overviewGuideController.enterPreview();
+                  Navigator.of(context)
+                      .push<void>(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              const AddTransactionScreen(previewOnly: true),
+                        ),
+                      )
+                      .then((_) {
+                        if (mounted &&
+                            _overviewGuideController.active &&
+                            _overviewGuideController.step == 5 &&
+                            _overviewGuideController.previewing) {
+                          _overviewGuideController.next();
+                        }
+                      });
+                }
+                return;
               }
-            }
-            return;
-          }
-          if (index != _currentIndex) HapticFeedback.selectionClick();
-          setState(() => _currentIndex = index);
-        },
-      ),
+              HapticFeedback.lightImpact();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+              );
+            },
+          ),
+          bottomNavigationBar: CustomBottomNav(
+            key: OverviewGuideTargets.navigation,
+            currentIndex: _currentIndex,
+            itemKeys: [
+              OverviewGuideTargets.navigationOverview,
+              OverviewGuideTargets.navigationTransactions,
+              OverviewGuideTargets.navigationCalendar,
+              OverviewGuideTargets.navigationWallet,
+            ],
+            onTap: (index) {
+              if (_overviewGuideController.active) {
+                if (!_overviewGuideController.previewing) {
+                  final expectedIndex = switch (_overviewGuideController.step) {
+                    6 => 1,
+                    7 => 2,
+                    8 => 3,
+                    _ => -1,
+                  };
+                  if (index == expectedIndex) {
+                    setState(() => _currentIndex = index);
+                    _overviewGuideController.enterPreview();
+                  }
+                }
+                return;
+              }
+              if (index != _currentIndex) HapticFeedback.selectionClick();
+              setState(() => _currentIndex = index);
+            },
+          ),
         ),
         if (_overviewGuideController.active)
           Positioned.fill(
@@ -205,6 +215,3 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     );
   }
 }
-
-
-

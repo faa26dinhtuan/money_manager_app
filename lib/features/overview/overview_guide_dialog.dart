@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/widgets/app_icon.dart';
@@ -83,6 +84,7 @@ class OverviewGuideOverlay extends StatefulWidget {
 
 class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
   List<Rect> _targetRects = [];
+  List<Rect> _interactiveRects = [];
   int _lastStep = -1;
   bool _lastStarted = false;
 
@@ -181,7 +183,10 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
         (controller.step != _lastStep || !_lastStarted);
     _lastStep = controller.step;
     _lastStarted = controller.started;
-    if (shouldRefocus) _targetRects = [];
+    if (shouldRefocus) {
+      _targetRects = [];
+      _interactiveRects = [];
+    }
     setState(() {});
     if (controller.started) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -197,8 +202,11 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
 
   Future<void> _focusCurrentTarget() async {
     if (!mounted || !widget.controller.active || !widget.controller.started) return;
-    final targetContext =
-        _steps(context)[widget.controller.step].targets.last.currentContext;
+    final targets = _steps(context)[widget.controller.step].targets;
+    final focusKey = widget.controller.step == 3
+        ? OverviewGuideTargets.period
+        : targets.last;
+    final targetContext = focusKey.currentContext;
     if (targetContext == null) {
       _measureTarget();
       return;
@@ -206,7 +214,7 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
     await Scrollable.ensureVisible(
       targetContext,
       duration: const Duration(milliseconds: 220),
-      alignment: 0.35,
+      alignment: widget.controller.step == 3 ? 0.05 : 0.35,
     );
     if (mounted) _measureTarget();
   }
@@ -271,13 +279,46 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
           CustomBottomNav.barHeight,
         ));
     }
-    if (next.length == _targetRects.length &&
-        List.generate(next.length, (index) => next[index] == _targetRects[index])
-            .every((matches) => matches)) {
-      return;
+    final interactive = <Rect>[];
+    if (widget.controller.step >= 6 && widget.controller.step <= 8) {
+      interactive.addAll(next);
+    } else {
+      for (final key in _interactiveKeys(widget.controller.step)) {
+        final object = key.currentContext?.findRenderObject();
+        if (object is! RenderBox || !object.hasSize) continue;
+        final rect = ((object.localToGlobal(Offset.zero) & object.size)
+                .shift(-origin))
+            .intersect(Offset.zero & overlayObject.size);
+        if (!rect.isEmpty) interactive.add(rect);
+      }
     }
-    setState(() => _targetRects = next);
+    final targetsChanged = next.length != _targetRects.length ||
+        List.generate(next.length, (index) => next[index] != _targetRects[index])
+            .any((changed) => changed);
+    final interactiveChanged = interactive.length != _interactiveRects.length ||
+        List.generate(
+          interactive.length,
+          (index) => interactive[index] != _interactiveRects[index],
+        ).any((changed) => changed);
+    if (!targetsChanged && !interactiveChanged) return;
+    setState(() {
+      _targetRects = next;
+      _interactiveRects = interactive;
+    });
   }
+
+  List<GlobalKey> _interactiveKeys(int step) => switch (step) {
+        0 => [OverviewGuideTargets.wallet],
+        1 => [OverviewGuideTargets.balance],
+        2 => [OverviewGuideTargets.type, OverviewGuideTargets.chart],
+        3 => [OverviewGuideTargets.period],
+        4 => [OverviewGuideTargets.transactions],
+        5 => [OverviewGuideTargets.addTransaction],
+        6 => [OverviewGuideTargets.navigationTransactions],
+        7 => [OverviewGuideTargets.navigationCalendar],
+        8 => [OverviewGuideTargets.navigationWallet],
+        _ => <GlobalKey>[],
+      };
 
   double _bubbleTop(Size size, EdgeInsets padding, Rect target) {
     const bubbleHeight = 190.0;
@@ -335,6 +376,11 @@ class _OverviewGuideOverlayState extends State<OverviewGuideOverlay> {
                 : _bubbleTop(size, media.padding, anchor);
             return Stack(
               children: [
+                Positioned.fill(
+                  child: _GuideInteractionGate(
+                    rects: widget.controller.started ? _interactiveRects : const [],
+                  ),
+                ),
                 Positioned.fill(
                   child: IgnorePointer(
                     child: CustomPaint(
@@ -620,6 +666,54 @@ class _GuideCard extends StatelessWidget {
   }
 }
 
+class _GuideInteractionGate extends LeafRenderObjectWidget {
+  const _GuideInteractionGate({required this.rects});
+
+  final List<Rect> rects;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderGuideInteractionGate(rects);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant _RenderGuideInteractionGate renderObject,
+  ) {
+    renderObject.rects = rects;
+  }
+}
+
+class _RenderGuideInteractionGate extends RenderBox {
+  _RenderGuideInteractionGate(this._rects);
+
+  List<Rect> _rects;
+
+  set rects(List<Rect> value) {
+    _rects = value;
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) => constraints.biggest;
+
+  @override
+  void performLayout() {
+    size = constraints.biggest;
+  }
+
+  @override
+  bool hitTest(
+    BoxHitTestResult result, {
+    required Offset position,
+  }) {
+    final bounds = Rect.fromLTWH(0, 0, size.width, size.height);
+    if (!bounds.contains(position)) return false;
+    if (_rects.any((rect) => rect.contains(position))) return false;
+    result.add(BoxHitTestEntry(this, position));
+    return true;
+  }
+}
+
 class _OverviewSpotlightPainter extends CustomPainter {
   const _OverviewSpotlightPainter({
     required this.targets,
@@ -675,6 +769,9 @@ class _OverviewSpotlightPainter extends CustomPainter {
       oldDelegate.step != step ||
       oldDelegate.dimBackground != dimBackground;
 }
+
+
+
 
 
 

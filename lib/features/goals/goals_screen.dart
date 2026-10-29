@@ -7,6 +7,7 @@ import 'package:money_manager_app/core/utils/formatters.dart';
 import 'package:money_manager_app/core/utils/goal_status.dart';
 import 'package:money_manager_app/core/widgets/budget_progress_bar.dart';
 import 'package:money_manager_app/core/widgets/category_icon.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 import 'package:money_manager_app/core/widgets/bulk_selection.dart';
 import 'package:money_manager_app/data/models/goal.dart';
 import 'package:money_manager_app/data/services/app_store.dart';
@@ -108,11 +109,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Column(
                     children: [
-                      AppIcon(
-                        AppIcons.goal,
-                        size: 56,
-                        color: context.textDisabled,
-                      ),
+                      const AppLottie(asset: AppAnimations.goals, size: 96),
                       const SizedBox(height: 12),
                       Text(
                         l.noGoalsYet,

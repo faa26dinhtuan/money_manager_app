@@ -115,6 +115,7 @@ class AppTheme {
     final baseTextTheme = ThemeData(
       brightness: brightness,
       useMaterial3: true,
+      fontFamily: 'BeVietnamPro',
     ).textTheme.apply(bodyColor: foreground, displayColor: foreground);
     final textTheme = baseTextTheme.copyWith(
       headlineMedium: baseTextTheme.headlineMedium?.copyWith(
@@ -147,6 +148,7 @@ class AppTheme {
       platform: TargetPlatform.iOS,
       brightness: brightness,
       colorScheme: scheme,
+      fontFamily: 'BeVietnamPro',
       textTheme: textTheme,
       scaffoldBackgroundColor: backgroundColor,
       canvasColor: surfaceColor,

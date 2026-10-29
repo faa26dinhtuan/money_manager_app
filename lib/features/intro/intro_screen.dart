@@ -4,6 +4,7 @@ import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/widgets/welcome_icon_tile.dart';
 import 'package:money_manager_app/core/widgets/welcome_backdrop.dart';
+import 'package:money_manager_app/core/widgets/app_lottie.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key, required this.next});
@@ -53,6 +54,7 @@ class _IntroScreenState extends State<IntroScreen> {
     final pages = [
       _IntroPage(
         icon: AppIcons.overview,
+        animation: AppAnimations.onboarding,
         title: l.introTrackTitle,
         description: l.introTrackDesc,
       ),
@@ -136,11 +138,13 @@ class _IntroScreenState extends State<IntroScreen> {
 class _IntroPage {
   const _IntroPage({
     required this.icon,
+    this.animation,
     required this.title,
     required this.description,
   });
 
   final AppIconData icon;
+  final String? animation;
   final String title;
   final String description;
 }
@@ -157,7 +161,7 @@ class _PageContent extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _IntroArtwork(icon: page.icon),
+          _IntroArtwork(icon: page.icon, animation: page.animation),
           const SizedBox(height: 34),
           Text(
             page.title,
@@ -185,9 +189,10 @@ class _PageContent extends StatelessWidget {
 }
 
 class _IntroArtwork extends StatelessWidget {
-  const _IntroArtwork({required this.icon});
+  const _IntroArtwork({required this.icon, this.animation});
 
   final AppIconData icon;
+  final String? animation;
 
   @override
   Widget build(BuildContext context) {
@@ -233,12 +238,15 @@ class _IntroArtwork extends StatelessWidget {
               ),
             ),
           ),
-          WelcomeIconTile(
-            icon: icon,
-            size: 142,
-            iconSize: 76,
-            radius: 42,
-          ),
+          if (animation == null)
+            WelcomeIconTile(
+              icon: icon,
+              size: 142,
+              iconSize: 76,
+              radius: 42,
+            )
+          else
+            AppLottie(asset: animation!, size: 170),
         ],
       ),
     );

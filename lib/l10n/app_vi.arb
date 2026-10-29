@@ -848,6 +848,8 @@
   "overviewGuideClosing": "Bạn đã nắm các mục chính. Giờ bạn có thể bắt đầu theo dõi thu chi và quản lý tài chính của mình.",
   "overviewGuideFinish": "Bắt đầu sử dụng",
   "overviewGuideTransactionsPageDescription": "Chạm vào một giao dịch để xem chi tiết, chỉnh sửa hoặc xóa khi cần.",
-  "overviewGuideCalendarPageDescription": "Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch."
+  "overviewGuideCalendarPageDescription": "Tạo sự kiện cho ngày sắp tới để ghi nhớ khoản thu hoặc chi và xem lại ngay trên lịch.",
+  "transactionSaved": "Đã lưu giao dịch",
+  "eventTransactionSaved": "Đã ghi sự kiện thành giao dịch",
+  "animatedIconsByLordicon": "Animated icons by Lordicon.com"
 }
-
