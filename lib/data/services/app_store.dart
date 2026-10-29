@@ -746,8 +746,9 @@ class AppStore extends ChangeNotifier {
 
   Budget? budgetOfCategory(String categoryId) {
     for (final b in _budgets) {
-      if (b.categoryId == categoryId && b.currencyCode == _currency.code)
+      if (b.categoryId == categoryId && b.currencyCode == _currency.code) {
         return b;
+      }
     }
     return null;
   }
@@ -762,8 +763,9 @@ class AppStore extends ChangeNotifier {
     for (final t in _transactions) {
       if (t.type != TxType.expense ||
           t.categoryId != categoryId ||
-          walletById(t.walletId)?.currencyCode != code)
+          walletById(t.walletId)?.currencyCode != code) {
         continue;
+      }
       if (range.contains(t.date)) sum += t.amount;
     }
     return sum;
@@ -775,8 +777,9 @@ class AppStore extends ChangeNotifier {
     for (final t in _transactions) {
       if (t.type == TxType.expense &&
           range.contains(t.date) &&
-          walletById(t.walletId)?.currencyCode == code)
+          walletById(t.walletId)?.currencyCode == code) {
         sum += t.amount;
+      }
     }
     return sum;
   }
@@ -1146,8 +1149,9 @@ class AppStore extends ChangeNotifier {
     for (var i = 0; i < _goals.length; i++) {
       final g = _goals[i];
       if (g.currencyCode != fromCode ||
-          !g.entries.any((entry) => sourceWalletIds.contains(entry.walletId)))
+          !g.entries.any((entry) => sourceWalletIds.contains(entry.walletId))) {
         continue;
+      }
       _goals[i] = g.copyWith(
         target: conv(g.target),
         currencyCode: to.code,
@@ -1169,8 +1173,9 @@ class AppStore extends ChangeNotifier {
           (!sourceWalletIds.contains(d.walletId) &&
               !d.payments.any(
                 (payment) => sourceWalletIds.contains(payment.walletId),
-              )))
+              ))) {
         continue;
+      }
       _debts[i] = d.copyWith(
         amount: conv(d.amount),
         currencyCode: to.code,
@@ -1831,3 +1836,5 @@ class _GuideDemoSnapshot {
   final List<PlannedEvent> plannedEvents;
   final String? selectedWalletId;
 }
+
+

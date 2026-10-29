@@ -141,7 +141,9 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     final from = AppCurrency.byCode(source.currencyCode);
     if (walletIds.any(
       (id) => AppStore.instance.walletById(id)?.currencyCode != from.code,
-    )) return;
+    )) {
+      return;
+    }
     await _rates.ensureLoaded();
     if (!mounted) return;
     final to = await _pickTargetCurrency(from);
@@ -401,3 +403,5 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     );
   }
 }
+
+

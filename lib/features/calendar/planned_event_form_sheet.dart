@@ -291,7 +291,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
               ),
               if (_repeat) ...[
                 DropdownButtonFormField<Frequency>(
-                  value: _frequency,
+                  initialValue: _frequency,
                   decoration: InputDecoration(labelText: l.repeatFrequency),
                   items: [
                     for (final frequency in Frequency.values)
@@ -316,7 +316,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                 ),
                 if (_linkToRecurring) ...[
                   DropdownButtonFormField<String>(
-                    value: _categoryId,
+                    initialValue: _categoryId,
                     decoration: InputDecoration(labelText: l.category),
                     items: [
                       for (final category in _store.categoriesOf(_type))
@@ -332,7 +332,7 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _walletId,
+                    initialValue: _walletId,
                     decoration: InputDecoration(labelText: l.wallet),
                     items: [
                       for (final wallet in _store.wallets.where(
@@ -438,3 +438,5 @@ class _PlannedEventFormSheetState extends State<PlannedEventFormSheet> {
     );
   }
 }
+
+

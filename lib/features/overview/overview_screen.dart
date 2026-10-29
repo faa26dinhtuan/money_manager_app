@@ -318,6 +318,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           percent: total == 0 ? 0 : e.value / total * 100,
                           onTap: () {
                             if (_guideController.active) {
+                              if (_guideController.step != 4) return;
                               _openGuideCategoryTransactions(e.key, range);
                               return;
                             }
@@ -455,7 +456,7 @@ class _RecordEventTransactionDialogState
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _categoryId,
+              initialValue: _categoryId,
               decoration: InputDecoration(labelText: l.category),
               items: [
                 for (final category in categories)
@@ -808,3 +809,5 @@ class _CategoryRow extends StatelessWidget {
     );
   }
 }
+
+

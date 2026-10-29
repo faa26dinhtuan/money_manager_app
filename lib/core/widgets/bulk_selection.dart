@@ -45,7 +45,7 @@ class BulkSelectionControls extends StatelessWidget {
             child: Text(selectedCount == count ? l.clearAll : l.selectAll),
           ),
         ),
-        if (trailingAction != null) trailingAction!,
+        ?trailingAction,
         IconButton(
           tooltip: l.delete,
           onPressed: selectedCount == 0 ? null : onDelete,
@@ -85,3 +85,5 @@ class BulkSelectableItem extends StatelessWidget {
     );
   }
 }
+
+

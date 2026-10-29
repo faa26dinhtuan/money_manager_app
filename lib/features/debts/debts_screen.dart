@@ -3,7 +3,6 @@ import 'package:money_manager_app/core/widgets/app_icon.dart';
 import 'package:money_manager_app/core/extensions/l10n_extensions.dart';
 import 'package:money_manager_app/core/extensions/model_l10n.dart';
 import 'package:money_manager_app/core/theme/app_colors.dart';
-import 'package:money_manager_app/core/theme/app_theme.dart';
 import 'package:money_manager_app/core/widgets/gradient_card.dart';
 import 'package:money_manager_app/core/utils/debt_status.dart';
 import 'package:money_manager_app/core/utils/formatters.dart';
@@ -346,3 +345,5 @@ class _DebtTile extends StatelessWidget {
     );
   }
 }
+
+
